@@ -21,6 +21,7 @@ Historically, only Floor could choose what mints users could mint through Floor 
 This library is included in Floor's platform and executed in a sandboxed environment for indexing mints.
 
 <br />
+
 ## Adding a new platform to Mobile Minting
 
 Adding a new platform to Mobile Minting is easy - you just have to write a `MintIngestor`!
