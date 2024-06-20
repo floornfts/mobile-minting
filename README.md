@@ -1,4 +1,3 @@
-# Floor Mobile Minting
 ## What is Mobile Minting?
 Mobile Minting unlocks mobile payments for onchain purchases and powers minting in the Floor app.
 
