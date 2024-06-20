@@ -6,7 +6,7 @@ Mobile Minting unlocks mobile payments for onchain purchases and powers minting 
 
 **⛓️ A fleet of signers instantly deliver NFTs onchain**
 
-For users: no 🌉 Bridging, no ⛽️ Gas gees - just the tap of a button!
+For users: no 🌉 Bridging, no ⛽️ Gas fees - just the tap of a button!
 
 <img width="1251" alt="mm" src="https://github.com/floornfts/mobile-minting/assets/1068437/5ea33905-d645-48e5-84c0-f56c1ab28b3a">
 
