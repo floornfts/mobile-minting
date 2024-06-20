@@ -22,6 +22,7 @@ This library is included in Floor's platform and executed in a sandboxed environ
 
 <br />
 ## Adding a new platform to Mobile Minting
+
 Adding a new platform to Mobile Minting is easy - you just have to write a `MintIngestor`!
 
 ### MintIngestor functionality
