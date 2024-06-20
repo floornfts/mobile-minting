@@ -15,11 +15,11 @@ _Example Mobile Minting user experience._
 <br />
 
 ## What is this repository?
-This repository is a **public, contribuatable collection of Ingestors** that teach Mobile Minting how to support mints from new platforms. 
+This repository is a **public, contributable collection of Ingestors** that teach Mobile Minting how to support mints from new platforms. 
 
 Historically, only Floor could choose what mints users could mint through Floor based on our roadmap, or partnerships, now anyone can build support for any minting platform / product and (provided it meets some safety & reliability checks) it can be included in Mobile Minting.
 
-This library is incldued in Floor's platform and run in a sandbox when indexing mints.
+This library is included in Floor's platform and executed in a sandboxed environment for indexing mints.
 
 <br />
 ## Adding a new platform to Mobile Minting
@@ -74,7 +74,7 @@ export class MyMintIngestor implements MintIngestor {
 
 For building the MintTemplate, we recommend using the `MintTemplateBuilder` which will ensure validation and give handy builder methods.
 
-In this example we make a template, relying on `getMintMetdataFromSomewhere()` and `getMintContractDetailsFromSomewhere()` to fetch the marketing & onchain data respectively. We'll touch on those later.
+In this example we make a template, relying on `getMintMetadataFromSomewhere()` and `getMintContractDetailsFromSomewhere()` to fetch the marketing & onchain data respectively. We'll touch on those later.
 
 
 ```ts
