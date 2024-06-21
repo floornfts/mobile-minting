@@ -46,4 +46,58 @@ describe('fxhash', function () {
     expect(template.availableForPurchaseStart?.getTime()).to.equal(1715358000000);
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(1893456000000);
   });
+
+  it('createMintTemplateForUrl: Throws error if the mint for fxhash is on mainnet or tezos', async function () {
+    const ingestor = new FxHashIngestor();
+    const url = 'https://fxhash.xyz/generative/slug/1x4-shape-study';
+    const resources = mintIngestorResources();
+
+    // It should throw an error
+    let error: any;
+
+    try {
+      await ingestor.createMintTemplateForUrl(url, resources);
+    } catch (err) {
+      error = err;
+    }
+
+    expect(error).to.be.an('error');
+    expect(error.message).to.equal('Chain not supported');
+  });
+
+  it('createMintTemplateForUrl: Throws error if incompatible URL', async function () {
+    const ingestor = new FxHashIngestor();
+    const url = 'https://twitter.com/yungwknd';
+    const resources = mintIngestorResources();
+
+    // It should throw an error
+    let error: any;
+
+    try {
+      await ingestor.createMintTemplateForUrl(url, resources);
+    } catch (err) {
+      error = err;
+    }
+
+    expect(error).to.be.an('error');
+    expect(error.message).to.equal('Incompatible URL');
+  });
+
+  it('createMintTemplateForUrl: Throws error if non-existent project', async function () {
+    const ingestor = new FxHashIngestor();
+    const url = 'https://fxhash.xyz/generative/slug/project-doesnt-exist';
+    const resources = mintIngestorResources();
+
+    // It should throw an error
+    let error: any;
+
+    try {
+      await ingestor.createMintTemplateForUrl(url, resources);
+    } catch (err) {
+      error = err;
+    }
+
+    expect(error).to.be.an('error');
+    expect(error.message).to.equal('Project not found');
+  });
 });

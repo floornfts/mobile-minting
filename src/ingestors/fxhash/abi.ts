@@ -288,7 +288,7 @@ export const FXHASH_BASE_FRAME_ABI = [
   },
 ];
 
-export const FXHASH_MAINNET_FIXED_PRICE_ABI = [
+export const FXHASH_BASE_FIXED_PRICE_ABI = [
   { inputs: [], name: 'AddressZero', type: 'error' },
   { inputs: [], name: 'Ended', type: 'error' },
   { inputs: [], name: 'InsufficientFunds', type: 'error' },

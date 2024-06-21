@@ -2,11 +2,11 @@ import { MintIngestor, MintIngestorResources } from '../../lib/types/mint-ingest
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { FXHASH_BASE_FRAME_ABI, FXHASH_MAINNET_FIXED_PRICE_ABI } from './abi';
+import { FXHASH_BASE_FIXED_PRICE_ABI, FXHASH_BASE_FRAME_ABI } from './abi';
 import { getFxHashMintPriceInEth } from './onchain-metadata';
 
 const BASE_FRAME_CONTRACT_ADDRESS = '0x6e625892C739bFD960671Db5544E260757480725';
-const MAINNET_FIXED_PRICE_CONTRACT_ADDRESS = '0xB645cFfD9bFB93c2c181d5Be0D6a8C1d81C2aEf3';
+const BASE_FIXED_PRICE_CONTRACT_ADDRESS = '0x4bDcaC532143d8d35ed759189EE22E3704580b9D';
 
 export class FxHashIngestor implements MintIngestor {
   async supportsUrl(url: string): Promise<boolean> {
@@ -77,28 +77,19 @@ export class FxHashIngestor implements MintIngestor {
     );
 
     if (!token) {
-      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Missing required data');
+      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Project not found');
     }
 
     // For newer / eth based collections, the id is the contract
     const dropAddress = token.id;
-    const chainId = token.chain === 'ETHEREUM' ? 1 : token.chain === 'BASE' ? 8453 : null;
-    const contractAddress =
-      token.chain === 'ETHEREUM' && !token.isFrame
-        ? MAINNET_FIXED_PRICE_CONTRACT_ADDRESS
-        : token.chain === 'BASE' && token.isFrame
-        ? BASE_FRAME_CONTRACT_ADDRESS
-        : null;
-    const abi =
-      token.chain === 'ETHEREUM' && !token.isFrame
-        ? FXHASH_MAINNET_FIXED_PRICE_ABI
-        : token.chain === 'BASE' && token.isFrame
-        ? FXHASH_BASE_FRAME_ABI
-        : null;
+    const chainId = token.chain === 'BASE' ? 8453 : null;
 
-    if (!chainId || !contractAddress || !abi) {
-      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Missing required data');
+    if (!chainId) {
+      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Chain not supported');
     }
+
+    const contractAddress = token.isFrame ? BASE_FRAME_CONTRACT_ADDRESS : BASE_FIXED_PRICE_CONTRACT_ADDRESS;
+    const abi = token.isFrame ? FXHASH_BASE_FRAME_ABI : FXHASH_BASE_FIXED_PRICE_ABI;
 
     const description = token.metadata?.description || '';
     const image = token.metadata?.thumbnailUri || '';
