@@ -21,7 +21,7 @@ describe('fxhash', function () {
     const result2 = await ingestor.supportsUrl(url2);
     expect(result2).to.be.true;
   });
-  it('createMintTemplateForUrl: Returns a mint template for a supported URL', async function () {
+  it('createMintTemplateForUrl: Returns a mint template for a supported URL with frame contract', async function () {
     const ingestor = new FxHashIngestor();
     const url = 'https://fxhash.xyz/generative/slug/allegro';
     const resources = mintIngestorResources();
@@ -44,6 +44,32 @@ describe('fxhash', function () {
 
     expect(template.originalUrl).to.equal(url);
     expect(template.availableForPurchaseStart?.getTime()).to.equal(1715358000000);
+    expect(template.availableForPurchaseEnd?.getTime()).to.equal(1893456000000);
+  });
+
+  it('createMintTemplateForUrl: Returns a mint template for a supported URL with fixed price contract', async function () {
+    const ingestor = new FxHashIngestor();
+    const url = 'https://fxhash.xyz/generative/slug/graphomania';
+    const resources = mintIngestorResources();
+    const template = await ingestor.createMintTemplateForUrl(url, resources);
+
+    // Verify that the mint template passed validation
+    const builder = new MintTemplateBuilder(template);
+    builder.validateMintTemplate();
+
+    expect(template.name).to.equal('graphomania');
+    expect(template.description).to.contain('And maybe:');
+    const mintInstructions = template.mintInstructions as EVMMintInstructions;
+
+    expect(mintInstructions.contractAddress).to.equal('0x4bDcaC532143d8d35ed759189EE22E3704580b9D');
+    expect(mintInstructions.contractMethod).to.equal('buy');
+    expect(mintInstructions.contractParams).to.equal('[0x755625dEfD0f1Bb90850d533f30176aa7a425f6E, 1, 1, address]');
+    expect(mintInstructions.priceWei).to.equal('500000000000000');
+
+    expect(template.featuredImageUrl).to.equal('ipfs://QmYV4LXoz18youcW7zREFFFVpPf6Tn1j4QRzmTi1cSPinb');
+
+    expect(template.originalUrl).to.equal(url);
+    expect(template.availableForPurchaseStart?.getTime()).to.equal(1718983800000);
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(1893456000000);
   });
 
