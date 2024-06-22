@@ -1,6 +1,6 @@
 {
   "name": "@floornfts/mobile-minting",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "repository": "git://github.com/floornfts/mobile-minting.git",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -40,14 +40,16 @@
     "alchemy-sdk": "^3.3.1",
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
+    "np": "^10.0.6",
     "ts-node": "10.9.1",
-    "tslib": "^2.6.3",
-    "np": "^10.0.6"    
+    "tslib": "^2.6.3"
   },
   "devDependencies": {
     "@types/chai": "^4.3.16",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.14.6",
+    "@typescript-eslint/eslint-plugin": "6.9.0",
+    "@typescript-eslint/parser": "6.9.0",
     "c8": "^10.1.2",
     "chai": "^4.3.9",
     "eslint": "^8.52.0",
@@ -55,8 +57,6 @@
     "shx": "^0.3.4",
     "tsc-alias": "^1.8.10",
     "tsup": "^6.1.2",
-    "typescript": "^5.0.0",
-    "@typescript-eslint/eslint-plugin": "6.9.0",
-    "@typescript-eslint/parser": "6.9.0"
+    "typescript": "^5.0.0"
   }
 }
