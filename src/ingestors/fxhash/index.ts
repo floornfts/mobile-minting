@@ -22,7 +22,7 @@ export class FxHashIngestor implements MintIngestor {
     const mintBuilder = new MintTemplateBuilder()
       .setOriginalUrl(url)
       .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('FxHash');
+      .setPartnerName('fxhash');
 
     // Example URL: https://www.fxhash.xyz/generative/slug/allegro
     // First get the slug from the end
