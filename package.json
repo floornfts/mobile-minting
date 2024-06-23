@@ -34,7 +34,8 @@
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
     "test": "NODE_OPTIONS=\"--loader ts-node/esm\" c8 mocha --require ts-node/register",
-    "release": "np"
+    "release": "np",
+    "dry-run": "ts-node src/dry-run/index.ts"
   },
   "dependencies": {
     "alchemy-sdk": "^3.3.1",

@@ -4,7 +4,7 @@ export type MintTemplate = {
 
   featuredImageUrl: string | null;
   images: MintImage[];
-  originalUrl: string;
+  marketingUrl: string;
   creator?: MintArtistMetadata | null;
 
   /* Contract details */
