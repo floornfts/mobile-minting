@@ -1,5 +1,5 @@
 import { Alchemy, Network } from "alchemy-sdk";
-import { MintIngestorResources } from "../src/lib/types/mint-ingestor";
+import { MintIngestorResources } from "./types/mint-ingestor";
 import axios from "axios";
 
 export const mintIngestorResources = (): MintIngestorResources => {

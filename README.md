@@ -27,9 +27,9 @@ This library is included in Floor's platform and executed in a sandboxed environ
 Adding a new platform to Mobile Minting is easy - you just have to write a `MintIngestor`!
 
 ### MintIngestor functionality
-A MintIngestor has one simple job:
+A MintIngestor has a simple job:
 
-> Transform a URL into a valid MintTemplate, iff that URL represents a supported mint by the ingestor
+> Transform a URL or contract address into a valid MintTemplate, iff it represents a supported mint by the ingestor
 
 ![template](https://github.com/floornfts/mobile-minting/assets/1068437/7693bfe2-8754-48ba-ac5d-7b222b1435de)
 
@@ -63,12 +63,20 @@ You will create a new folder in `src/ingestors` for your new Ingestor.
 
 ```ts
 export class MyMintIngestor implements MintIngestor {
-  async supportsUrl(url: string): Promise<boolean> {
+  async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
     // check if URL is supported by your ingestor
   }
 
-  async createMintTemplateForUrl(url: string, resources: MintIngestorResources): Promise<MintTemplate> {
+  async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
+    // check if the contract is supported by the ingestor
+  }
+
+  async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
     // create the mint template for your URL
+  }
+
+  async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
+    // create the mint template for your contract
   }
 }
 ```
@@ -97,6 +105,8 @@ In this example we make a template, relying on `getMintMetadataFromSomewhere()` 
       priceWei: totalPriceWei,
     });
 ```
+
+_Note: You will typically want to implement either 
 
 You can then build the MintTemplate from the builder.
 
@@ -141,6 +151,28 @@ yarn test
 ```
 
 <br />
+
+### Trying out your Mint Ingestor
+You can try your mint ingestory using `yarn dry-run` -- this will:
+
+* Create an instance of your minter
+* Pass the inputs you provide to it
+* Print out the output MintTemplate
+
+```bash
+yarn dry-run <minterSlug> <inputType> <input>
+```
+
+`<minterSlug>`: The key for the ingestor in `ALL_MINT_INGESTORS`
+`<inputType>`: `url` or `contract`
+`<input>`: A full URL for `url`, or a colon delimited fullly qualified address for `contract
+
+Examples:
+```bash
+yarn dry-run prohibition-daily url https://daily.prohibition.art/mint/8453/0x896037d93a231273070dd5f5c9a72aba9a3fe920
+yarn dry-run prohibition-daily contract 8453:0x896037d93a231273070dd5f5c9a72aba9a3fe920
+yarn dry-run some-erc-1155-ingestor contract 8453:contractAddress:tokenId
+```
 
 # Submitting a Mobile Minting Ingestor
 Once you've written a Mobile Minting Ingestor, it needs to be Pull Requested to this repository to be included in the production Floor Mobile Minting ingestion fleet.
