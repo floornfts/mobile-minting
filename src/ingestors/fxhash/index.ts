@@ -1,4 +1,4 @@
-import { MintIngestor, MintIngestorResources } from '../../lib/types/mint-ingestor';
+import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../lib/types/mint-ingestor';
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
@@ -9,18 +9,37 @@ const BASE_FRAME_CONTRACT_ADDRESS = '0x6e625892C739bFD960671Db5544E260757480725'
 const BASE_FIXED_PRICE_CONTRACT_ADDRESS = '0x4bDcaC532143d8d35ed759189EE22E3704580b9D';
 
 export class FxHashIngestor implements MintIngestor {
-  async supportsUrl(url: string): Promise<boolean> {
+  async supportsUrl(_resources: MintIngestorResources, url: string): Promise<boolean> {
     return new URL(url).hostname === 'www.fxhash.xyz' || new URL(url).hostname === 'fxhash.xyz';
   }
 
-  async createMintTemplateForUrl(url: string, resources: MintIngestorResources): Promise<MintTemplate> {
-    const isCompatible = await this.supportsUrl(url);
+  async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
+    if (contract.chainId !== 8453) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async createMintForContract(
+    _resources: MintIngestorResources,
+    _contract: MintContractOptions,
+  ): Promise<MintTemplate> {
+    const mintBuilder = new MintTemplateBuilder()
+      .setMintInstructionType(MintInstructionType.EVM_MINT)
+      .setPartnerName('fxhash');
+
+    return mintBuilder.build();
+  }
+
+  async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
+    const isCompatible = await this.supportsUrl(resources, url);
     if (!isCompatible) {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
     const mintBuilder = new MintTemplateBuilder()
-      .setOriginalUrl(url)
+      .setMarketingUrl(url)
       .setMintInstructionType(MintInstructionType.EVM_MINT)
       .setPartnerName('fxhash');
 

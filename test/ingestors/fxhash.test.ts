@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { FxHashIngestor } from '../../src/ingestors/fxhash';
-import { mintIngestorResources } from '../resources';
+import { mintIngestorResources } from '../../src/lib/resources';
 import { EVMMintInstructions } from '../../src/lib/types/mint-template';
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
 
@@ -8,24 +8,26 @@ describe('fxhash', function () {
   it('supportsUrl: Returns false for an unsupported URL', async function () {
     const ingestor = new FxHashIngestor();
     const url = 'https://example.com';
-    const result = await ingestor.supportsUrl(url);
+    const resources = mintIngestorResources();
+    const result = await ingestor.supportsUrl(resources, url);
     expect(result).to.be.false;
   });
   it('supportsUrl: Returns true for a supported URL', async function () {
     const ingestor = new FxHashIngestor();
     const url = 'https://www.fxhash.xyz/generative/slug/1x4-shape-study';
-    const result = await ingestor.supportsUrl(url);
+    const resources = mintIngestorResources();
+    const result = await ingestor.supportsUrl(resources, url);
     expect(result).to.be.true;
 
     const url2 = 'https://fxhash.xyz/generative/slug/allegro';
-    const result2 = await ingestor.supportsUrl(url2);
+    const result2 = await ingestor.supportsUrl(resources, url2);
     expect(result2).to.be.true;
   });
   it('createMintTemplateForUrl: Returns a mint template for a supported URL with frame contract', async function () {
     const ingestor = new FxHashIngestor();
     const url = 'https://fxhash.xyz/generative/slug/allegro';
     const resources = mintIngestorResources();
-    const template = await ingestor.createMintTemplateForUrl(url, resources);
+    const template = await ingestor.createMintTemplateForUrl(resources, url);
 
     // Verify that the mint template passed validation
     const builder = new MintTemplateBuilder(template);
@@ -42,7 +44,7 @@ describe('fxhash', function () {
 
     expect(template.featuredImageUrl).to.equal('ipfs://Qmc9eKhAkQvt1mXq1pD5FP9ZnprBNuU2USq5rELKVdb9uf');
 
-    expect(template.originalUrl).to.equal(url);
+    expect(template.marketingUrl).to.equal(url);
     expect(template.availableForPurchaseStart?.getTime()).to.equal(1715358000000);
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(1893456000000);
   });
@@ -51,7 +53,7 @@ describe('fxhash', function () {
     const ingestor = new FxHashIngestor();
     const url = 'https://fxhash.xyz/generative/slug/graphomania';
     const resources = mintIngestorResources();
-    const template = await ingestor.createMintTemplateForUrl(url, resources);
+    const template = await ingestor.createMintTemplateForUrl(resources, url);
 
     // Verify that the mint template passed validation
     const builder = new MintTemplateBuilder(template);
@@ -68,7 +70,7 @@ describe('fxhash', function () {
 
     expect(template.featuredImageUrl).to.equal('ipfs://QmYV4LXoz18youcW7zREFFFVpPf6Tn1j4QRzmTi1cSPinb');
 
-    expect(template.originalUrl).to.equal(url);
+    expect(template.marketingUrl).to.equal(url);
     expect(template.availableForPurchaseStart?.getTime()).to.equal(1718983800000);
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(1893456000000);
   });
@@ -82,7 +84,7 @@ describe('fxhash', function () {
     let error: any;
 
     try {
-      await ingestor.createMintTemplateForUrl(url, resources);
+      await ingestor.createMintTemplateForUrl(resources, url);
     } catch (err) {
       error = err;
     }
@@ -100,7 +102,7 @@ describe('fxhash', function () {
     let error: any;
 
     try {
-      await ingestor.createMintTemplateForUrl(url, resources);
+      await ingestor.createMintTemplateForUrl(resources, url);
     } catch (err) {
       error = err;
     }
@@ -118,7 +120,7 @@ describe('fxhash', function () {
     let error: any;
 
     try {
-      await ingestor.createMintTemplateForUrl(url, resources);
+      await ingestor.createMintTemplateForUrl(resources, url);
     } catch (err) {
       error = err;
     }
