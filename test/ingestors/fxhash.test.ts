@@ -128,4 +128,90 @@ describe('fxhash', function () {
     expect(error).to.be.an('error');
     expect(error.message).to.equal('Project not found');
   });
+
+  it('createMintTemplateForContract: Returns a mint template for a supported contract', async function () {
+    const ingestor = new FxHashIngestor();
+    const resources = mintIngestorResources();
+    const contract = {
+      chainId: 8453,
+      url: 'https://fxhash.xyz/generative/slug/allegro',
+      contractAddress: '0x914cf2d92b087C9C01a062111392163c3B35B60e',
+    };
+    const template = await ingestor.createMintForContract(resources, contract);
+
+    // Verify that the mint template passed validation
+    const builder = new MintTemplateBuilder(template);
+    builder.validateMintTemplate();
+
+    expect(template.name).to.equal('Allegro');
+    expect(template.description).to.contain('Allegro from Pixelwank');
+    const mintInstructions = template.mintInstructions as EVMMintInstructions;
+
+    expect(mintInstructions.contractAddress).to.equal('0x6e625892C739bFD960671Db5544E260757480725');
+    expect(mintInstructions.contractMethod).to.equal('buy');
+    expect(mintInstructions.contractParams).to.equal('["0x914cf2d92b087C9C01a062111392163c3B35B60e", 1, 1, address]');
+    expect(mintInstructions.priceWei).to.equal('4200000000000000');
+
+    expect(template.featuredImageUrl).to.equal('ipfs://Qmc9eKhAkQvt1mXq1pD5FP9ZnprBNuU2USq5rELKVdb9uf');
+
+    expect(template.marketingUrl).to.equal(contract.url);
+    expect(template.availableForPurchaseStart?.getTime()).to.equal(1715358000000);
+    expect(template.availableForPurchaseEnd?.getTime()).to.equal(1893456000000);
+  });
+
+  it('createMintTemplateForContract: Throws error for a non supported contract', async function () {
+    const ingestor = new FxHashIngestor();
+    const resources = mintIngestorResources();
+    const contract = {
+      chainId: 8453,
+      contractAddress: '0x6140F00e4Ff3936702E68744f2b5978885464cbB',
+    };
+
+    // It should throw an error
+    let error: any;
+    try {
+      await ingestor.createMintForContract(resources, contract);
+    } catch (err) {
+      error = err;
+    }
+
+    expect(error).to.be.an('error');
+    expect(error.message).to.equal('Project not found');
+  });
+
+  it('supportsContract: Returns false for a non supported contract', async function () {
+    const ingestor = new FxHashIngestor();
+    const resources = mintIngestorResources();
+    const contract = {
+      chainId: 8453,
+      contractAddress: '0x6140F00e4Ff3936702E68744f2b5978885464cbB',
+    };
+
+    const supported = await ingestor.supportsContract(resources, contract);
+    expect(supported).to.be.false;
+  });
+
+  it('supportsContract: Returns true for a supported contract', async function () {
+    const ingestor = new FxHashIngestor();
+    const resources = mintIngestorResources();
+    const contract = {
+      chainId: 8453,
+      contractAddress: '0x914cf2d92b087C9C01a062111392163c3B35B60e',
+    };
+
+    const supported = await ingestor.supportsContract(resources, contract);
+    expect(supported).to.be.true;
+  });
+
+  it('supportsContract: Returns false for a non supported chain', async function () {
+    const ingestor = new FxHashIngestor();
+    const resources = mintIngestorResources();
+    const contract = {
+      chainId: 1,
+      contractAddress: '0x914cf2d92b087C9C01a062111392163c3B35B60e',
+    };
+
+    const supported = await ingestor.supportsContract(resources, contract);
+    expect(supported).to.be.false;
+  });
 });

@@ -18,16 +18,130 @@ export class FxHashIngestor implements MintIngestor {
       return false;
     }
 
+    const graphQLRes = await resources.fetcher({
+      url: 'https://api.v2-temp.fxhash.xyz/graphql',
+      method: 'POST',
+      headers: {
+        accept: '*/*',
+        'accept-language': 'en-US,en;q=0.9',
+        'content-type': 'application/json',
+        priority: 'u=1, i',
+        'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-site',
+        Referer: 'https://www.fxhash.xyz/',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+      },
+      data: {
+        query: `
+            query GenerativeToken($generativeTokenId: String) {
+              generativeToken(id: $generativeTokenId) {
+                slug
+              }
+            }
+          `,
+        variables: {
+          generativeTokenId: contract.contractAddress,
+        },
+      },
+    });
+
+    const token = (graphQLRes as any).data.data.generativeToken;
+
+    if (!token) {
+      return false;
+    }
+
     return true;
   }
 
-  async createMintForContract(
-    _resources: MintIngestorResources,
-    _contract: MintContractOptions,
-  ): Promise<MintTemplate> {
+  async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
       .setPartnerName('fxhash');
+
+    if (contract.url) {
+      mintBuilder.setMarketingUrl(contract.url);
+    }
+
+    const graphQLRes = await resources.fetcher({
+      url: 'https://api.v2-temp.fxhash.xyz/graphql',
+      method: 'POST',
+      headers: {
+        accept: '*/*',
+        'accept-language': 'en-US,en;q=0.9',
+        'content-type': 'application/json',
+        priority: 'u=1, i',
+        'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-site',
+        Referer: 'https://www.fxhash.xyz/',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+      },
+      data: {
+        query: `
+            query GenerativeToken($generativeTokenId: String) {
+              generativeToken(id: $generativeTokenId) {
+                slug
+                chain
+                isFrame
+                metadata
+                name
+                mintOpensAt
+                openEditionsEndsAt
+              }
+            }
+          `,
+        variables: {
+          generativeTokenId: contract.contractAddress,
+        },
+      },
+    });
+
+    const token = (graphQLRes as any).data.data.generativeToken;
+
+    if (!token) {
+      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Project not found');
+    }
+
+    const contractAddress = token.isFrame ? BASE_FRAME_CONTRACT_ADDRESS : BASE_FIXED_PRICE_CONTRACT_ADDRESS;
+    const abi = token.isFrame ? FXHASH_BASE_FRAME_ABI : FXHASH_BASE_FIXED_PRICE_ABI;
+
+    const description = token.metadata?.description || '';
+    const image = token.metadata?.thumbnailUri || '';
+
+    mintBuilder.setName(token.name).setDescription(description).setFeaturedImageUrl(image);
+
+    // The 1 is reserveId in their contract... not clear what for... but it's always 1
+    const totalPriceWei = await getFxHashMintPriceInEth(
+      contract.chainId,
+      contractAddress,
+      contract.contractAddress,
+      1,
+      resources.alchemy,
+      abi,
+    );
+
+    mintBuilder.setMintInstructions({
+      chainId: contract.chainId,
+      contractAddress,
+      contractMethod: 'buy',
+      contractParams: `["${contract.contractAddress}", 1, 1, address]`,
+      abi: abi,
+      priceWei: totalPriceWei,
+    });
+
+    const liveDate = new Date() > token.mintOpensAt ? new Date() : new Date(token.mintOpensAt);
+    mintBuilder
+      .setAvailableForPurchaseEnd(new Date(token.openEditionsEndsAt || '2030-01-01'))
+      .setAvailableForPurchaseStart(new Date(token.mintOpensAt || Date.now()))
+      .setLiveDate(liveDate);
 
     return mintBuilder.build();
   }
