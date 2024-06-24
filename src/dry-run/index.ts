@@ -4,19 +4,19 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const args = process.argv.slice(2);
-const [ ingesterName, inputType, input ] = args;
+const [ingestorName, inputType, input] = args;
 
-if (!ingesterName || !inputType || !input) {
+if (!ingestorName || !inputType || !input) {
   console.error('Missing arguments');
   process.exit(1);
 }
 
 console.log(`Running dry-run\n
-  ingestory: ${ingesterName}\n
+  ingestory: ${ingestorName}\n
   inputType: ${inputType}
   input: ${input}`);
 
-const ingestor = ALL_MINT_INGESTORS[ingesterName];
+const ingestor = ALL_MINT_INGESTORS[ingestorName];
 
 if (!ingestor) {
   console.error('Ingestor not registered in ALL_MINT_INGESTORS');
