@@ -11,7 +11,7 @@ export class MintTemplateBuilder {
         name: null,
         featuredImageUrl: null,
         images: [],
-        originalUrl: null,
+        marketingUrl: null,
         mintInstructionType: null,
         mintInstructions: null,
         liveDate: null,
@@ -34,9 +34,6 @@ export class MintTemplateBuilder {
     }
     if (!this.mintTemplate.featuredImageUrl) {
       throw new Error('MintTemplate featuredImageUrl is required');
-    }
-    if (!this.mintTemplate.originalUrl) {
-      throw new Error('MintTemplate originalUrl is required');
     }
     if (!this.mintTemplate.mintInstructionType) {
       throw new Error('MintTemplate mintInstructionType is required');
@@ -80,8 +77,8 @@ export class MintTemplateBuilder {
     return this;
   }
 
-  setOriginalUrl(originalUrl: string) {
-    this.mintTemplate.originalUrl = originalUrl;
+  setMarketingUrl(marketingUrl: string) {
+    this.mintTemplate.marketingUrl = marketingUrl;
     return this;
   }
 
@@ -157,8 +154,8 @@ export class MintTemplateBuilder {
     return this;
   }
 
-  unsetOriginalUrl() {
-    this.mintTemplate.originalUrl = null;
+  unsetMarketingUrl() {
+    this.mintTemplate.marketingUrl = null;
     return this;
   }
 
