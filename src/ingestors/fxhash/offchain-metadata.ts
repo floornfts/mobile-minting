@@ -46,6 +46,7 @@ export const getFxHashMintsBySlug = async (resources: MintIngestorResources, slu
     if (!slug) {
         return [];
     }
+    const cleanedSlug = slug.replaceAll('-', '');
     const graphQLRes = await resources.fetcher({
         url: 'https://api.v2-temp.fxhash.xyz/graphql',
         method: 'POST',
@@ -82,7 +83,7 @@ export const getFxHashMintsBySlug = async (resources: MintIngestorResources, slu
           `,
           variables: {
             filters: {
-              searchQuery_eq: slug,
+              searchQuery_eq: cleanedSlug,
             },
           },
         },
