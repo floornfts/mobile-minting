@@ -9,4 +9,4 @@ jobs:
           persist-credentials: false
 
       - name: Run Tests
-        run: yarn && ALCHEMY_API_KEY=${ALCHEMY_API_KEY} yarn test
+        run: yarn install --userconfig=/dev/null && ALCHEMY_API_KEY=${ALCHEMY_API_KEY} yarn test
