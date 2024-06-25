@@ -1,0 +1,16 @@
+name: Run Tests
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ALCHEMY_API_KEY: ${{ env.ALCHEMY_API_KEY }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Run Tests
+        run: yarn && yarn test
