@@ -4,6 +4,7 @@ import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { FXHASH_BASE_FIXED_PRICE_ABI, FXHASH_BASE_FRAME_ABI } from './abi';
 import { getFxHashMintPriceInEth } from './onchain-metadata';
+import { getFxhashMintByContract, getFxHashMintsBySlug } from './offchain-metadata';
 
 const BASE_FRAME_CONTRACT_ADDRESS = '0x6e625892C739bFD960671Db5544E260757480725';
 const BASE_FIXED_PRICE_CONTRACT_ADDRESS = '0x4bDcaC532143d8d35ed759189EE22E3704580b9D';
@@ -17,44 +18,10 @@ export class FxHashIngestor implements MintIngestor {
     if (contract.chainId !== 8453) {
       return false;
     }
-
-    const graphQLRes = await resources.fetcher({
-      url: 'https://api.v2-temp.fxhash.xyz/graphql',
-      method: 'POST',
-      headers: {
-        accept: '*/*',
-        'accept-language': 'en-US,en;q=0.9',
-        'content-type': 'application/json',
-        priority: 'u=1, i',
-        'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"macOS"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-site',
-        Referer: 'https://www.fxhash.xyz/',
-        'Referrer-Policy': 'strict-origin-when-cross-origin',
-      },
-      data: {
-        query: `
-            query GenerativeToken($generativeTokenId: String) {
-              generativeToken(id: $generativeTokenId) {
-                slug
-              }
-            }
-          `,
-        variables: {
-          generativeTokenId: contract.contractAddress,
-        },
-      },
-    });
-
-    const token = (graphQLRes as any).data.data.generativeToken;
-
+    const token = await getFxhashMintByContract(resources, contract)
     if (!token) {
       return false;
     }
-
     return true;
   }
 
@@ -67,44 +34,7 @@ export class FxHashIngestor implements MintIngestor {
       mintBuilder.setMarketingUrl(contract.url);
     }
 
-    const graphQLRes = await resources.fetcher({
-      url: 'https://api.v2-temp.fxhash.xyz/graphql',
-      method: 'POST',
-      headers: {
-        accept: '*/*',
-        'accept-language': 'en-US,en;q=0.9',
-        'content-type': 'application/json',
-        priority: 'u=1, i',
-        'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"macOS"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-site',
-        Referer: 'https://www.fxhash.xyz/',
-        'Referrer-Policy': 'strict-origin-when-cross-origin',
-      },
-      data: {
-        query: `
-            query GenerativeToken($generativeTokenId: String) {
-              generativeToken(id: $generativeTokenId) {
-                slug
-                chain
-                isFrame
-                metadata
-                name
-                mintOpensAt
-                openEditionsEndsAt
-              }
-            }
-          `,
-        variables: {
-          generativeTokenId: contract.contractAddress,
-        },
-      },
-    });
-
-    const token = (graphQLRes as any).data.data.generativeToken;
+    const token = await getFxhashMintByContract(resources, contract);
 
     if (!token) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Project not found');
@@ -159,53 +89,11 @@ export class FxHashIngestor implements MintIngestor {
 
     // Example URL: https://www.fxhash.xyz/generative/slug/allegro
     // First get the slug from the end
-
     const slug = url.split('/').pop();
 
-    const graphQLRes = await resources.fetcher({
-      url: 'https://api.v2-temp.fxhash.xyz/graphql',
-      method: 'POST',
-      headers: {
-        accept: '*/*',
-        'accept-language': 'en-US,en;q=0.9',
-        'content-type': 'application/json',
-        priority: 'u=1, i',
-        'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"macOS"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-site',
-        Referer: 'https://www.fxhash.xyz/',
-        'Referrer-Policy': 'strict-origin-when-cross-origin',
-      },
-      data: {
-        query: `
-          query GenerativeToken($filters: SearchFilters!) {
-            search(filters: $filters) {
-              generativeTokens {
-                slug
-                id
-                chain
-                isFrame
-                name
-                metadata
-                mintOpensAt
-                openEditionsEndsAt
-              }
-            }
-          }
-        `,
-        variables: {
-          filters: {
-            searchQuery_eq: slug,
-          },
-        },
-      },
-    });
-
+    const tokens = await getFxHashMintsBySlug(resources, slug);
     // Make sure one has the exact slug we're looking for and is on BASE or ETHEREUM (not TEZOS)
-    const token = (graphQLRes as any).data.data.search.generativeTokens.find(
+    const token = tokens.find(
       (t: any) => t.slug === slug && t.chain !== 'TEZOS',
     );
 
