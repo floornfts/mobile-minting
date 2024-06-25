@@ -1,6 +1,4 @@
 name: Run Tests
-env:
-  ALCHEMY_API_KEY: ${{ env.ALCHEMY_API_KEY }}
 on: push
 jobs:
   build:
@@ -11,4 +9,4 @@ jobs:
           persist-credentials: false
 
       - name: Run Tests
-        run: yarn && yarn test
+        run: yarn && ALCHEMY_API_KEY=${ALCHEMY_API_KEY} yarn test
