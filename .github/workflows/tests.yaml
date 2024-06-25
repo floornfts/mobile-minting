@@ -1,12 +1,11 @@
 name: Run Tests
 
 on: push
-
+env:
+  ALCHEMY_API_KEY: ${{ env.ALCHEMY_API_KEY }}
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ALCHEMY_API_KEY: ${{ env.ALCHEMY_API_KEY }}
     steps:
       - uses: actions/checkout@v3
         with:
