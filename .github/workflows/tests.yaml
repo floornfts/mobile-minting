@@ -1,8 +1,7 @@
 name: Run Tests
-
-on: push
 env:
   ALCHEMY_API_KEY: ${{ env.ALCHEMY_API_KEY }}
+on: push
 jobs:
   build:
     runs-on: ubuntu-latest
