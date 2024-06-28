@@ -5,28 +5,23 @@ import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { zoraMintAbi } from './abi';
 import {  getZoraMintPriceInEth,getZoraContractMetadata } from './onchain-zora';
 import { urlForValidZoraPage,zoraOnchainIdDataFromUrl } from './offchain-metadata';
-// import { getProhibitionContractMetadata} from './onchain-zora';
-// import { Address, encodeAbiParameters } from "viem";
-// 
-export class zoraIngestor implements MintIngestor {
-  // async supportsUrl(url: string): Promise<boolean> {
-  //   return new URL(url).hostname === 'zora.co';
-  // }
+
+export class ZoraIngestor implements MintIngestor {
+
   configuration = {
     supportsContractIsExpensive: true,
   };
 
   async supportsUrl(_resources: MintIngestorResources, url: string): Promise<boolean> {
-    return new URL(url).hostname === 'zora.co' ;
+    const urlObject = new URL(url);
+    return urlObject.hostname === 'zora.co' && urlObject.pathname.startsWith('/collect/base');
   }
-
-
+  
   async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
     const { contractAddress,tokenId } = contract;
     if (!contractAddress || !tokenId) {
       return false;
     }
-
     const url = await urlForValidZoraPage( contractAddress,tokenId, resources.fetcher);
     return !!url;
   }
@@ -38,48 +33,25 @@ export class zoraIngestor implements MintIngestor {
     }
 
     const { chainId,tokenId, contractAddress } = await zoraOnchainIdDataFromUrl(url, resources.fetcher);
-
-
     if (!chainId || !contractAddress || !tokenId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
     }
-
     return this.createMintForContract(resources, {chainId, contractAddress,tokenId, url });
   }
 
-
-
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
-
-
-
     const { chainId, contractAddress,tokenId } = contract;
     if (!chainId || !contractAddress || !tokenId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
     }
 
-
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
       .setPartnerName('Zora');
-
+      
     const { name, description, imageUrl,startAt } = await getZoraContractMetadata(Number(tokenId), contractAddress);
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(imageUrl);
-
     const totalPriceWei = await getZoraMintPriceInEth(chainId, contractAddress, resources.alchemy);
-
-    // const minterArguments = encodeAbiParameters(
-    //     [
-    //       { name: "mintTo", type: "address" },
-    //       { name: "comment", type: "string" },
-    //     ],
-    //     ['address', 'zoraNft']
-    //   );
-    // const minterAddress ='0x04E2516A2c207E84a1839755675dfd8eF6302F0a'
-    // const token = 1;
-    // const input= 1;
-    // const mintReferral = "0x8879318091671ba1274e751f8cdef76bb37eb3ed";
-
     mintBuilder.setMintInstructions({
       chainId,
       contractAddress,

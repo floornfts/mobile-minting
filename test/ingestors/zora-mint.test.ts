@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { zoraIngestor } from '../../src/ingestors/zora-mint';
+import { ZoraIngestor } from '../../src/ingestors/zora-mint';
 import { EVMMintInstructions } from '../../src/lib/types/mint-template';
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
 import { mintIngestorResources } from '../../src/lib/resources';
@@ -9,7 +9,7 @@ import { mintIngestorResources } from '../../src/lib/resources';
 describe('zora-base-mint', function () {
 
     it('supportsUrl: Returns false for an unsupported URL', async function () {
-        const ingestor = new zoraIngestor();
+        const ingestor = new ZoraIngestor();
         const url = 'https://example.com';
         const resources = mintIngestorResources();
         const result = await ingestor.supportsUrl(resources, url);
@@ -18,7 +18,7 @@ describe('zora-base-mint', function () {
 
 
       it('supportsUrl: Returns true for a supported URL', async function () {
-        const ingestor = new zoraIngestor();
+        const ingestor = new ZoraIngestor();
         const url = 'https://zora.co/collect/base:0x1e1ad3d381bc0ccea5e44c29fb1f7a0981b97f37/1';
         const resources = mintIngestorResources();
         const result = await ingestor.supportsUrl(resources, url);
@@ -30,7 +30,7 @@ describe('zora-base-mint', function () {
       });
 
       it('createMintTemplateForUrl: Throws error if incompatible URL', async function () {
-        const ingestor = new zoraIngestor();
+        const ingestor = new ZoraIngestor();
         const url = 'https://twitter.com/Nithinkd567';
         const resources = mintIngestorResources();
     
@@ -50,7 +50,7 @@ describe('zora-base-mint', function () {
       
 
     it('createMintTemplateForUrl: Returns a mint template for a supported URL', async function () {
-        const ingestor = new zoraIngestor();
+        const ingestor = new ZoraIngestor();
         const url = 'https://zora.co/collect/base:0x1e1ad3d381bc0ccea5e44c29fb1f7a0981b97f37/1';
 
 
@@ -82,7 +82,7 @@ describe('zora-base-mint', function () {
 
 
 it('createMintTemplateForContract: Throws error for a non supported contract', async function () {
-    const ingestor = new zoraIngestor();
+    const ingestor = new ZoraIngestor();
     const resources = mintIngestorResources();
     const contract = {
       chainId: 8453,
