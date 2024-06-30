@@ -47,13 +47,22 @@ export class FxHashIngestor implements MintIngestor {
     const image = token.metadata?.thumbnailUri || '';
 
     mintBuilder.setName(token.name).setDescription(description).setFeaturedImageUrl(image);
+    mintBuilder.setMintOutputContract({ chainId: contract.chainId, address: contract.contractAddress });
+    mintBuilder.setCreator({
+      name: token.author.account.username,
+      imageUrl: token.author.account.profile.picture,
+      walletAddress: token.author.account.wallets?.find((w: any) => w.address.startsWith('0x'))?.address,
+      websiteUrl: token.author.account.profile.website,
+      description: token.author.account.profile.description,
+      twitterUsername: token.author.account.profile.twitter?.split('/').pop(),
+    })
 
-    // The 1 is reserveId in their contract... not clear what for... but it's always 1
+    // The 0 is reserveId in their contract... not clear what for... but 0 seems to always work
     const totalPriceWei = await getFxHashMintPriceInEth(
       contract.chainId,
       contractAddress,
       contract.contractAddress,
-      1,
+      0,
       resources.alchemy,
       abi,
     );
@@ -82,11 +91,6 @@ export class FxHashIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    const mintBuilder = new MintTemplateBuilder()
-      .setMarketingUrl(url)
-      .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('fxhash');
-
     // Example URL: https://www.fxhash.xyz/generative/slug/allegro
     // First get the slug from the end
     const slug = url.split('/').pop();
@@ -106,44 +110,9 @@ export class FxHashIngestor implements MintIngestor {
     const chainId = token.chain === 'BASE' ? 8453 : null;
 
     if (!chainId) {
-      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Chain not supported');
+      throw new MintIngestorError(MintIngestionErrorName.MintUnsupportedNetwork, 'Chain not supported');
     }
 
-    const contractAddress = token.isFrame ? BASE_FRAME_CONTRACT_ADDRESS : BASE_FIXED_PRICE_CONTRACT_ADDRESS;
-    const abi = token.isFrame ? FXHASH_BASE_FRAME_ABI : FXHASH_BASE_FIXED_PRICE_ABI;
-
-    const description = token.metadata?.description || '';
-    const image = token.metadata?.thumbnailUri || '';
-
-    mintBuilder.setName(token.name).setDescription(description).setFeaturedImageUrl(image);
-
-    // The 1 is reserveId in their contract... not clear what for... but it's always 1
-    const totalPriceWei = await getFxHashMintPriceInEth(
-      chainId,
-      contractAddress,
-      dropAddress,
-      1,
-      resources.alchemy,
-      abi,
-    );
-
-    mintBuilder.setMintInstructions({
-      chainId,
-      contractAddress,
-      contractMethod: 'buy',
-      // Note - the "id" is really the contract address in their system
-      contractParams: `["${token.id}", 1, 1, address]`,
-      abi: abi,
-      priceWei: totalPriceWei,
-    });
-
-    const liveDate = new Date() > token.mintOpensAt ? new Date() : new Date(token.mintOpensAt);
-    mintBuilder
-      .setAvailableForPurchaseEnd(new Date(token.openEditionsEndsAt || '2030-01-01'))
-      .setAvailableForPurchaseStart(new Date(token.mintOpensAt || Date.now()))
-      .setLiveDate(liveDate);
-
-    const output = mintBuilder.build();
-    return output;
+    return this.createMintForContract(resources, { chainId, contractAddress: dropAddress, url });
   }
 }

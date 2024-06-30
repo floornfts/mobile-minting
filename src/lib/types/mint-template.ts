@@ -10,6 +10,8 @@ export type MintTemplate = {
   /* Contract details */
   mintInstructionType: MintInstructionType;
   mintInstructions: EVMMintInstructions | SolanaMintInstructions;
+  /* The address of the NFT contract, if different from the mint contract */
+  mintOutputContract: CollectionContract | null;
 
   /* Availability */
   liveDate: Date | null;
@@ -63,12 +65,19 @@ export type MintImage = {
 export type MintArtistMetadata = {
   name: string;
   imageUrl?: string | null;
+  walletAddress?: string | null;
   websiteUrl?: string | null;
   description?: string | null;
-  twitterHandle?: string | null;
-  instagram?: string | null;
-  discord?: string | null;
-  tikTok?: string | null;
-  github?: string | null;
-  farcaster?: string | null;
+  twitterUsername?: string | null;
+  floorUsername?: string | null;
+  instagramUsername?: string | null;
+  discordUsername?: string | null;
+  tikTokUsername?: string | null;
+  githubUsername?: string | null;
+  farcasterUsername?: string | null;
 };
+
+export type CollectionContract = {
+  address: string;
+  chainId: number;
+}

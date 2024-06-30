@@ -30,6 +30,25 @@ export const getFxhashMintByContract = async (resources: MintIngestorResources, 
                 name
                 mintOpensAt
                 openEditionsEndsAt
+                author {
+                  account {
+                    profile {
+                      description
+                      farcaster
+                      instagram
+                      picture
+                      twitter
+                      website
+                    }
+                    username
+                    wallets {
+                      address
+                      flag
+                      network
+                    }
+                    id
+                  }
+                }
               }
             }
           `,
