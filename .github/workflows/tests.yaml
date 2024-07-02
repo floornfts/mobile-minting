@@ -1,0 +1,17 @@
+name: Run Tests
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          
+      - name: Remove .npmrc
+        run: rm -f .npmrc
+
+      - name: Run Tests
+        env:
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+        run: yarn install --userconfig=/dev/null && yarn test
