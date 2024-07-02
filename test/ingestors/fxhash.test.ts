@@ -69,6 +69,9 @@ describe('fxhash', function () {
     expect(mintInstructions.priceWei).to.equal('500000000000000');
 
     expect(template.featuredImageUrl).to.equal('ipfs://QmYV4LXoz18youcW7zREFFFVpPf6Tn1j4QRzmTi1cSPinb');
+    expect(template.creator?.name).to.equal('P|mll');
+    expect(template.creator?.imageUrl).to.not.be.empty;
+    expect(template.creator?.walletAddress).to.equal('0x6eF478BeFe3f7Ae12E6357311C3826a865626643');
 
     expect(template.marketingUrl).to.equal(url);
     expect(template.availableForPurchaseStart?.getTime()).to.equal(1718983800000);

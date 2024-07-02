@@ -1,4 +1,4 @@
-import { EVMMintInstructions, MintInstructionType, MintTemplate, SolanaMintInstructions } from '../types/mint-template';
+import { CollectionContract, EVMMintInstructions, MintArtistMetadata, MintInstructionType, MintTemplate, SolanaMintInstructions } from '../types/mint-template';
 
 export class MintTemplateBuilder {
   private mintTemplate: any;
@@ -14,11 +14,13 @@ export class MintTemplateBuilder {
         marketingUrl: null,
         mintInstructionType: null,
         mintInstructions: null,
+        mintOutputContract: null,
         liveDate: null,
         availableForPurchaseStart: null,
         availableForPurchaseEnd: null,
         partnerName: null,
         promotionaltext: null,
+        creator: null,
       };
     }
   }
@@ -92,6 +94,11 @@ export class MintTemplateBuilder {
     return this;
   }
 
+  setMintOutputContract(mintOutputContract: CollectionContract) {
+    this.mintTemplate.mintOutputContract = mintOutputContract;
+    return this;
+  }
+
   setLiveDate(liveDate: Date) {
     this.mintTemplate.liveDate = liveDate;
     return this;
@@ -114,6 +121,11 @@ export class MintTemplateBuilder {
 
   setPromotionalText(promotionaltext: string) {
     this.mintTemplate.promotionaltext = promotionaltext;
+    return this;
+  }
+
+  setCreator(creator: MintArtistMetadata) {
+    this.mintTemplate.creator = creator;
     return this;
   }
 
@@ -154,6 +166,11 @@ export class MintTemplateBuilder {
     return this;
   }
 
+  unsetMintOutputContract() {
+    this.mintTemplate.mintOutputContract = null;
+    return this;
+  }
+
   unsetMarketingUrl() {
     this.mintTemplate.marketingUrl = null;
     return this;
@@ -176,6 +193,11 @@ export class MintTemplateBuilder {
 
   unsetImages() {
     this.mintTemplate.images = [];
+    return this;
+  }
+
+  unsetCreator() {
+    this.mintTemplate.creator = null;
     return this;
   }
 }

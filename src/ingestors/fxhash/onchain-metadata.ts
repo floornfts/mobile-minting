@@ -14,6 +14,7 @@ export const getFxHashMintPriceInEth = async (
   alchemy: Alchemy,
   abi: any,
 ): Promise<any> => {
+
   const contract = await getContract(chainId, contractAddress, alchemy, abi);
   const tokenPrice = await contract.functions.prices(dropAddress, reserveId);
 
