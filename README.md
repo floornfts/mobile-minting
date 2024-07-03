@@ -24,6 +24,9 @@ This library is included in Floor's platform and executed in a sandboxed environ
 
 ## Adding a new platform to Mobile Minting
 
+Today, Mobile Minting supports the following creator platforms: 
+![supported_platforms_base](https://github.com/floornfts/mobile-minting/assets/8492853/44fd5e45-c74f-4749-9b64-938b427de4db)
+
 Adding a new platform to Mobile Minting is easy - you just have to write a `MintIngestor`!
 
 ### MintIngestor functionality
