@@ -1,9 +1,6 @@
 import { Contract } from 'alchemy-sdk';
 import { MintContractOptions, MintIngestorResources } from 'src/lib';
 
-import dotenv from 'dotenv';
-dotenv.config();
-
 export const getFoundationMintByAddress = async (
   resources: MintIngestorResources,
   contract: MintContractOptions,
@@ -116,7 +113,6 @@ export const getFoundationMintByAddress = async (
         ...EditionSaleConfigurationFragment
       }
     }
-
     fragment EditionSaleConfigurationFragment on EditionSaleConfiguration {
       __typename
       ... on TimedEditionSaleConfiguration {
@@ -132,9 +128,6 @@ export const getFoundationMintByAddress = async (
         limitedEditionStatus: status
       }
     }
-
-    
-
   `,
         variables: {
           collection: {
@@ -161,39 +154,7 @@ export const getFoundationMintByAddress = async (
     );
     return resp.data.data.collection;
   } catch (error: any) {
-    console.log(error)
+    console.log(error);
     return;
   }
 };
-
-// export const getOpenSeaCollectionBySlug = async (
-//   resources: MintIngestorResources,
-//   slug: string | undefined,
-// ): Promise<Collection | undefined> => {
-//   try {
-//     const resp = await resources.fetcher(`https://api.opensea.io/api/v2/collections/${slug}`, options);
-//     if (!resp.data && !resp.data.contracts) {
-//       throw new Error('Empty response');
-//     }
-
-//     return resp.data;
-//   } catch (error: any) {
-//     return;
-//   }
-// };
-
-// export const getMintCreatorByAddress = async (
-//   resources: MintIngestorResources,
-//   address: string,
-// ): Promise<Creator | undefined> => {
-//   try {
-//     const resp = await resources.fetcher(`https://api.opensea.io/api/v2/accounts/${address}`, options);
-//     if (!resp.data && !resp.data.username) {
-//       throw new Error('No account found.');
-//     }
-
-//     return resp.data;
-//   } catch (error: any) {
-//     return;
-//   }
-// };

@@ -12,7 +12,7 @@ const getChainId = (chain: string) => {
   switch (chain) {
     case 'base':
       return 8453;
-
+    case 'eth':
     default:
       return 1;
   }
@@ -52,7 +52,6 @@ export class FoundationIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection not found');
     }
 
-    // Find required fee recipient
     const contractAddress = collection.contractAddress;
 
     const description = collection?.description;
@@ -89,7 +88,6 @@ export class FoundationIngestor implements MintIngestor {
         collection.saleType === 'FIXED_PRICE_DROP'
           ? 'mintFromFixedPriceSaleWithEarlyAccessAllowlistV2'
           : 'mintFromDutchAuctionV2',
-      // The payer is always the mint recipient
       contractParams:
         collection.saleType === 'FIXED_PRICE_DROP'
           ? `["${collection.contractAddress}", 1, "${contractOptions.recipient}", "0x0000000000000000000000000000000000000000", "0x00000000000000000000000000000000000000a0]`
@@ -120,8 +118,7 @@ export class FoundationIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    // Example URL: https://opensea.io/collection/parallel-ocs-24-starter-bundle/overview
-    // First get the slug from the end
+    // Example URL: https://foundation.app/mint/base/0x0C92Ce2aECc651Dd3733008A301f126662ae4A50
     const splits = url.split('/');
     const tokenAddress = splits.pop();
     const chain = splits.pop();
