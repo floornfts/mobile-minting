@@ -15,22 +15,7 @@ export class OpenSeaIngestor implements MintIngestor {
   };
 
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
-    if (new URL(url).hostname !== 'opensea.io') {
-      return false;
-    }
-
-    // Check if the URL matches the expected format
-    const urlRegex = new RegExp(/^https:\/\/opensea\.io\/collection\/([^/]+)\/overview$/);
-    const match = url.match(urlRegex);
-    if (!match) {
-      return false; // URL doesn't match the pattern
-    }
-
-    // We know the base chainId already and the implementation address is same for all OpenSea proxies.
-    const chainId = CHAIN_ID;
-    const contractAddress = CONTRACT_ADDRESS;
-
-    return !!chainId && !!contractAddress;
+    return false; // This ingestor does not support ingesting via URL
   }
 
   async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
