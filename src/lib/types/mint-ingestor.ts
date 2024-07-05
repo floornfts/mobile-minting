@@ -7,12 +7,13 @@ export type MintContractOptions = {
   contractAddress: string;
   tokenId?: string | undefined;
   url?: string | undefined;
+  recipient?: string;
 };
 
 interface MintIngestor {
   supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean>;
   supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean>;
-  createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate>;
+  createMintTemplateForUrl(resources: MintIngestorResources, url: string, recipient: string): Promise<MintTemplate>;
   createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate>;
 
   configuration?: MintIngestorOptions;
