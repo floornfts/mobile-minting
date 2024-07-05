@@ -5,9 +5,6 @@ import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { OPENSEA_PROXY_ABI } from './abi';
 import { getOpenSeaDropContractMetadata, getOpenSeaDropPriceInEth, urlForValidOpenSeaDropContract } from './onchain-metadata';
 
-const CHAIN_ID = 8453;
-const CONTRACT_ADDRESS = "0x00005ea00ac477b1030ce78506496e8c2de24bf5";
-
 export class OpenSeaIngestor implements MintIngestor {
 
   configuration = {
@@ -29,20 +26,13 @@ export class OpenSeaIngestor implements MintIngestor {
     return !!url;
   }
 
-  async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
+  async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<any> {
     const isCompatible = await this.supportsUrl(resources, url);
     if (!isCompatible) {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    const chainId = CHAIN_ID;
-    const contractAddress = CONTRACT_ADDRESS;
-
-    if (!chainId || !contractAddress) {
-      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
-    }
-
-    return this.createMintForContract(resources, { chainId, contractAddress, url });
+    return false; // This ingestor does not support ingesting via URL
   }
 
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
