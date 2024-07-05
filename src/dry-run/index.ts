@@ -1,20 +1,20 @@
-import { ALL_MINT_INGESTORS } from "../ingestors";
-import { mintIngestorResources } from "../lib/resources";
+import { ALL_MINT_INGESTORS } from '../ingestors';
+import { mintIngestorResources } from '../lib/resources';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const args = process.argv.slice(2);
-const [ingestorName, inputType, input] = args;
+const [ingestorName, inputType, input, recipient] = args;
 
 if (!ingestorName || !inputType || !input) {
   console.error('Missing arguments');
   process.exit(1);
 }
 
-console.log(`Running dry-run\n
-  ingestory: ${ingestorName}\n
+console.log(`Running dry-run
+  ingestory: ${ingestorName}
   inputType: ${inputType}
-  input: ${input}`);
+  input: ${input} ${recipient ? `\n  recipient: ${recipient}` : ''}`);
 
 const ingestor = ALL_MINT_INGESTORS[ingestorName];
 
@@ -30,10 +30,10 @@ const resources = mintIngestorResources();
     let result;
     switch (inputType) {
       case 'url':
-        result = await ingestor.createMintTemplateForUrl(resources, input);
+        result = await ingestor.createMintTemplateForUrl(resources, input, recipient);
         break;
       case 'contract':
-        const [ chainId, contractAddress, tokenId ] = input.split(':');
+        const [chainId, contractAddress, tokenId] = input.split(':');
         if (!chainId || !contractAddress) {
           console.error('Invalid contract input');
           process.exit(1);
@@ -41,7 +41,7 @@ const resources = mintIngestorResources();
         result = await ingestor.createMintForContract(resources, {
           chainId: parseInt(chainId),
           contractAddress,
-          tokenId
+          tokenId,
         });
         break;
       default:
@@ -49,7 +49,8 @@ const resources = mintIngestorResources();
         process.exit(1);
     }
     console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
+  } catch (error: Error | any) {
+    console.log(error.message);
     console.error(error);
     process.exit(1);
   }
