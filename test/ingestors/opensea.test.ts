@@ -47,8 +47,8 @@ describe('opensea', function () {
     expect(template.featuredImageUrl).to.contain('cd729f7fce09a974c5dd2588f219393e.png');
 
     expect(template.marketingUrl).to.equal(url);
-    // expect(template.availableForPurchaseStart?.getTime()).to.equal(1715358000000);
-    // expect(template.availableForPurchaseEnd?.getTime()).to.equal(1893456000000);
+    expect(template.availableForPurchaseStart?.getTime()).to.equal(1719424843 * 1000);
+    expect(template.availableForPurchaseEnd?.getTime()).to.equal(1725472843 * 1000);
   });
 
   it('createMintTemplateForUrl: Throws error for non Base mint', async function () {
@@ -131,8 +131,8 @@ describe('opensea', function () {
     expect(template.featuredImageUrl).to.contain('cd729f7fce09a974c5dd2588f219393e.png');
 
     expect(template.marketingUrl).to.equal(contract.url);
-    // expect(template.availableForPurchaseStart?.getTime()).to.equal(1715358000000);
-    // expect(template.availableForPurchaseEnd?.getTime()).to.equal(1893456000000);
+    expect(template.availableForPurchaseStart?.getTime()).to.equal(1719424843 * 1000);
+    expect(template.availableForPurchaseEnd?.getTime()).to.equal(1725472843 * 1000);
   });
 
   it('createMintTemplateForContract: Throws error for a non supported contract', async function () {
