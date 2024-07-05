@@ -10,11 +10,6 @@ import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-
 import { RARIBLE_ABI } from './abi';
 
 export class RaribleIngestor {
-
-    configuration = {
-        supportsContractIsExpensive: true,
-    };
-    
     async supportsUrl(_resources: MintIngestorResources, url: string): Promise<boolean> {
         if (new URL(url).hostname !== 'www.rarible.com' && new URL(url).hostname !== 'rarible.com') {
             return false;
