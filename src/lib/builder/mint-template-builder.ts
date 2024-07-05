@@ -36,7 +36,7 @@ export class MintTemplateBuilder {
     }
     if (!this.mintTemplate.featuredImageUrl) {
       throw new Error('MintTemplate featuredImageUrl is required');
-    }
+    }   
     if (!this.mintTemplate.mintInstructionType) {
       throw new Error('MintTemplate mintInstructionType is required');
     }

@@ -24,7 +24,7 @@ export class FxHashIngestor implements MintIngestor {
     }
     return true;
   }
-
+            
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
@@ -83,7 +83,7 @@ export class FxHashIngestor implements MintIngestor {
       .setLiveDate(liveDate);
 
     return mintBuilder.build();
-  }
+  }   
 
   async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
     const isCompatible = await this.supportsUrl(resources, url);

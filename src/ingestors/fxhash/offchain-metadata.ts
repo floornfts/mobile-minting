@@ -71,7 +71,7 @@ export const getFxHashMintsBySlug = async (resources: MintIngestorResources, slu
         return cur;
       }
       return acc;
-    }, '');
+    }, '');       
 
     const graphQLRes = await resources.fetcher({
       url: 'https://api.v2-temp.fxhash.xyz/graphql',
