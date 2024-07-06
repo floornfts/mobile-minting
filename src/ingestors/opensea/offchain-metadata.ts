@@ -2,7 +2,7 @@ import { Axios } from "axios";
 
 const ipfsGateway = 'https://ipfs.io/ipfs/'; // IPFS gateway URL (replace if needed)
 
-export const openSeaOnchainDataFromIpfsUrl = async (baseuri: string, fetcher: Axios): Promise<{ name: string, description: string; image: string } | undefined> => {
+export const openSeaOnchainDataFromIpfsUrl = async (baseuri: string, fetcher: Axios): Promise<{ name: string, description: string, image: string, creatorName: string, creatorWebsite: string } | undefined> => {
     const ipfsHash = new URL(baseuri).href.split('/').slice(-1)[0];
     const url = `${ipfsGateway}${ipfsHash}`;
 
@@ -22,10 +22,15 @@ export const openSeaOnchainDataFromIpfsUrl = async (baseuri: string, fetcher: Ax
     
     const imageHash = new URL(data.image).href.split('/').slice(-1)[0];
 
+    const match = data.external_url.match(/^https:\/\/([^\/]+)\./);
+    const baseName = match ? match[1] : null;
+
     return {
       name: data.name,
       description: data.description,
       image: `${ipfsGateway}${imageHash}`,
+      creatorName: baseName,
+      creatorWebsite: data.external_url
     };
   } catch (error) {
     return undefined;

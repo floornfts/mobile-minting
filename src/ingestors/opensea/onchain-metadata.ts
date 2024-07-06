@@ -26,7 +26,7 @@ export const getOpenSeaDropContractMetadata = async (
   const contract = await getContract(CONTRACT_ADDRESS, OPENSEA_DROPS_ABI, alchemy);
 
   const baseuri = await nftContract.functions.baseURI();
-  const { name, description, image } = await openSeaOnchainDataFromIpfsUrl(baseuri, axios) || {};
+  const { name, description, image, creatorName, creatorWebsite } = await openSeaOnchainDataFromIpfsUrl(baseuri, axios) || {};
   const metadata = await contract.functions.getPublicDrop(nftContractAddress);
   
   const {startTime, endTime} = metadata[0]; 
@@ -37,6 +37,8 @@ export const getOpenSeaDropContractMetadata = async (
     image,
     startDate: new Date(startTime * 1000),
     endDate: new Date(endTime * 1000),
+    creatorName,
+    creatorWebsite
   };
 };
 

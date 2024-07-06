@@ -53,13 +53,17 @@ export class OpenSeaIngestor implements MintIngestor {
       mintBuilder.setMarketingUrl(url);
     }
 
-    const { name, description, image, startDate, endDate } = await getOpenSeaDropContractMetadata(
+    const { name, description, image, startDate, endDate, creatorName, creatorWebsite } = await getOpenSeaDropContractMetadata(
       chainId,
       contractAddress,
       resources.alchemy,
     );
 
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
+    mintBuilder.setCreator({
+      name: creatorName,
+      websiteUrl: creatorWebsite
+    })
 
     const totalPriceWei = await getOpenSeaDropPriceInEth(chainId, contractAddress, resources.alchemy);
 
