@@ -90,7 +90,7 @@ export class OpenSeaIngestor implements MintIngestor {
       contractAddress: CONTRACT_ADDRESS,
       contractMethod: 'mintPublic',
       // The payer is always the mint recipient
-      contractParams: `["${contract.address}", "${feeRecipient}", "0x0000000000000000000000000000000000000000", address]`,
+      contractParams: `["${contract.address}", "${feeRecipient}", "0x0000000000000000000000000000000000000000", 1]`,
       abi: OPENSEA_ABI,
       priceWei: totalPriceWei,
     });

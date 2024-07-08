@@ -41,7 +41,7 @@ describe('opensea', function () {
 
     expect(mintInstructions.contractAddress).to.equal('0x00005EA00Ac477B1030CE78506496e8C2dE24bf5');
     expect(mintInstructions.contractMethod).to.equal('mintPublic');
-    expect(mintInstructions.contractParams).to.equal('["0x7210587dd3df11efb7d6f34f970b32bf30bbc967", "0x0000a26b00c1f0df003000390027140000faa719", "0x0000000000000000000000000000000000000000", address]');
+    expect(mintInstructions.contractParams).to.equal('["0x7210587dd3df11efb7d6f34f970b32bf30bbc967", "0x0000a26b00c1f0df003000390027140000faa719", "0x0000000000000000000000000000000000000000", 1]');
     expect(mintInstructions.priceWei).to.equal('10750000000000000');
 
     expect(template.featuredImageUrl).to.contain('cd729f7fce09a974c5dd2588f219393e.png');
@@ -125,7 +125,7 @@ describe('opensea', function () {
 
     expect(mintInstructions.contractAddress).to.equal('0x00005EA00Ac477B1030CE78506496e8C2dE24bf5');
     expect(mintInstructions.contractMethod).to.equal('mintPublic');
-    expect(mintInstructions.contractParams).to.equal('["0x7210587dd3df11efb7d6f34f970b32bf30bbc967", "0x0000a26b00c1f0df003000390027140000faa719", "0x0000000000000000000000000000000000000000", address]');
+    expect(mintInstructions.contractParams).to.equal('["0x7210587dd3df11efb7d6f34f970b32bf30bbc967", "0x0000a26b00c1f0df003000390027140000faa719", "0x0000000000000000000000000000000000000000", 1]');
     expect(mintInstructions.priceWei).to.equal('10750000000000000');
 
     expect(template.featuredImageUrl).to.contain('cd729f7fce09a974c5dd2588f219393e.png');
