@@ -78,8 +78,8 @@ export class FoundationIngestor implements MintIngestor {
       collection.saleType,
     );
 
-    if (collection.saleType === 'FIXED_PRICE_DROP') {
-    }
+    // Proof is always this
+    const proof = '["0x00000000000000000000000000000000000000000000000000000000000000a0", "0x0000000000000000000000000000000000000000000000000000000000000000"]';
 
     mintBuilder.setMintInstructions({
       chainId: 8453,
@@ -90,7 +90,7 @@ export class FoundationIngestor implements MintIngestor {
           : 'mintFromDutchAuctionV2',
       contractParams:
         collection.saleType === 'FIXED_PRICE_DROP'
-          ? `["${collection.contractAddress}", 1, "${contractOptions.recipient}", "0x0000000000000000000000000000000000000000", "0x00000000000000000000000000000000000000a0]`
+          ? `["${collection.contractAddress}", 1, "${contractOptions.recipient}", "0x0000000000000000000000000000000000000000", ${proof}]`
           : `["${collection.contractAddress}", 1, "${contractOptions.recipient}"]`,
       abi: FOUNDATION_MINT_ABI,
       priceWei: totalPriceWei,

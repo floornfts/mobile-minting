@@ -20,10 +20,7 @@ export const getFoundationMintPriceInWei = async (
       ? await contract.functions.getFixedPriceSaleV2(dropAddress)
       : await contract.functions.getDutchAuctionV2(dropAddress);
 
-  console.log(saleData)
-
   const tokenPrice = saleType === 'FIXED_PRICE_DROP' ? saleData.price : saleData.currentPrice;
-
   const totalFee = parseInt(tokenPrice.toString()) + parseInt(saleData.mintFeePerNftInWei.toString());
 
   return `${totalFee}`;
