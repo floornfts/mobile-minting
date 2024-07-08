@@ -51,9 +51,7 @@ export class OpenSeaIngestor implements MintIngestor {
 
     // Find required fee recipient
     const feeRecipient = collection.fees.find((recipient) => recipient.required)?.recipient;
-
     const contractAddress = contract.address;
-
     const description = collection?.description;
     const image = collection?.image_url;
 
@@ -82,7 +80,6 @@ export class OpenSeaIngestor implements MintIngestor {
     });
 
     const totalPriceWei = await getOpenSeaMintPriceInEth(8453, CONTRACT_ADDRESS, contractAddress, resources.alchemy);
-
     const metadata = await getProhibitionContractMetadata(8453, CONTRACT_ADDRESS, contractAddress, resources.alchemy);
 
     mintBuilder.setMintInstructions({
@@ -121,10 +118,7 @@ export class OpenSeaIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Project not found');
     }
 
-    // Make sure one has the exact slug we're looking for and is on BASE or ETHEREUM (not TEZOS)
-    // const contract = collection.contracts.find((c: Contract) => c.chain === 'base');
     const contract = collection.contracts[0];
-
     if (!contract) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Contract not found');
     }
