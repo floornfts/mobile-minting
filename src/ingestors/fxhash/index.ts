@@ -2,12 +2,8 @@ import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { FXHASH_BASE_FIXED_PRICE_ABI, FXHASH_BASE_FRAME_ABI } from './abi';
-import { getFxHashMintPriceInEth } from './onchain-metadata';
-import { getFxhashMintByContract, getFxHashMintsBySlug } from './offchain-metadata';
-
-const BASE_FRAME_CONTRACT_ADDRESS = '0x6e625892C739bFD960671Db5544E260757480725';
-const BASE_FIXED_PRICE_CONTRACT_ADDRESS = '0x4bDcaC532143d8d35ed759189EE22E3704580b9D';
+import { fxHashContractForPricingType, getFxhashMintByContract, getFxHashMintsBySlug, fxHashGetPricingFromParams } from './offchain-metadata';
+import { FX_HASH_MINTABLE_ABI } from './abi';
 
 export class FxHashIngestor implements MintIngestor {
   async supportsUrl(_resources: MintIngestorResources, url: string): Promise<boolean> {
@@ -40,8 +36,15 @@ export class FxHashIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Project not found');
     }
 
-    const contractAddress = token.isFrame ? BASE_FRAME_CONTRACT_ADDRESS : BASE_FIXED_PRICE_CONTRACT_ADDRESS;
-    const abi = token.isFrame ? FXHASH_BASE_FRAME_ABI : FXHASH_BASE_FIXED_PRICE_ABI;
+    const { priceWei, type } = fxHashGetPricingFromParams(token);
+
+    if (!type) {
+      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Could not resolve mint type');
+    }
+
+    const contractAddress = fxHashContractForPricingType(type);
+
+    const abi = FX_HASH_MINTABLE_ABI;
 
     const description = token.metadata?.description || '';
     const image = token.metadata?.thumbnailUri || '';
@@ -57,23 +60,13 @@ export class FxHashIngestor implements MintIngestor {
       twitterUsername: token.author.account.profile.twitter?.split('/').pop(),
     })
 
-    // The 0 is reserveId in their contract... not clear what for... but 0 seems to always work
-    const totalPriceWei = await getFxHashMintPriceInEth(
-      contract.chainId,
-      contractAddress,
-      contract.contractAddress,
-      0,
-      resources.alchemy,
-      abi,
-    );
-
     mintBuilder.setMintInstructions({
       chainId: contract.chainId,
       contractAddress,
       contractMethod: 'buy',
       contractParams: `["${contract.contractAddress}", 1, 1, address]`,
       abi: abi,
-      priceWei: totalPriceWei,
+      priceWei: `${priceWei}`,
     });
 
     const liveDate = new Date() > token.mintOpensAt ? new Date() : new Date(token.mintOpensAt);
