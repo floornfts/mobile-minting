@@ -52,12 +52,10 @@ describe('zora-base-mint', function () {
     it('createMintTemplateForUrl: Returns a mint template for a supported URL', async function () {
         const ingestor = new ZoraIngestor();
         const url = 'https://zora.co/collect/base:0x1e1ad3d381bc0ccea5e44c29fb1f7a0981b97f37/1';
-
-
+        // const url = 'https://zora.co/collect/base:0xeb334f3fbd826ce99f1e74d7d074fbe351f4157a/1';
         const resources = mintIngestorResources();
         const template = await ingestor.createMintTemplateForUrl(resources,url);
-
-        // Verify that the mint template passed validation
+    //     // Verify that the mint template passed validation
         const builder = new MintTemplateBuilder(template);
         builder.validateMintTemplate();
         expect(template.name).to.equal('Base x Doodles');
@@ -71,7 +69,7 @@ describe('zora-base-mint', function () {
         expect(mintInstructions.contractMethod).to.equal('mintWithRewards');
         expect(mintInstructions.contractParams).to.equal('[address,1,1,bytes,address]');
         expect(mintInstructions.priceWei).to.equal('0.000777');
-
+        
         expect(template.featuredImageUrl).to.equal('ipfs://bafybeicyqd4qdb74hm3e6vevdhpjmklhkjtdazwdptgpdbh4hprcsi7uea');
 
         expect(template.availableForPurchaseStart?.getTime()).to.equal(1718202693000);

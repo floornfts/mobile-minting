@@ -32,16 +32,14 @@ export const getZoraContractMetadata = async (
     token: { address: contractAddress, tokenId:tokenId.toString() },
     includeFullDetails: true,
   });
+
   const { token: { tokenContract, mintInfo, ...restTokenDetails } } = collection.token;
 
-  // console.log('Mint Info:', mintInfo);
-  // console.log('Token Contract:', tokenContract);
-  // console.log('Other Token Details:', restTokenDetails);
   const name = restTokenDetails.name;
   const description = restTokenDetails.description;
   const imageUrl = restTokenDetails.image.url;
   const chainId = tokenContract.chain;
-  
+  const creatorAddress=mintInfo.originatorAddress;
   // Convert blockTimestamp to Date.now format
   const startAt = new Date(mintInfo.mintContext.blockTimestamp).getTime();
 
@@ -50,7 +48,8 @@ export const getZoraContractMetadata = async (
     description,
     imageUrl,
     chainId,
-    startAt
+    startAt,
+    creatorAddress
   };
 }
 }

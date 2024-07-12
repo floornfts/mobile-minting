@@ -4,7 +4,7 @@ import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { zoraMintAbi } from './abi';
 import {  getZoraMintPriceInEth,getZoraContractMetadata } from './onchain-zora';
-import { urlForValidZoraPage,zoraOnchainIdDataFromUrl } from './offchain-metadata';
+import { fetchCreatorProfile, urlForValidZoraPage,zoraOnchainIdDataFromUrl } from './offchain-metadata';
 
 export class ZoraIngestor implements MintIngestor {
 
@@ -49,7 +49,7 @@ export class ZoraIngestor implements MintIngestor {
       .setMintInstructionType(MintInstructionType.EVM_MINT)
       .setPartnerName('Zora');
       
-    const { name, description, imageUrl,startAt } = await getZoraContractMetadata(Number(tokenId), contractAddress);
+    const { name, description, imageUrl,startAt,creatorAddress } = await getZoraContractMetadata(Number(tokenId), contractAddress);
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(imageUrl);
     const totalPriceWei = await getZoraMintPriceInEth(chainId, contractAddress, resources.alchemy);
     mintBuilder.setMintInstructions({
@@ -60,11 +60,23 @@ export class ZoraIngestor implements MintIngestor {
       abi: zoraMintAbi,
       priceWei: totalPriceWei,
     });
-
+    const token=await fetchCreatorProfile(creatorAddress,resources.fetcher);
+    mintBuilder.setCreator({
+      name: token.username,
+      imageUrl: token.avatar,
+      walletAddress: token.address,
+      description: token.description,
+      twitterUsername: token.extension.links.twitter,
+      farcasterUsername: token.extension.links.farcaster,
+      tikTokUsername: token.extension.links.tiktok,
+      instagramUsername: token.extension.links.instagram,
+      discordUsername: token.extension.links.discord,
+      websiteUrl: token.extension.links.website,
+    })
+    
     const startAtDate = new Date(startAt);
     const liveDate = new Date() > startAt ? new Date() : startAt;
     mintBuilder
-      .setAvailableForPurchaseEnd(new Date('2050-01-01'))
       .setAvailableForPurchaseStart(startAtDate)
       .setLiveDate(liveDate);
 
