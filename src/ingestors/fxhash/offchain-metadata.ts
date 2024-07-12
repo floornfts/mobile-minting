@@ -149,9 +149,8 @@ enum FxHashPricingType {
   DUTCH_AUCTION = 'DUTCH_AUCTION',
   FRAME = 'FRAME',
 }
-export function getPricingFromParams(
-  generativeToken: any,
-  whitelist: boolean
+export function fxHashGetPricingFromParams(
+  generativeToken: any
 ) {
   if (!generativeToken) {
     throw new Error("generativeToken is null or undefined")

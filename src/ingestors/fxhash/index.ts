@@ -2,7 +2,7 @@ import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { fxHashContractForPricingType, getFxhashMintByContract, getFxHashMintsBySlug, getPricingFromParams } from './offchain-metadata';
+import { fxHashContractForPricingType, getFxhashMintByContract, getFxHashMintsBySlug, fxHashGetPricingFromParams } from './offchain-metadata';
 import { FX_HASH_MINTABLE_ABI } from './abi';
 
 export class FxHashIngestor implements MintIngestor {
@@ -36,7 +36,7 @@ export class FxHashIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Project not found');
     }
 
-    const { priceWei, type } = getPricingFromParams(token, false);
+    const { priceWei, type } = fxHashGetPricingFromParams(token);
 
     if (!type) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Could not resolve mint type');
