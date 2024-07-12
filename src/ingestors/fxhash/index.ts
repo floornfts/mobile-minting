@@ -42,7 +42,7 @@ export class FxHashIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Could not resolve mint type');
     }
 
-    const contractAddress = fxHashContractForPricingType(type, token.chain);
+    const contractAddress = fxHashContractForPricingType(type);
 
     const abi = FX_HASH_MINTABLE_ABI;
 

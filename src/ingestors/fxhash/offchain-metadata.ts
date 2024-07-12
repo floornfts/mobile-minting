@@ -1,4 +1,3 @@
-import axios from "axios";
 import { MintContractOptions, MintIngestorResources } from "src/lib";
 
 export const getFxhashMintByContract = async (resources: MintIngestorResources, contract: MintContractOptions): Promise<any> => {
@@ -155,8 +154,8 @@ export function fxHashGetPricingFromParams(
   if (!generativeToken) {
     throw new Error("generativeToken is null or undefined")
   }
-  const { pricingFixed, pricingDutchAuction, reserves, isFrame } = generativeToken;
-  var price = 0;
+  const { pricingFixed, pricingDutchAuction, isFrame } = generativeToken;
+  let price = 0;
   let type: FxHashPricingType | undefined = isFrame ? FxHashPricingType.FRAME : undefined;
   if (pricingFixed) {
     type = type || FxHashPricingType.FIXED;
@@ -174,7 +173,7 @@ const BASE_FRAME_CONTRACT_ADDRESS = '0x6e625892C739bFD960671Db5544E260757480725'
 const BASE_FIXED_PRICE_CONTRACT_ADDRESS = '0x4bDcaC532143d8d35ed759189EE22E3704580b9D';
 const BASE_DUTCH_AUCTION_CONTRACT_ADDRESS = '0x9667a1Cf26223c9de22207DD93cfEEc9237b8f4E';
 
-export function fxHashContractForPricingType(mintType: FxHashPricingType, chain: string) {
+export function fxHashContractForPricingType(mintType: FxHashPricingType) {
   if (mintType === FxHashPricingType.FRAME) {
     return BASE_FRAME_CONTRACT_ADDRESS;
   }
