@@ -33,8 +33,6 @@ describe('zora-base-mint', function () {
         const ingestor = new ZoraIngestor();
         const url = 'https://twitter.com/Nithinkd567';
         const resources = mintIngestorResources();
-    
-        // It should throw an error
         let error: any;
     
         try {
@@ -76,7 +74,6 @@ describe('zora-base-mint', function () {
         expect(template. liveDate?.getTime()).to.greaterThan(1718202693000);
     });
 });
-
 
 
 it('createMintTemplateForContract: Throws error for a non supported contract', async function () {

@@ -14,21 +14,16 @@ export const urlForValidZoraPage = async ( contractAddress: string,tokenId:strin
 };
 
 export const fetchCreatorProfile=async(walletAddress:string,fetcher: Axios):Promise<any>=>{
-
-//https://zora.co/api/profiles/0xe1c5fc12c0c5e05bbfd499fa2074c758a4391285 write for this 
-const url=`https://zora.co/api/profiles/${walletAddress}`;
-try {
-    const response = await fetcher.get(url);
-    if (response.status !== 200) {
-        return undefined;
-    }
-    return response.data;
-}
-
-catch(error){
-    return undefined;
-
-}
+    const url=`https://zora.co/api/profiles/${walletAddress}`;
+    try {
+        const response = await fetcher.get(url);
+        if (response.status !== 200) {
+             return undefined;
+        }
+        return response.data;
+     } catch (error) {
+          return undefined;
+     }
 }
 
 export const zoraOnchainIdDataFromUrl = async (url: string, fetcher: Axios): Promise<{ tokenId: string | undefined, contractAddress: string | undefined,chainId: number | undefined }> => {
