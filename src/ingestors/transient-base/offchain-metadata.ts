@@ -1,5 +1,5 @@
 import { AxiosInstance, AxiosResponse } from 'axios';
-import { MintContractOptions, MintIngestionErrorName, MintIngestorError, MintIngestorResources } from 'src/lib';
+import { MintContractOptions, MintIngestionErrorName, MintIngestorError, MintIngestorResources } from '../../lib';
 
 /**
  * @param resources MintIngestorResources
@@ -49,7 +49,6 @@ export const getTransientBaseMintBySlug = async (
   } catch (error) {
     throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Mint not found');
   }
-
 
   const data = response.data;
   if (!data || !data.nft_token) {
