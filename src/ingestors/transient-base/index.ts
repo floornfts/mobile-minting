@@ -81,7 +81,7 @@ export class TransientIngestor implements MintIngestor {
       chainId,
       contractAddress: mintAddress,
       contractMethod: 'purchase',
-      contractParams: '["address", 1, 1, address]',
+      contractParams: `["${contract.contractAddress}", 1, address, 1]`,
       abi: TRANSIENT_BASE_ABI,
       priceWei: priceInWei,
     });
