@@ -41,6 +41,11 @@ export const getTransientBaseMintBySlug = async (
   description: string;
   public_sale_start_at: string;
   public_sale_end_at: string;
+  user: {
+    name: string;
+    image: string;
+    website: string;
+  }
 }> => {
   // search Transient API for the slug
   let response: AxiosResponse;
@@ -67,6 +72,11 @@ export const getTransientBaseMintBySlug = async (
     description: data.description,
     public_sale_start_at: data.public_sale_start_at,
     public_sale_end_at: data.public_sale_end_at,
+    user: {
+      name: data.nft_contract.user.display_name,
+      image: data.nft_contract.user.pfp,
+      website: `https://www.transient.xyz${data.nft_contract.user.uri}`,
+    },
   };
 };
 
