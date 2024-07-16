@@ -41,6 +41,7 @@ export const getTransientBaseMintBySlug = async (
   description: string;
   public_sale_start_at: string;
   public_sale_end_at: string;
+  token_id: number;
   user: {
     name: string;
     image: string;
@@ -72,6 +73,7 @@ export const getTransientBaseMintBySlug = async (
     description: data.description,
     public_sale_start_at: data.public_sale_start_at,
     public_sale_end_at: data.public_sale_end_at,
+    token_id: data.nft_token.token_id,
     user: {
       name: data.nft_contract.user.display_name,
       image: data.nft_contract.user.pfp,

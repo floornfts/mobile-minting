@@ -61,8 +61,17 @@ export class TransientIngestor implements MintIngestor {
     }
 
     // asides name and image no other metadata we need is onchain so we can just use the offchain metadata
-    const { name, image, description, priceInWei, mintAddress, public_sale_start_at, public_sale_end_at, user } =
-      await getTransientBaseMintByAddressAndChain(resources, contract.chainId, contract.contractAddress);
+    const {
+      name,
+      image,
+      description,
+      priceInWei,
+      mintAddress,
+      public_sale_start_at,
+      public_sale_end_at,
+      token_id,
+      user,
+    } = await getTransientBaseMintByAddressAndChain(resources, contract.chainId, contract.contractAddress);
 
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
 
@@ -74,14 +83,14 @@ export class TransientIngestor implements MintIngestor {
     mintBuilder.setCreator({
       name: user.name,
       imageUrl: user.image,
-      websiteUrl: user.website
+      websiteUrl: user.website,
     });
 
     mintBuilder.setMintInstructions({
       chainId,
       contractAddress: mintAddress,
       contractMethod: 'purchase',
-      contractParams: `["${contract.contractAddress}", 1, address, 1]`,
+      contractParams: `["${contract.contractAddress}", ${token_id}, address, 1]`,
       abi: TRANSIENT_BASE_ABI,
       priceWei: priceInWei,
     });
