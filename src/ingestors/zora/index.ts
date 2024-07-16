@@ -1,7 +1,7 @@
 import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../lib/types/mint-ingestor';
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
-import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
+import { DATE_DISTANT_FUTURE, MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { zoraMintAbi } from './abi';
 import {  getZoraMintPriceInEth,getZoraContractMetadata } from './onchain-zora';
 import { fetchCreatorProfile, urlForValidZoraPage,zoraOnchainIdDataFromUrl } from './offchain-metadata';
@@ -36,7 +36,7 @@ export class ZoraIngestor implements MintIngestor {
     if (!chainId || !contractAddress || !tokenId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
     }
-    return this.createMintForContract(resources, {chainId, contractAddress,tokenId, url });
+    return this.createMintForContract(resources, {chainId, contractAddress, tokenId, url });
   }
 
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
@@ -47,10 +47,15 @@ export class ZoraIngestor implements MintIngestor {
 
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('Zora');
+      .setPartnerName('Zora')
+      .setMintOutputContract({chainId, address: contractAddress })
+      .setMarketingUrl(contract.url || `https://zora.co/collect/${'base'}:${contractAddress}${tokenId ? `/${tokenId}` : ''}`);
       
-    const { name, description, imageUrl,startAt,creatorAddress } = await getZoraContractMetadata(Number(tokenId), contractAddress);
-    mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(imageUrl);
+    const { name, description, imageUrl, startAt, creatorAddress } = await getZoraContractMetadata(Number(tokenId), contractAddress);
+    mintBuilder.setName(name)
+      .setDescription(description)
+      .setFeaturedImageUrl(imageUrl);
+
     const totalPriceWei = await getZoraMintPriceInEth(chainId, contractAddress, resources.alchemy);
     mintBuilder.setMintInstructions({
       chainId,
@@ -78,6 +83,7 @@ export class ZoraIngestor implements MintIngestor {
     const liveDate = new Date() > startAt ? new Date() : startAt;
     mintBuilder
       .setAvailableForPurchaseStart(startAtDate)
+      .setAvailableForPurchaseEnd(DATE_DISTANT_FUTURE)
       .setLiveDate(liveDate);
 
     const output = mintBuilder.build();

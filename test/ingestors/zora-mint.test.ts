@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { ZoraIngestor } from '../../src/ingestors/zora-mint';
+import { ZoraIngestor } from '../../src/ingestors/zora';
 import { EVMMintInstructions } from '../../src/lib/types/mint-template';
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
 import { mintIngestorResources } from '../../src/lib/resources';
