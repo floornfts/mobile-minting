@@ -1,6 +1,6 @@
 {
   "name": "@floornfts/mobile-minting",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "repository": "git://github.com/floornfts/mobile-minting.git",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -34,7 +34,7 @@
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
     "test": "NODE_OPTIONS=\"--loader ts-node/esm\" c8 mocha --require ts-node/register",
-    "release": "np",
+    "release": "npm run build && np",
     "dry-run": "ts-node src/dry-run/index.ts"
   },
   "dependencies": {
