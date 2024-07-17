@@ -7,7 +7,6 @@ export type MintContractOptions = {
   contractAddress: string;
   tokenId?: string | undefined;
   url?: string | undefined;
-  recipient?: string;
 };
 
 interface MintIngestor {

@@ -56,7 +56,6 @@ export class FoundationIngestor implements MintIngestor {
     }
 
     const collection = await getFoundationMintByAddress(resources, contractOptions);
-    console.log(collection)
 
     if (!collection) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection not found');
@@ -107,8 +106,8 @@ export class FoundationIngestor implements MintIngestor {
           : 'mintFromDutchAuctionV2',
       contractParams:
         collection.saleType === 'FIXED_PRICE_DROP'
-          ? `["${collection.contractAddress}", 1, "${contractOptions.recipient}", "0x0000000000000000000000000000000000000000", ${proof}]`
-          : `["${collection.contractAddress}", 1, "${contractOptions.recipient}"]`,
+          ? `["${collection.contractAddress}", 1, address, "0x0000000000000000000000000000000000000000", ${proof}]`
+          : `["${collection.contractAddress}", 1, address]`,
       abi: FOUNDATION_MINT_ABI,
       priceWei: totalPriceWei,
     });
@@ -128,7 +127,6 @@ export class FoundationIngestor implements MintIngestor {
   async createMintTemplateForUrl(
     resources: MintIngestorResources,
     url: string,
-    recipient: string,
   ): Promise<MintTemplate> {
     const isCompatible = await this.supportsUrl(resources, url);
     if (!isCompatible) {
@@ -145,6 +143,6 @@ export class FoundationIngestor implements MintIngestor {
     }
 
     const chainId = getChainId(chain);
-    return this.createMintForContract(resources, { chainId, contractAddress: tokenAddress, url, recipient });
+    return this.createMintForContract(resources, { chainId, contractAddress: tokenAddress, url});
   }
 }

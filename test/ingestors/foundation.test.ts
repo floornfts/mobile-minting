@@ -50,7 +50,7 @@ describe('foundation', function () {
     const ingestor = new FoundationIngestor();
     const url = 'https://foundation.app/mint/base/0x89E63F58da71E9CD4DA439C3D1194917c67eb869';
     const resources = mintIngestorResources();
-    const template = await ingestor.createMintTemplateForUrl(resources, url, 'test');
+    const template = await ingestor.createMintTemplateForUrl(resources, url);
 
     // Verify that the mint template passed validation
     const builder = new MintTemplateBuilder(template);
@@ -63,7 +63,7 @@ describe('foundation', function () {
     expect(mintInstructions.contractAddress).to.equal('0x62037b26ffF91929655AA3A060F327b47d1e2b3e');
     expect(mintInstructions.contractMethod).to.equal('mintFromFixedPriceSaleWithEarlyAccessAllowlistV2');
     expect(mintInstructions.contractParams).to.equal(
-      '["0x89E63F58da71E9CD4DA439C3D1194917c67eb869", 1, "test", "0x0000000000000000000000000000000000000000", ["0x00000000000000000000000000000000000000000000000000000000000000a0", "0x0000000000000000000000000000000000000000000000000000000000000000"]]',
+      '["0x89E63F58da71E9CD4DA439C3D1194917c67eb869", 1, address, "0x0000000000000000000000000000000000000000", ["0x00000000000000000000000000000000000000000000000000000000000000a0", "0x0000000000000000000000000000000000000000000000000000000000000000"]]',
     );
     expect(mintInstructions.priceWei).to.equal('7700000000000000');
 
@@ -80,7 +80,7 @@ describe('foundation', function () {
     const ingestor = new FoundationIngestor();
     const url = 'https://foundation.app/mint/base/0x89e63f58da71e800000000000000000000000000';
     const resources = mintIngestorResources();
-    const template = await ingestor.createMintTemplateForUrl(resources, url, 'test');
+    const template = await ingestor.createMintTemplateForUrl(resources, url);
 
     // Verify that the mint template passed validation
     const builder = new MintTemplateBuilder(template);
@@ -93,7 +93,7 @@ describe('foundation', function () {
     expect(mintInstructions.contractAddress).to.equal('0x62037b26fff91800000000000000000000000000');
     expect(mintInstructions.contractMethod).to.equal('mintFromFixedPriceSaleWithEarlyAccessAllowlistV1');
     expect(mintInstructions.contractParams).to.equal(
-      '["0x89e63f58da71e800000000000000000000000000", 1, "test", "0x0000000000000000000000000000000000000000", ["0x00000000000000000000000000000000000000000000000000000000000000a0", "0x0000000000000000000000000000000000000000000000000000000000000000"]]',
+      '["0x89e63f58da71e800000000000000000000000000", 1, address, "0x0000000000000000000000000000000000000000", ["0x00000000000000000000000000000000000000000000000000000000000000a0", "0x0000000000000000000000000000000000000000000000000000000000000000"]]',
     );
     expect(mintInstructions.priceWei).to.equal('7699999999999999');
 
@@ -110,7 +110,7 @@ describe('foundation', function () {
     const ingestor = new FoundationIngestor();
     const url = 'https://foundation.app/mint/base/0x0C92Ce2aECc651Dd3733008A301f126662ae4A50';
     const resources = mintIngestorResources();
-    const template = await ingestor.createMintTemplateForUrl(resources, url, 'test');
+    const template = await ingestor.createMintTemplateForUrl(resources, url);
 
     // Verify that the mint template passed validation
     const builder = new MintTemplateBuilder(template);
@@ -121,7 +121,7 @@ describe('foundation', function () {
 
     expect(mintInstructions.contractAddress).to.equal('0x62037b26ffF91929655AA3A060F327b47d1e2b3e');
     expect(mintInstructions.contractMethod).to.equal('mintFromDutchAuctionV2');
-    expect(mintInstructions.contractParams).to.equal('["0x0C92Ce2aECc651Dd3733008A301f126662ae4A50", 1, "test"]');
+    expect(mintInstructions.contractParams).to.equal('["0x0C92Ce2aECc651Dd3733008A301f126662ae4A50", 1, address]');
     expect(mintInstructions.priceWei).to.equal('9900800000000000000');
 
     expect(template.featuredImageUrl).to.equal(
