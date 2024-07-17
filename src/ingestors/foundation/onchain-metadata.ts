@@ -13,15 +13,19 @@ export const getFoundationMintPriceInWei = async (
   dropAddress: string,
   alchemy: Alchemy,
   saleType: 'FIXED_PRICE_DROP' | string,
-): Promise<any> => {
-  const contract = await getContract(chainId, contractAddress, alchemy);
-  const saleData =
-    saleType === 'FIXED_PRICE_DROP'
-      ? await contract.functions.getFixedPriceSaleV2(dropAddress)
-      : await contract.functions.getDutchAuctionV2(dropAddress);
+): Promise<string | undefined> => {
 
-  const tokenPrice = saleType === 'FIXED_PRICE_DROP' ? saleData.price : saleData.currentPrice;
-  const totalFee = parseInt(tokenPrice.toString()) + parseInt(saleData.mintFeePerNftInWei.toString());
+  try {
+    const contract = await getContract(chainId, contractAddress, alchemy);
+    const saleData =
+      saleType === 'FIXED_PRICE_DROP'
+        ? await contract.functions.getFixedPriceSaleV2(dropAddress)
+        : await contract.functions.getDutchAuctionV2(dropAddress);
 
-  return `${totalFee}`;
+    const tokenPrice = saleType === 'FIXED_PRICE_DROP' ? saleData.price : saleData.currentPrice;
+    const totalFee = parseInt(tokenPrice.toString()) + parseInt(saleData.mintFeePerNftInWei.toString());
+
+    return `${totalFee}`;
+  } catch (error) {
+  }
 };

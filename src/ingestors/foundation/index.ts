@@ -75,7 +75,7 @@ export class FoundationIngestor implements MintIngestor {
     }
 
     if (!collection.creator) {
-      throw new Error('Error finding creator');
+      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Error finding creator');
     }
 
     mintBuilder.setCreator({
@@ -90,6 +90,10 @@ export class FoundationIngestor implements MintIngestor {
       resources.alchemy,
       collection.saleType,
     );
+
+    if (!totalPriceWei) {
+      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Price not available');
+    }
 
     // Proof is always this
     const proof = '["0x00000000000000000000000000000000000000000000000000000000000000a0", "0x0000000000000000000000000000000000000000000000000000000000000000"]';
