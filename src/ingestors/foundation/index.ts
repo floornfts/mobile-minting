@@ -20,6 +20,15 @@ const getChainId = (chain: string) => {
 
 export class FoundationIngestor implements MintIngestor {
   async supportsUrl(_resources: MintIngestorResources, url: string): Promise<boolean> {
+    const urlSplit = url.split('/');
+    const slug = urlSplit.pop();
+    if (!slug || slug.length !== 42 || !slug.startsWith('0x')) {
+      return false;
+    }
+    const chain = urlSplit.pop();
+    if (chain !== 'base') {
+      return false;
+    }
     return new URL(url).hostname === 'www.foundation.app' || new URL(url).hostname === 'foundation.app';
   }
 
