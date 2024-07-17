@@ -1,7 +1,7 @@
 import { Alchemy, Contract } from 'alchemy-sdk';
 import { OPENSEA_DROPS_ABI, OPENSEA_PROXY_ABI } from './abi';
-import { openSeaOnchainDataFromIpfsUrl } from './offchain-metadata';
 import axios from "axios";
+import { openSeaOnchainDataFromUrl } from './offchain-metadata';
 
 // Declare global constant for OpenSea Drops implementation contract address
 // Proxy contracts which are the mint contracts will be defined as nftContract 
@@ -22,14 +22,14 @@ export const getOpenSeaDropContractMetadata = async (
   nftContractAddress: string,
   alchemy: Alchemy,
 ): Promise<any> => {
-  const nftContract = await getContract(nftContractAddress, OPENSEA_PROXY_ABI, alchemy);
   const contract = await getContract(CONTRACT_ADDRESS, OPENSEA_DROPS_ABI, alchemy);
 
-  const baseuri = await nftContract.functions.baseURI();
-  const { name, description, image, creatorName, creatorWebsite } = await openSeaOnchainDataFromIpfsUrl(baseuri, axios) || {};
+  const url = await urlForValidOpenSeaDropContract(nftContractAddress, alchemy) || "";
+
+  const { name, description, image, creatorName, creatorAddress, creatorWebsite, creatorTwitter } = await openSeaOnchainDataFromUrl(url, axios) || {};
+
   const metadata = await contract.functions.getPublicDrop(nftContractAddress);
-  
-  const {startTime, endTime} = metadata[0]; 
+  const {startTime, endTime} = metadata[0];
 
   return {
     name,
@@ -38,7 +38,9 @@ export const getOpenSeaDropContractMetadata = async (
     startDate: new Date(startTime * 1000),
     endDate: new Date(endTime * 1000),
     creatorName,
-    creatorWebsite
+    creatorAddress,
+    creatorWebsite,
+    creatorTwitter
   };
 };
 
@@ -50,7 +52,8 @@ export const getOpenSeaDropPriceInEth = async (
   const contract = await getContract(CONTRACT_ADDRESS, OPENSEA_DROPS_ABI, alchemy);
   const metadata = await contract.functions.getPublicDrop(nftContract);
 
-  const {mintPrice, feeBps} = metadata[0]; 
+  const {mintPrice, feeBps} = metadata[0];
+
   // Convert basis points to decimal value
   const feeRatio = feeBps / 10000;
 
@@ -61,12 +64,12 @@ export const getOpenSeaDropPriceInEth = async (
   return `${totalFee}`;
 };
 
+
 // Function to get the URL for a valid OpenSea Drop contract
 export const urlForValidOpenSeaDropContract = async (
-  chainId: number,
   contractAddress: string,
   alchemy: Alchemy,
-): Promise<string | undefined> => {
+): Promise<any> => {
   try {
     // Get the contract
     const contract = await getContract(contractAddress, OPENSEA_PROXY_ABI, alchemy);
