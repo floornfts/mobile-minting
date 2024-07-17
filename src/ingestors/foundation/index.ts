@@ -49,7 +49,7 @@ export class FoundationIngestor implements MintIngestor {
   ): Promise<MintTemplate> {
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('foundation');
+      .setPartnerName('Foundation');
 
     if (contractOptions.url) {
       mintBuilder.setMarketingUrl(contractOptions.url);
