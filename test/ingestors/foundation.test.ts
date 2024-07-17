@@ -61,9 +61,9 @@ describe('foundation', function () {
     const mintInstructions = template.mintInstructions as EVMMintInstructions;
 
     expect(mintInstructions.contractAddress).to.equal('0x62037b26ffF91929655AA3A060F327b47d1e2b3e');
-    expect(mintInstructions.contractMethod).to.equal('mintFromFixedPriceSaleWithEarlyAccessAllowlistV2');
+    expect(mintInstructions.contractMethod).to.equal('mintFromFixedPriceSaleV2');
     expect(mintInstructions.contractParams).to.equal(
-      '["0x89E63F58da71E9CD4DA439C3D1194917c67eb869", 1, address, "0x0000000000000000000000000000000000000000", ["0x00000000000000000000000000000000000000000000000000000000000000a0", "0x0000000000000000000000000000000000000000000000000000000000000000"]]',
+      '["0x89E63F58da71E9CD4DA439C3D1194917c67eb869", 1, address, "0x0000000000000000000000000000000000000000"]',
     );
     expect(mintInstructions.priceWei).to.equal('7700000000000000');
 
@@ -91,9 +91,9 @@ describe('foundation', function () {
     const mintInstructions = template.mintInstructions as EVMMintInstructions;
 
     expect(mintInstructions.contractAddress).to.equal('0x62037b26fff91800000000000000000000000000');
-    expect(mintInstructions.contractMethod).to.equal('mintFromFixedPriceSaleWithEarlyAccessAllowlistV1');
+    expect(mintInstructions.contractMethod).to.equal('mintFromFixedPriceSaleV2');
     expect(mintInstructions.contractParams).to.equal(
-      '["0x89e63f58da71e800000000000000000000000000", 1, address, "0x0000000000000000000000000000000000000000", ["0x00000000000000000000000000000000000000000000000000000000000000a0", "0x0000000000000000000000000000000000000000000000000000000000000000"]]',
+      '["0x89e63f58da71e800000000000000000000000000", 1, address, "0x0000000000000000000000000000000000000000"]',
     );
     expect(mintInstructions.priceWei).to.equal('7699999999999999');
 
