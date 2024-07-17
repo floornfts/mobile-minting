@@ -56,6 +56,7 @@ export class FoundationIngestor implements MintIngestor {
     }
 
     const collection = await getFoundationMintByAddress(resources, contractOptions);
+    console.log(collection)
 
     if (!collection) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection not found');
@@ -68,7 +69,10 @@ export class FoundationIngestor implements MintIngestor {
 
     mintBuilder.setName(collection.name).setDescription(description).setFeaturedImageUrl(image);
     mintBuilder.setMintOutputContract({ chainId: 8453, address: contractAddress });
-    mintBuilder.addImage(collection.banner_image_url, 'banner');
+
+    if (collection.coverImageUrl) {
+      mintBuilder.addImage(collection.coverImageUrl, 'cover-image');
+    }
 
     if (!collection.creator) {
       throw new Error('Error finding creator');

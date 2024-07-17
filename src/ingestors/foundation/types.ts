@@ -1,3 +1,5 @@
+import { Alchemy } from "alchemy-sdk";
+
 export type Creator = {
   username: string;
   address: string;
@@ -20,16 +22,17 @@ export type Contract = {
 };
 
 export type Collection = {
+  endTime: string;
+  generalAvailabilityStartTime: Date;
+  saleType: "FIXED_PRICE_DROP";
+  creator: any;
+  coverImageUrl: string;
+  media: any;
+  contractAddress: any;
   collection: string;
   name: string;
   description: string;
-  image_url: string;
-  banner_image_url: string;
   owner: string;
-  opensea_url: string;
-  project_url: string;
   contracts: Contract[];
-  total_supply: number;
-  created_date: string;
   fees: { fee: number; recipient: string; required: boolean }[];
 };

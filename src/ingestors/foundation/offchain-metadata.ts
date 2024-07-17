@@ -1,10 +1,10 @@
-import { Contract } from 'alchemy-sdk';
 import { MintContractOptions, MintIngestorResources } from 'src/lib';
+import { Collection } from './types';
 
 export const getFoundationMintByAddress = async (
   resources: MintIngestorResources,
   contract: MintContractOptions,
-): Promise<Contract | undefined> => {
+): Promise<Collection | undefined> => {
   try {
     const resp = await resources.fetcher.post(
       'https://api-v2.foundation.app/graphql',
