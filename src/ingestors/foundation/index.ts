@@ -94,19 +94,16 @@ export class FoundationIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Price not available');
     }
 
-    // Proof is always this
-    const proof = '["0x00000000000000000000000000000000000000000000000000000000000000a0", "0x0000000000000000000000000000000000000000000000000000000000000000"]';
-
     mintBuilder.setMintInstructions({
       chainId: 8453,
       contractAddress: CONTRACT_ADDRESS,
       contractMethod:
         collection.saleType === 'FIXED_PRICE_DROP'
-          ? 'mintFromFixedPriceSaleWithEarlyAccessAllowlistV2'
+          ? 'mintFromFixedPriceSaleV2'
           : 'mintFromDutchAuctionV2',
       contractParams:
         collection.saleType === 'FIXED_PRICE_DROP'
-          ? `["${collection.contractAddress}", 1, address, "0x0000000000000000000000000000000000000000", ${proof}]`
+          ? `["${collection.contractAddress}", 1, address, "0x0000000000000000000000000000000000000000"]`
           : `["${collection.contractAddress}", 1, address]`,
       abi: FOUNDATION_MINT_ABI,
       priceWei: totalPriceWei,
