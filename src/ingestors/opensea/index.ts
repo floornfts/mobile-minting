@@ -4,6 +4,7 @@ import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { OPENSEA_PROXY_ABI } from './abi';
 import { getOpenSeaDropContractMetadata, getOpenSeaDropPriceInEth, urlForValidOpenSeaDropContract } from './onchain-metadata';
+import { openSeaOnchainDataFromUrl } from './offchain-metadata';
 
 export class OpenSeaIngestor implements MintIngestor {
 
@@ -12,7 +13,11 @@ export class OpenSeaIngestor implements MintIngestor {
   };
 
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
-    return false; // This ingestor does not support ingesting via URL
+    if (new URL(url).hostname !== 'opensea.io') {
+      return false;
+    }
+    const { chainId, contractAddress } = await openSeaOnchainDataFromUrl(url, resources.fetcher);
+    return !!chainId && !!contractAddress;
   }
 
   async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
@@ -21,18 +26,24 @@ export class OpenSeaIngestor implements MintIngestor {
       return false;
     }
 
-    const url = await urlForValidOpenSeaDropContract(chainId, contractAddress, resources.alchemy);
+    const url = await urlForValidOpenSeaDropContract(contractAddress, resources.alchemy);
 
     return !!url;
   }
 
-  async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<any> {
+  async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
     const isCompatible = await this.supportsUrl(resources, url);
     if (!isCompatible) {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    return false; // This ingestor does not support ingesting via URL
+    const { chainId, contractAddress } = await openSeaOnchainDataFromUrl(url, resources.fetcher);
+
+    if (!chainId || !contractAddress) {
+      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
+    }
+
+    return this.createMintForContract(resources, { chainId, contractAddress, url });
   }
 
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
@@ -47,13 +58,13 @@ export class OpenSeaIngestor implements MintIngestor {
       .setPartnerName('OpenSea');
 
 
-    const url = await urlForValidOpenSeaDropContract(chainId, contractAddress, resources.alchemy);
+    const url = await urlForValidOpenSeaDropContract(contractAddress, resources.alchemy);
     
     if (url) {
       mintBuilder.setMarketingUrl(url);
     }
 
-    const { name, description, image, startDate, endDate, creatorName, creatorWebsite } = await getOpenSeaDropContractMetadata(
+    const { name, description, image, startDate, endDate, creatorName, creatorAddress, creatorWebsite, creatorTwitter } = await getOpenSeaDropContractMetadata(
       chainId,
       contractAddress,
       resources.alchemy,
@@ -62,7 +73,9 @@ export class OpenSeaIngestor implements MintIngestor {
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
     mintBuilder.setCreator({
       name: creatorName,
-      websiteUrl: creatorWebsite
+      walletAddress: creatorAddress,
+      websiteUrl: creatorWebsite,
+      twitterUsername: creatorTwitter
     })
 
     const totalPriceWei = await getOpenSeaDropPriceInEth(chainId, contractAddress, resources.alchemy);
