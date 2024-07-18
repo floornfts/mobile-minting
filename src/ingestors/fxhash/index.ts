@@ -64,7 +64,7 @@ export class FxHashIngestor implements MintIngestor {
       chainId: contract.chainId,
       contractAddress,
       contractMethod: 'buy',
-      contractParams: `["${contract.contractAddress}", 1, 1, address]`,
+      contractParams: `["${contract.contractAddress}", 0, 1, address]`,
       abi: abi,
       priceWei: `${priceWei}`,
     });
