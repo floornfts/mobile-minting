@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const args = process.argv.slice(2);
-const [ingestorName, inputType, input, recipient] = args;
+const [ingestorName, inputType, input] = args;
 
 if (!ingestorName || !inputType || !input) {
   console.error('Missing arguments');
@@ -14,7 +14,7 @@ if (!ingestorName || !inputType || !input) {
 console.log(`Running dry-run
   ingestory: ${ingestorName}
   inputType: ${inputType}
-  input: ${input} ${recipient ? `\n  recipient: ${recipient}` : ''}`);
+  input: ${input}`);
 
 const ingestor = ALL_MINT_INGESTORS[ingestorName];
 
@@ -30,7 +30,7 @@ const resources = mintIngestorResources();
     let result;
     switch (inputType) {
       case 'url':
-        result = await ingestor.createMintTemplateForUrl(resources, input, recipient);
+        result = await ingestor.createMintTemplateForUrl(resources, input);
         break;
       case 'contract':
         const [chainId, contractAddress, tokenId] = input.split(':');
@@ -50,7 +50,6 @@ const resources = mintIngestorResources();
     }
     console.log(JSON.stringify(result, null, 2));
   } catch (error: Error | any) {
-    console.log(error.message);
     console.error(error);
     process.exit(1);
   }
