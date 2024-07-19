@@ -9,7 +9,7 @@ const getContract = async (alchemy: Alchemy): Promise<Contract> => {
   return contract;
 };
 
-export const getMintPriceInWei = async (vectorId: string, alchemy: Alchemy): Promise<string | undefined> => {
+export const getHighlightMintPriceInWei = async (vectorId: string, alchemy: Alchemy): Promise<string | undefined> => {
   try {
     const contract = await getContract(alchemy);
     const data = await contract.functions.getAbridgedVector(vectorId);
@@ -24,7 +24,7 @@ export const getMintPriceInWei = async (vectorId: string, alchemy: Alchemy): Pro
   }
 };
 
-export const getMetadata = async (
+export const getHighlightMetadata = async (
   vectorId: number,
   alchemy: Alchemy,
 ): Promise<{ startTimestamp: number; endTimestamp: number } | undefined> => {

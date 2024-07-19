@@ -1,7 +1,7 @@
 import { MintContractOptions, MintIngestorResources } from 'src/lib';
 import { Collection, CollectionByAddress, CollectionByAddress1 } from './types';
 
-export const getCollectionById = async (
+export const getHighlightCollectionById = async (
   resources: MintIngestorResources,
   id: string,
 ): Promise<Collection | undefined> => {
@@ -46,7 +46,7 @@ export const getCollectionById = async (
   } catch (error) {}
 };
 
-export const getCollectionByAddress = async (
+export const getHighlightCollectionByAddress = async (
   resources: MintIngestorResources,
   contractOptioons: MintContractOptions,
 ): Promise<CollectionByAddress | undefined> => {
@@ -69,7 +69,7 @@ export const getCollectionByAddress = async (
   } catch (error) {}
 };
 
-export const getVectorId = async (resources: MintIngestorResources, id: string): Promise<string | undefined> => {
+export const getHighlightVectorId = async (resources: MintIngestorResources, id: string): Promise<string | undefined> => {
   const url = 'https://api.highlight.xyz:8080/';
 
   const headers = {
@@ -118,7 +118,7 @@ export const getVectorId = async (resources: MintIngestorResources, id: string):
   } catch (error) {}
 };
 
-export const getCollectionOwnerDetails = async (resources: MintIngestorResources, id: string) => {
+export const getHighlightCollectionOwnerDetails = async (resources: MintIngestorResources, id: string) => {
   const url = 'https://api.highlight.xyz:8080/';
   const data = {
     operationName: 'GetCollectionCreatorDetails',

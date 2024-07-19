@@ -2,8 +2,8 @@ import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { getMetadata, getMintPriceInWei } from './onchain-metadata';
-import { getCollectionByAddress, getCollectionById, getCollectionOwnerDetails, getVectorId } from './offchain-metadata';
+import { getHighlightMetadata, getHighlightMintPriceInWei } from './onchain-metadata';
+import { getHighlightCollectionByAddress, getHighlightCollectionById, getHighlightCollectionOwnerDetails, getHighlightVectorId } from './offchain-metadata';
 import { MINT_CONTRACT_ABI } from './abi';
 
 const CONTRACT_ADDRESS = '0x8087039152c472Fa74F47398628fF002994056EA';
@@ -15,7 +15,7 @@ export class HighlightIngestor implements MintIngestor {
       return false;
     }
 
-    const collection = await getCollectionById(resources, id);
+    const collection = await getHighlightCollectionById(resources, id);
 
     if (!collection || collection.chainId !== 8453) {
       return false;
@@ -31,7 +31,7 @@ export class HighlightIngestor implements MintIngestor {
     if (contractOptions.chainId !== 8453) {
       return false;
     }
-    const collection = await getCollectionByAddress(resources, contractOptions);
+    const collection = await getHighlightCollectionByAddress(resources, contractOptions);
     if (!collection) {
       return false;
     }
@@ -50,7 +50,7 @@ export class HighlightIngestor implements MintIngestor {
       mintBuilder.setMarketingUrl(contractOptions.url);
     }
 
-    const collection = await getCollectionByAddress(resources, contractOptions);
+    const collection = await getHighlightCollectionByAddress(resources, contractOptions);
 
     if (!collection) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection not found');
@@ -75,7 +75,7 @@ export class HighlightIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Error finding creator');
     }
 
-    const creator = await getCollectionOwnerDetails(resources, collection.highlightCollection.id);
+    const creator = await getHighlightCollectionOwnerDetails(resources, collection.highlightCollection.id);
 
     mintBuilder.setCreator({
       name: creator.creatorAccountSettings.displayName,
@@ -83,13 +83,13 @@ export class HighlightIngestor implements MintIngestor {
       imageUrl: creator.creatorAccountSettings.displayAvatar,
     });
 
-    const vectorId = await getVectorId(resources, collection.highlightCollection.id);
+    const vectorId = await getHighlightVectorId(resources, collection.highlightCollection.id);
 
     if (!vectorId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Id not available');
     }
 
-    const totalPriceWei = await getMintPriceInWei(vectorId, resources.alchemy);
+    const totalPriceWei = await getHighlightMintPriceInWei(vectorId, resources.alchemy);
 
     if (!totalPriceWei) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Price not available');
@@ -104,7 +104,7 @@ export class HighlightIngestor implements MintIngestor {
       priceWei: totalPriceWei,
     });
 
-    const metadata = await getMetadata(+vectorId, resources.alchemy);
+    const metadata = await getHighlightMetadata(+vectorId, resources.alchemy);
 
     if (!metadata) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing timestamps');
@@ -136,7 +136,7 @@ export class HighlightIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Url error');
     }
 
-    const collection = await getCollectionById(resources, id);
+    const collection = await getHighlightCollectionById(resources, id);
 
     if (!collection) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'No such collection');
