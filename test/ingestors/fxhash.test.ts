@@ -3,8 +3,36 @@ import { FxHashIngestor } from '../../src/ingestors/fxhash';
 import { mintIngestorResources } from '../../src/lib/resources';
 import { EVMMintInstructions } from '../../src/lib/types/mint-template';
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
+import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 
 describe('fxhash', function () {
+
+  basicIngestorTests(
+    new FxHashIngestor(),
+    mintIngestorResources(),
+    {
+      successUrls: [
+        'https://fxhash.xyz/generative/slug/allegro',
+        'https://fxhash.xyz/generative/slug/graphomania',
+        'https://www.fxhash.xyz/generative/slug/the-space-in-between'
+      ],
+      failureUrls: ['https://example.com'],
+      successContracts: [{
+        chainId: 8453,
+        contractAddress: '0x914cf2d92b087C9C01a062111392163c3B35B60e'
+      }],
+      failureContracts: [
+        {
+          chainId: 8453,
+          contractAddress: '0x6140F00e4Ff3936702E68744f2b5978885464cbB'
+        }
+      ]
+    },
+    {
+      // 8453: '0x107A60C'
+    }
+  );
+
   it('supportsUrl: Returns false for an unsupported URL', async function () {
     const ingestor = new FxHashIngestor();
     const url = 'https://example.com';
@@ -39,7 +67,7 @@ describe('fxhash', function () {
 
     expect(mintInstructions.contractAddress).to.equal('0x6e625892C739bFD960671Db5544E260757480725');
     expect(mintInstructions.contractMethod).to.equal('buy');
-    expect(mintInstructions.contractParams).to.equal('["0x914cf2d92b087C9C01a062111392163c3B35B60e", 0, 1, address]');
+    expect(mintInstructions.contractParams).to.equal('["0x914cf2d92b087C9C01a062111392163c3B35B60e", 1, 1, address]');
     expect(mintInstructions.priceWei).to.equal('4200000000000000');
 
     expect(template.featuredImageUrl).to.equal('ipfs://Qmc9eKhAkQvt1mXq1pD5FP9ZnprBNuU2USq5rELKVdb9uf');
@@ -65,7 +93,7 @@ describe('fxhash', function () {
 
     expect(mintInstructions.contractAddress).to.equal('0x4bDcaC532143d8d35ed759189EE22E3704580b9D');
     expect(mintInstructions.contractMethod).to.equal('buy');
-    expect(mintInstructions.contractParams).to.equal('["0x755625dEfD0f1Bb90850d533f30176aa7a425f6E", 0, 1, address]');
+    expect(mintInstructions.contractParams).to.equal('["0x755625dEfD0f1Bb90850d533f30176aa7a425f6E", 1, 1, address]');
     expect(mintInstructions.priceWei).to.equal('500000000000000');
 
     expect(template.featuredImageUrl).to.equal('ipfs://QmYV4LXoz18youcW7zREFFFVpPf6Tn1j4QRzmTi1cSPinb');
@@ -152,7 +180,7 @@ describe('fxhash', function () {
 
     expect(mintInstructions.contractAddress).to.equal('0x6e625892C739bFD960671Db5544E260757480725');
     expect(mintInstructions.contractMethod).to.equal('buy');
-    expect(mintInstructions.contractParams).to.equal('["0x914cf2d92b087C9C01a062111392163c3B35B60e", 0, 1, address]');
+    expect(mintInstructions.contractParams).to.equal('["0x914cf2d92b087C9C01a062111392163c3B35B60e", 1, 1, address]');
     expect(mintInstructions.priceWei).to.equal('4200000000000000');
 
     expect(template.featuredImageUrl).to.equal('ipfs://Qmc9eKhAkQvt1mXq1pD5FP9ZnprBNuU2USq5rELKVdb9uf');
