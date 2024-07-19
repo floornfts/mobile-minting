@@ -23,6 +23,8 @@ describe('prohibition-daily', function () {
             { chainId: 8453, contractAddress: '0x965ef172b303b0bcdc38669df1de3c26bad2db8a' },
             { chainId: 8453, contractAddress: 'derp' }
         ]
+    }, {
+        8453: '0xF469C6'
     });
     it('createMintTemplateForUrl: Returns a mint template for a supported URL', async function () {
         const ingestor = new ProhibitionDailyIngestor();

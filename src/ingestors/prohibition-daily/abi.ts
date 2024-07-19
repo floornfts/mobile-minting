@@ -12,7 +12,6 @@ export const PROHIBITION_DAILY_ABI = [
     stateMutability: 'view',
     type: 'function',
   },
-
   {
     inputs: [],
     name: 'saleStart',
@@ -88,5 +87,5 @@ export const PROHIBITION_DAILY_ABI = [
     outputs: [],
     stateMutability: 'payable',
     type: 'function',
-  },
+  }
 ];

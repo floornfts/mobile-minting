@@ -16,7 +16,7 @@ export class ProhibitionDailyIngestor implements MintIngestor {
     if (new URL(url).hostname !== 'daily.prohibition.art') {
       return false;
     }
-    const { chainId, contractAddress } = await prohibitionOnchainDataFromUrl(url, resources.fetcher);
+    const { chainId, contractAddress } = await prohibitionOnchainDataFromUrl(url);
     return !!chainId && !!contractAddress;
   }
 
@@ -36,7 +36,7 @@ export class ProhibitionDailyIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    const { chainId, contractAddress } = await prohibitionOnchainDataFromUrl(url, resources.fetcher);
+    const { chainId, contractAddress } = await prohibitionOnchainDataFromUrl(url);
 
     if (!chainId || !contractAddress) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
