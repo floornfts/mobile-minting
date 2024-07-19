@@ -1,6 +1,8 @@
 import { expect } from "chai";
 import { MintContractOptions, MintIngestor, MintIngestorResources } from "../../src/lib/types/mint-ingestor";
 import { MintTemplateBuilder } from "../../src/lib/builder/mint-template-builder";
+import { simulateEVMTransactionWithAlchemy } from "../../src/lib/simulation/simulation";
+import { EVMMintInstructions } from "../../src/lib/types";
 
 export const basicIngestorTests = (
     ingestor: MintIngestor, 
@@ -9,9 +11,12 @@ export const basicIngestorTests = (
         successUrls: string[],
         failureUrls: string[],
         successContracts: MintContractOptions[],
-        failureContracts: MintContractOptions[]
-    }
+        failureContracts: MintContractOptions[],
+    },
+    simulationBlocks: { [key: number]: string } = {}
 ) => {
+    const shouldSimulate = process.env.SIMULATE_DURING_TESTS === "true";
+
     describe(`${ingestor.constructor.name}-auto`, function () {
         const { successUrls, failureUrls, successContracts, failureContracts } = cases;
 
@@ -46,6 +51,12 @@ export const basicIngestorTests = (
                 // Verify that the mint template passed validation
                 const builder = new MintTemplateBuilder(template);
                 builder.validateMintTemplate();
+
+                if (shouldSimulate) {
+                    const mintInstructions = template.mintInstructions as EVMMintInstructions;
+                    const result = await simulateEVMTransactionWithAlchemy(mintInstructions, simulationBlocks[mintInstructions.chainId]);
+                    expect(result.success).to.be.true;
+                }
             }
         });
         it('createMintForContract: Returns a mint template for a supported contract', async function () {

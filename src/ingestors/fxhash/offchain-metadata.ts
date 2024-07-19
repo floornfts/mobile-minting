@@ -157,6 +157,11 @@ export function fxHashGetPricingFromParams(
   const { pricingFixed, pricingDutchAuction, isFrame } = generativeToken;
   let price = 0;
   let type: FxHashPricingType | undefined = isFrame ? FxHashPricingType.FRAME : undefined;
+  let reserveId: number = 1;
+
+  if (!!generativeToken.openEditionsEndsAt) {
+    reserveId = 0;
+  }
   if (pricingFixed) {
     type = type || FxHashPricingType.FIXED;
     price = pricingFixed.price;
@@ -166,7 +171,10 @@ export function fxHashGetPricingFromParams(
     price = pricingDutchAuction.restingPrice;
   }
 
-  return { priceWei: price, type: type }
+  if (type === FxHashPricingType.DUTCH_AUCTION) {
+  }
+
+  return { priceWei: price, type: type, reserveId: reserveId }
 }
 
 const BASE_FRAME_CONTRACT_ADDRESS = '0x6e625892C739bFD960671Db5544E260757480725';
