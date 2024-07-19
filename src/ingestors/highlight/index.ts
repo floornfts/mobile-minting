@@ -3,7 +3,7 @@ import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { getMetadata, getMintPriceInWei } from './onchain-metadata';
-import { getCollectionByAddress, getCollectionById, getVectorId } from './offchain-metadata';
+import { getCollectionByAddress, getCollectionById, getCollectionOwnerDetails, getVectorId } from './offchain-metadata';
 import { MINT_CONTRACT_ABI } from './abi';
 
 const CONTRACT_ADDRESS = '0x8087039152c472Fa74F47398628fF002994056EA';
@@ -59,7 +59,10 @@ export class HighlightIngestor implements MintIngestor {
     const contractAddress = collection.contract;
     const description = collection?.description;
 
-    mintBuilder.setName(collection.name).setDescription(description).setFeaturedImageUrl(collection.image.split('?')[0]);
+    mintBuilder
+      .setName(collection.name)
+      .setDescription(description)
+      .setFeaturedImageUrl(collection.image.split('?')[0]);
     mintBuilder.setMintOutputContract({ chainId: 8453, address: contractAddress });
 
     if (collection.sampleImages.length) {
@@ -72,10 +75,12 @@ export class HighlightIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Error finding creator');
     }
 
+    const creator = await getCollectionOwnerDetails(resources, collection.highlightCollection.id);
+
     mintBuilder.setCreator({
-      // TODO
-      name: 'null',
+      name: creator.creatorAccountSettings.displayName,
       walletAddress: collection.creator,
+      imageUrl: creator.creatorAccountSettings.displayAvatar,
     });
 
     const vectorId = await getVectorId(resources, collection.highlightCollection.id);

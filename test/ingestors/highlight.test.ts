@@ -21,9 +21,7 @@ describe('highlight', function () {
       { chainId: 8453, contractAddress: '0x0E5DDe3De7cf2761d8a81Ee68F48410425e2dBbA' },
       { chainId: 8453, contractAddress: '0xBE96B2572CA0F1ac8ec6323Bc9037AffD270bA7F' },
     ],
-    failureContracts: [
-      { chainId: 5000, contractAddress: '0x62F8C536De24ED32611f128f64F6eAbd9b82176c' },
-    ],
+    failureContracts: [{ chainId: 5000, contractAddress: '0x62F8C536De24ED32611f128f64F6eAbd9b82176c' }],
   });
   it('supportsUrl: Returns false for an unsupported URL', async function () {
     const ingestor = new HighlightIngestor();
@@ -70,6 +68,14 @@ describe('highlight', function () {
       'https://img.reservoir.tools/images/v2/base/z9JRSpLYGu7%2BCZoKWtAuANCXTgWBry4OTpgBkNYv7UVX%2FOELQ1B1IQGOoFgJBPmEzWQJa5hKPeiypcjXnSgXVEhZJDeOg9vk5slunBxp8ABMKIlkw3COL8nejLu9cx7f5QrJHJecqNaXIZCHlWY311DY%2F4e9zjeJnyY%2Fvp3J%2FivCSdJShfdu2%2FoCfqed8TvVTrlrElK7Wp8owCwKnZNhaw%3D%3D',
     );
 
+    if (template.creator) {
+      expect(template.creator.name).to.equal('Emily Xie');
+      expect(template.creator.walletAddress).to.equal('0x591a0b1994e8880215b89c5b9cd8d0738e5c0f1e');
+      expect(template.creator.imageUrl).to.equal(
+        'https://highlight-creator-assets.highlight.xyz/main/image/91eaf712-b9de-49e4-8674-85f37dd823e0.png',
+      );
+    }
+
     expect(template.marketingUrl).to.equal(url);
     expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2024-06-05T16:00:00.000Z'));
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2024-08-31T16:00:00.000Z'));
@@ -98,10 +104,16 @@ describe('highlight', function () {
       'https://img.reservoir.tools/images/v2/base/z9JRSpLYGu7%2BCZoKWtAuAKM5v2dthdDNgoFYsopVhfXBHjSfVbMXHiaW1XsdogS5oNzhOcvyJcxoIKiiKqHsNxiXyJX%2B%2BppNtkeQvHYCslZTqG21HhITlOtTV8jhhZhOQdWST4CHb1DA%2B5K8ZAHTSu9b0MV4dWJJsqPVJ439DhVcURxmw1fKJ4pAhC3iCwl1DOXK1xnEOnLO0il04rMAPA%3D%3D',
     );
 
+    if (template.creator) {
+      expect(template.creator.name).to.equal('RGB');
+      expect(template.creator.walletAddress).to.equal('0xf3e2399c5d1c698a6c1dfa195adbd12a6afd1899');
+      expect(template.creator.imageUrl).to.equal(
+        'https://highlight-creator-assets.highlight.xyz/main/image/47cfb18b-a189-41f2-8013-1cee51c0c08d.png',
+      );
+    }
+
     expect(template.marketingUrl).to.equal(url);
     expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2024-06-20T17:00:04.000Z'));
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2030-01-01T00:00:00.000Z'));
   });
 });
-
-// TODO Test owner

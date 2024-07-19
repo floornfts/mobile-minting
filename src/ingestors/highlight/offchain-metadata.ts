@@ -40,12 +40,10 @@ export const getCollectionById = async (
   try {
     const resp = await resources.fetcher.post(url, data, { headers });
     if (!resp.data.data) {
-      throw new Error("Empty response");
+      throw new Error('Empty response');
     }
     return resp.data.data.getPublicCollectionDetails;
-  } catch (error) {
-    
-  }
+  } catch (error) {}
 };
 
 export const getCollectionByAddress = async (
@@ -117,5 +115,46 @@ export const getVectorId = async (resources: MintIngestorResources, id: string):
     ).onchainMintVectorId;
     const vectorId = vectorString.split(':').pop();
     return vectorId;
+  } catch (error) {}
+};
+
+export const getCollectionOwnerDetails = async (resources: MintIngestorResources, id: string) => {
+  const url = 'https://api.highlight.xyz:8080/';
+  const data = {
+    operationName: 'GetCollectionCreatorDetails',
+    variables: {
+      withEns: true,
+      collectionId: id,
+    },
+    query: `query GetCollectionCreatorDetails($collectionId: String!, $withEns: Boolean) {
+    getPublicCollectionDetails(collectionId: $collectionId) {
+      id
+      creatorAddresses {
+        address
+        name
+      }
+      creatorEns
+      creatorAccountSettings(withEns: $withEns) {
+        verified
+        imported
+        displayAvatar
+        displayName
+        walletAddresses
+      }
+    }
+  }`,
+  };
+
+  const headers = {
+    accept: 'application/json',
+    'content-type': 'application/json',
+  };
+
+  try {
+    const resp = await resources.fetcher.post(url, data, { headers });
+    if (resp.data.errors) {
+      throw new Error("Error fetching owner");
+    }
+    return resp.data.data.getPublicCollectionDetails;
   } catch (error) {}
 };
