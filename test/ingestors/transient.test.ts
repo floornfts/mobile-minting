@@ -1,7 +1,6 @@
 import { EVMMintInstructions, SolanaMintInstructions } from '../../src/lib/types/mint-template';
 
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
-import { ProhibitionDailyIngestor } from '../../src/ingestors/prohibition-daily';
 import { TransientIngestor } from '../../src/ingestors/transient-base/index';
 import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 import { expect } from 'chai';
@@ -10,7 +9,7 @@ import { mintIngestorResources } from '../../src/lib/resources';
 const resources = mintIngestorResources();
 
 describe('Transient', function () {
-    basicIngestorTests(new ProhibitionDailyIngestor(), resources, {
+    basicIngestorTests(new TransientIngestor(), resources, {
         successUrls: [
             'https://www.transient.xyz/stacks/kansas-smile'
         ],
@@ -27,7 +26,7 @@ describe('Transient', function () {
         ]
     });
     it('createMintTemplateForUrl: Returns a mint template for a supported URL', async function () {
-        const ingestor = new ProhibitionDailyIngestor();
+        const ingestor = new TransientIngestor();
         const url = 'https://www.transient.xyz/stacks/kansas-smile';
         
         const template = await ingestor.createMintTemplateForUrl(resources, url);
