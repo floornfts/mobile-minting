@@ -115,7 +115,7 @@ export const transientSupports = async (contract: MintContractOptions, fetcher: 
   const { chainId, contractAddress } = contract;
   let response: AxiosResponse;
   try {
-    response = await fetcher.get(`https://api.transient.xyz/v1/catalog/nfts?chain=${chainId}&format=json`);
+    response = await fetcher.get(`https://api.transient.xyz/v1/catalog/nfts?chainId=${chainId}&address=${contractAddress}`);
   } catch (error) {
     return false;
   }

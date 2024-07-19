@@ -19,8 +19,12 @@ export class TransientIngestor implements MintIngestor {
     if (new URL(url).hostname !== 'www.transient.xyz') {
       return false;
     }
-    const { chainId, contractAddress } = await getTransientBaseMintByURL(resources, url);
-    return !!chainId && !!contractAddress;
+    try {
+      const { chainId, contractAddress } = await getTransientBaseMintByURL(resources, url);
+      return !!chainId && !!contractAddress;
+    } catch (error) {
+      return false;
+    }
   }
 
   async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
@@ -90,7 +94,7 @@ export class TransientIngestor implements MintIngestor {
       chainId,
       contractAddress: mintAddress,
       contractMethod: 'purchase',
-      contractParams: `["${contract.contractAddress}", ${token_id}, address, 1]`,
+      contractParams: `[address, ${token_id}, address, 1, 0, []]`,
       abi: TRANSIENT_BASE_ABI,
       priceWei: priceInWei,
     });
