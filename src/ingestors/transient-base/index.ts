@@ -7,8 +7,10 @@ import {
   transientSupports,
 } from './offchain-metadata';
 
+import { BigNumber } from 'alchemy-sdk';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { TRANSIENT_BASE_ABI } from './abi';
+import { getTransientProtocolFeeInEth } from './onchain-metadata';
 
 export class TransientIngestor implements MintIngestor {
   configuration = {
@@ -78,6 +80,8 @@ export class TransientIngestor implements MintIngestor {
     } = await getTransientBaseMintByAddressAndChain(resources, contract.chainId, contract.contractAddress);
 
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
+    const protocolFee = await getTransientProtocolFeeInEth(chainId, mintAddress, resources.alchemy);
+    const totalPrice = BigNumber.from(priceInWei).add(BigNumber.from(protocolFee)).toString();
 
     mintBuilder.setMintOutputContract({
       chainId,
@@ -94,9 +98,9 @@ export class TransientIngestor implements MintIngestor {
       chainId,
       contractAddress: mintAddress,
       contractMethod: 'purchase',
-      contractParams: `[address, ${token_id}, address, 1, 0, []]`,
+      contractParams: `["${contractAddress}", ${token_id}, address, 1, 0, []]`,
       abi: TRANSIENT_BASE_ABI,
-      priceWei: priceInWei,
+      priceWei: totalPrice,
     });
 
     const startDate = public_sale_start_at ? new Date(public_sale_start_at) : new Date();

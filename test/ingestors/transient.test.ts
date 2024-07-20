@@ -12,7 +12,10 @@ describe('Transient', function () {
   basicIngestorTests(new TransientIngestor(), resources, {
     successUrls: ['https://www.transient.xyz/stacks/kansas-smile'],
     failureUrls: ['https://www.transient.xyz/stacks/kansas-smiles', 'https://www.transient.xyz/stacks'],
-    successContracts: [{ chainId: 8453, contractAddress: '0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8' }],
+    successContracts: [
+      { chainId: 8453, contractAddress: '0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8' }
+      // { chainId: 8453, contractAddress: '0x8a2e6797d5930527272642a41f36cedc84a3935e' },
+    ],
     failureContracts: [
       { chainId: 8453, contractAddress: '0x965ef172b303b0bcdc38669df1de3c26bad2db8a' },
       { chainId: 8453, contractAddress: 'derp' },
@@ -36,8 +39,8 @@ describe('Transient', function () {
 
     expect(mintInstructions.contractAddress).to.equal('0x32953d7ae37b05075b88c34e800ae80c1cb1b794');
     expect(mintInstructions.contractMethod).to.equal('purchase');
-    expect(mintInstructions.contractParams).to.equal('[address, 1, address, 1, 0, []]');
-    expect(mintInstructions.priceWei).to.equal('20000000000000000');
+    expect(mintInstructions.contractParams).to.equal('["0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8", 1, address, 1, 0, []]');
+    expect(mintInstructions.priceWei).to.equal('20900000000000000');
 
     expect(template.featuredImageUrl).to.be.matches(/https:\/\/ipfs.io\/ipfs\/.+\/media/);
 
@@ -68,8 +71,8 @@ describe('Transient', function () {
 
     expect(mintInstructions.contractAddress).to.equal('0x32953d7ae37b05075b88c34e800ae80c1cb1b794');
     expect(mintInstructions.contractMethod).to.equal('purchase');
-    expect(mintInstructions.contractParams).to.equal('[address, 1, address, 1, 0, []]');
-    expect(mintInstructions.priceWei).to.equal('20000000000000000');
+    expect(mintInstructions.contractParams).to.equal('["0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8", 1, address, 1, 0, []]');
+    expect(mintInstructions.priceWei).to.equal('20900000000000000');
 
     expect(template.mintOutputContract?.address).to.equal('0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8');
 
