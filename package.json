@@ -1,6 +1,6 @@
 {
   "name": "@floornfts/mobile-minting",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "repository": "git://github.com/floornfts/mobile-minting.git",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -42,6 +42,7 @@
     "@zoralabs/zdk": "^2.4.0",
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
+    "ethers": "^6.13.1",
     "np": "^10.0.6",
     "ts-node": "10.9.1",
     "tslib": "^2.6.3"

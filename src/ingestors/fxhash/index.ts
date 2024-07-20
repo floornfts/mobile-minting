@@ -36,7 +36,7 @@ export class FxHashIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Project not found');
     }
 
-    const { priceWei, type } = fxHashGetPricingFromParams(token);
+    const { priceWei, type, reserveId } = fxHashGetPricingFromParams(token);
 
     if (!type) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Could not resolve mint type');
@@ -58,13 +58,13 @@ export class FxHashIngestor implements MintIngestor {
       websiteUrl: token.author.account.profile.website,
       description: token.author.account.profile.description,
       twitterUsername: token.author.account.profile.twitter?.split('/').pop(),
-    })
+    });
 
     mintBuilder.setMintInstructions({
       chainId: contract.chainId,
       contractAddress,
       contractMethod: 'buy',
-      contractParams: `["${contract.contractAddress}", 1, 1, address]`,
+      contractParams: `["${contract.contractAddress}", ${reserveId}, 1, address]`,
       abi: abi,
       priceWei: `${priceWei}`,
     });
