@@ -56,6 +56,9 @@ export const basicIngestorTests = (
                     const mintInstructions = template.mintInstructions as EVMMintInstructions;
                     const result = await simulateEVMTransactionWithAlchemy(mintInstructions, simulationBlocks[mintInstructions.chainId]);
                     expect(result.success).to.be.true;
+                    if (result.success) {
+                        console.log(`✅ Simulation success`);
+                    }
                 }
             }
         });
