@@ -1,5 +1,50 @@
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { MintContractOptions, MintIngestionErrorName, MintIngestorError, MintIngestorResources } from '../../lib';
+interface NFTContractVersion {
+  major: number;
+  minor: number;
+  patch: number;
+}
+
+interface NFTContractAddress {
+  raw_address: string;
+  chain: string;
+  ecosystem: string;
+}
+
+interface NFTContractUser {
+  id: number;
+  username: string;
+  display_name: string;
+  pfp: string;
+  uri: string;
+  joined_at: string;
+  updated_at: string;
+}
+
+interface NFTContract {
+  name: string;
+  symbol: string;
+  contract_type: string;
+  version: NFTContractVersion;
+  uri: string;
+  address: NFTContractAddress;
+  user: NFTContractUser;
+  created_at: string;
+  updated_at: string;
+}
+
+interface NFT {
+  id: number;
+  token_id: number;
+  name: string;
+  uri: string;
+  image_uri: string;
+  is_valid: boolean;
+  nft_contract: NFTContract;
+  created_at: string;
+  updated_at: string;
+}
 
 /**
  * @param resources MintIngestorResources
@@ -19,7 +64,6 @@ export const getTransientBaseMintByURL = async (
   priceInWei: string;
   description: string;
 }> => {
-  // https://www.transient.xyz/stacks/kansas-smile
   const urlParts = url.split('/');
   const slug = urlParts.pop();
   if (!slug) {
@@ -46,7 +90,7 @@ export const getTransientBaseMintBySlug = async (
     name: string;
     image: string;
     website: string;
-  }
+  };
 }> => {
   // search Transient API for the slug
   let response: AxiosResponse;
@@ -57,23 +101,23 @@ export const getTransientBaseMintBySlug = async (
   }
 
   const data = response.data;
-  if (!data || !data.nft_token) {
+  if (!data || !data.nft_contract) {
     throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Mint not found');
   }
 
-  const { nft_contract, nft_token } = data;
+  const { nft_contract, media_url, name } = data;
 
   return {
     chainId: nft_contract.address.chain,
     contractAddress: nft_contract.address.raw_address,
-    image: nft_token.image_uri,
-    name: nft_token.name,
+    image: media_url,
+    name,
     priceInWei: data.current_cost,
     mintAddress: data.stacks_address.raw_address,
     description: data.description,
     public_sale_start_at: data.public_sale_start_at,
     public_sale_end_at: data.public_sale_end_at,
-    token_id: data.nft_token.token_id,
+    token_id: data.nft_token?.token_id || 0,
     user: {
       name: data.nft_contract.user.display_name,
       image: data.nft_contract.user.pfp,
@@ -90,7 +134,7 @@ export const getTransientBaseMintByAddressAndChain = async (
   let response: AxiosResponse;
   try {
     response = await resources.fetcher.get(
-      `https://api.transient.xyz/v1/catalog/nfts?chain=${chainId}&address=${contractAddress}&format=json`,
+      `https://api.transient.xyz/v1/catalog/stacks?chain=${chainId}&address=${contractAddress}&format=json`,
     );
   } catch (error) {
     throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Could not query mint from Transient API');
@@ -101,34 +145,42 @@ export const getTransientBaseMintByAddressAndChain = async (
     throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Project not found');
   }
 
-  const token = data.results.find((token: any) => token.nft_contract.address.raw_address === contractAddress);
+  const token = data.results.find(
+    (token: NFT) =>
+      token.nft_contract.address.raw_address === contractAddress &&
+      token.nft_contract.address.chain == chainId.toString(),
+  );
+
   if (!token) {
     throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Project not found');
   }
 
-  const slug = token.name.toLocaleLowerCase().split(' ').join('-');
+  const slug = token.slug;
 
   return await getTransientBaseMintBySlug(resources, slug);
 };
 
-export const transientSupports = async (contract: MintContractOptions, fetcher: AxiosInstance): Promise<boolean> => {
-  const { chainId, contractAddress } = contract;
-  let response: AxiosResponse;
-  try {
-    response = await fetcher.get(`https://api.transient.xyz/v1/catalog/nfts?chainId=${chainId}&address=${contractAddress}`);
-  } catch (error) {
-    return false;
+export const transientSupports = async (
+  contract: MintContractOptions,
+  resources: MintIngestorResources,
+): Promise<boolean> => {
+  const { chainId, contractAddress, tokenId } = contract;
+  const { fetcher } = resources;
+  if (!tokenId) {
+    try {
+      const exists = await getTransientBaseMintByAddressAndChain(resources, chainId, contractAddress);
+      return !!exists;
+    } catch (error) {
+      return false;
+    }
   }
 
-  const data = response.data;
-  if (!data || !data.results.length) {
-    return false;
-  }
+  const _tokens = await getTransientTokensForAddress(fetcher, chainId, contractAddress);
 
-  const tokens = data.results
-    .filter((token: any) => token.nft_contract.address.raw_address === contractAddress)
+  const tokens = _tokens
+    .filter((token) => token.nft_contract.address.raw_address === contractAddress)
     // filter by tokenId if set
-    .filter((token: any) => !contract.tokenId || token.token_id === contract.tokenId)
+    .filter((token) => !contract.tokenId || token.token_id.toString() == contract.tokenId)
     // now if url was set, check for slug match
     .filter(
       (token: any) =>
@@ -141,4 +193,22 @@ export const transientSupports = async (contract: MintContractOptions, fetcher: 
   }
 
   return true;
+};
+
+const getTransientTokensForAddress = async (fetcher: AxiosInstance, chainId: number, contractAddress: string) => {
+  let response: AxiosResponse;
+  try {
+    response = await fetcher.get(
+      `https://api.transient.xyz/v1/catalog/nfts?chainId=${chainId}&address=${contractAddress}`,
+    );
+  } catch (error) {
+    return [];
+  }
+
+  const data = response.data;
+  if (!data || !data.results.length) {
+    return [];
+  }
+
+  return data.results as NFT[];
 };

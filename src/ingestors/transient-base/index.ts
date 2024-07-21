@@ -34,7 +34,7 @@ export class TransientIngestor implements MintIngestor {
     if (!chainId || !contractAddress) {
       return false;
     }
-    return await transientSupports(contract, resources.fetcher);
+    return await transientSupports(contract, resources);
   }
 
   async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
