@@ -1,6 +1,8 @@
+import { simulateEVMTransactionWithAlchemy } from "../lib/simulation/simulation";
 import { ALL_MINT_INGESTORS } from "../ingestors";
 import { mintIngestorResources } from "../lib/resources";
 import dotenv from 'dotenv';
+import { EVMMintInstructions } from "src/lib";
 dotenv.config();
 
 const args = process.argv.slice(2);
@@ -49,6 +51,16 @@ const resources = mintIngestorResources();
         process.exit(1);
     }
     console.log(JSON.stringify(result, null, 2));
+
+    console.log('Simulating transaction....');
+    const mintInstructions = result.mintInstructions as EVMMintInstructions;
+    const simulationResult = await simulateEVMTransactionWithAlchemy(mintInstructions);
+    if (simulationResult.success) {
+      console.log('✅ Simulation Success');
+    } else {
+      console.log('❌ Simulation Failed');
+      console.log(JSON.stringify(simulationResult, null, 2));
+    }
   } catch (error) {
     console.error(error);
     process.exit(1);
