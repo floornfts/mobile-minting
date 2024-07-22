@@ -65,11 +65,10 @@ describe('zora-base-mint', function () {
         
         expect(mintInstructions.contractAddress).to.equal('0x1e1ad3d381bc0ccea5e44c29fb1f7a0981b97f37');
         expect(mintInstructions.contractMethod).to.equal('mintWithRewards');
-        expect(mintInstructions.contractParams).to.equal('[address,1,1,bytes,address]');
+        expect(mintInstructions.contractParams).to.equal('["0x04e2516a2c207e84a1839755675dfd8ef6302f0a", 1, 1, encodedAddress, "0xe1c5fc12c0c5e05bbfd499fa2074c758a4391285"]');
         expect(mintInstructions.priceWei).to.equal('0.000777');
         
         expect(template.featuredImageUrl).to.equal('ipfs://bafybeicyqd4qdb74hm3e6vevdhpjmklhkjtdazwdptgpdbh4hprcsi7uea');
-
         expect(template.availableForPurchaseStart?.getTime()).to.equal(1718202693000);
         expect(template. liveDate?.getTime()).to.greaterThan(1718202693000);
     });

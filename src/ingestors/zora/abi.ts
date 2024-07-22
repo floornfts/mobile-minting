@@ -9,7 +9,7 @@ export const zoraMintAbi = [
               'type': 'uint256'
           }
       ],
-      'stateMutability': 'view',
+    'stateMutability': 'view',
       'type': 'function'
   },
   {
