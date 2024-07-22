@@ -3,9 +3,9 @@ import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { DATE_DISTANT_FUTURE, MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { zoraMintAbi } from './abi';
-import {  getZoraMintPriceInEth,getZoraContractMetadata } from './onchain-zora';
+import { getZoraMintPriceInEth,getZoraContractMetadata } from './onchain-zora';
 import { fetchCreatorProfile, urlForValidZoraPage,zoraOnchainIdDataFromUrl } from './offchain-metadata';
-
+import {ethers} from 'ethers';
 export class ZoraIngestor implements MintIngestor {
 
   configuration = {
@@ -65,8 +65,9 @@ export class ZoraIngestor implements MintIngestor {
       contractMethod: 'mintWithRewards',
       contractParams: `["${ZORA_FIXED_PRICE_MINTER_ADDRESS}", ${tokenId}, 1, encodedAddress, "${creatorAddress}"]`,
       abi: zoraMintAbi,
-      priceWei: totalPriceWei,
+      priceWei: ethers.utils.parseEther(totalPriceWei).toString()
     });
+  
     const token=await fetchCreatorProfile(creatorAddress,resources.fetcher);
     mintBuilder.setCreator({
       name: token.username,

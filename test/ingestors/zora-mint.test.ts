@@ -4,9 +4,16 @@ import { ZoraIngestor } from '../../src/ingestors/zora';
 import { EVMMintInstructions } from '../../src/lib/types/mint-template';
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
 import { mintIngestorResources } from '../../src/lib/resources';
-
+import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 
 describe('zora-base-mint', function () {
+
+  basicIngestorTests(new ZoraIngestor(), mintIngestorResources(), {
+    successUrls: ['https://zora.co/collect/base:0x1e1ad3d381bc0ccea5e44c29fb1f7a0981b97f37/1'],
+    failureUrls: ['https://example.com'],
+    successContracts: [{ chainId: 8453, contractAddress: '0x1e1ad3d381bc0ccea5e44c29fb1f7a0981b97f37', tokenId: '1' }],
+    failureContracts: [{ chainId: 8453, contractAddress: '0x6140F00e4Ff3936702E68744f2b597885464cbB', tokenId: '1' }],
+      });
 
     it('supportsUrl: Returns false for an unsupported URL', async function () {
         const ingestor = new ZoraIngestor();
@@ -50,10 +57,8 @@ describe('zora-base-mint', function () {
     it('createMintTemplateForUrl: Returns a mint template for a supported URL', async function () {
         const ingestor = new ZoraIngestor();
         const url = 'https://zora.co/collect/base:0x1e1ad3d381bc0ccea5e44c29fb1f7a0981b97f37/1';
-        // const url = 'https://zora.co/collect/base:0xeb334f3fbd826ce99f1e74d7d074fbe351f4157a/1';
         const resources = mintIngestorResources();
         const template = await ingestor.createMintTemplateForUrl(resources,url);
-    //     // Verify that the mint template passed validation
         const builder = new MintTemplateBuilder(template);
         builder.validateMintTemplate();
         expect(template.name).to.equal('Base x Doodles');
@@ -66,7 +71,7 @@ describe('zora-base-mint', function () {
         expect(mintInstructions.contractAddress).to.equal('0x1e1ad3d381bc0ccea5e44c29fb1f7a0981b97f37');
         expect(mintInstructions.contractMethod).to.equal('mintWithRewards');
         expect(mintInstructions.contractParams).to.equal('["0x04e2516a2c207e84a1839755675dfd8ef6302f0a", 1, 1, encodedAddress, "0xe1c5fc12c0c5e05bbfd499fa2074c758a4391285"]');
-        expect(mintInstructions.priceWei).to.equal('0.000777');
+        expect(mintInstructions.priceWei).to.equal('777000000000000');
         
         expect(template.featuredImageUrl).to.equal('ipfs://bafybeicyqd4qdb74hm3e6vevdhpjmklhkjtdazwdptgpdbh4hprcsi7uea');
         expect(template.availableForPurchaseStart?.getTime()).to.equal(1718202693000);
