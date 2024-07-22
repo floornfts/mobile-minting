@@ -10,11 +10,16 @@ const resources = mintIngestorResources();
 
 describe('Transient', function () {
   basicIngestorTests(new TransientIngestor(), resources, {
-    successUrls: ['https://www.transient.xyz/stacks/kansas-smile'],
+    successUrls: [
+      'https://www.transient.xyz/stacks/kansas-smile',
+      'https://www.transient.xyz/stacks/16384',
+      'https://www.transient.xyz/stacks/volumina-8',
+    ],
     failureUrls: ['https://www.transient.xyz/stacks/kansas-smiles', 'https://www.transient.xyz/stacks'],
     successContracts: [
       { chainId: 8453, contractAddress: '0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8' },
-      // { chainId: 8453, contractAddress: '0x8a2e6797d5930527272642a41f36cedc84a3935e' },
+      { chainId: 8453, contractAddress: '0xd2f9c0ef092d7ffd1a5de43b6ee546065461887d' },
+      { chainId: 8453, contractAddress: '0x999f084f06ee49a3deef0c9d1511d2f040da4034' },
     ],
     failureContracts: [
       { chainId: 8453, contractAddress: '0x965ef172b303b0bcdc38669df1de3c26bad2db8a' },
@@ -56,7 +61,7 @@ describe('Transient', function () {
           'By exposing a 1px 8x8 grid to simulated physics turbulence, the grid interferes with the diodes in a ever changing moiré patterns, revealing a subtle breeze of random generated palm leaves behind the grid. \n\nThe colors of the leaves are then transferred back into the squares of the grid as large pixels.\n\n16384 are the amount of emitting diodes on the 128px LED artworks from Spøgelsesmaskinen. \n\nEach token holds both a 4K MP4 version and the original 128x128px GIF artwork for low res LED screens.\nOn mint a new generative variation of the art piece will be added by the artist to the token, also as both MP4 and GIF.\n\nEach piece is 60 seconds loop, of 2161 frames\n\nCollectors are able to require a physical custom assembled LED display made specifically for this artwork on https://spogel.xyz/led',
         contractAddress: '0x384092784cfaa91efaa77870c04d958e20840242',
         contractMethod: 'purchase',
-        contractParams: '["0xd2f9c0ef092d7ffd1a5de43b6ee546065461887d", 0, address, 1, 0, []]',
+        contractParams: '["0xd2f9c0ef092d7ffd1a5de43b6ee546065461887d", address, 1, 0, []]',
         priceWei: '50900000000000000',
         featuredImageUrlPattern: /^https:\/\/dv0xp0uwyoh8r\.cloudfront\.net\/stacks\/[0-9a-fA-F\-]+\/media/,
         availableForPurchaseStart: 1720465200000,
@@ -73,10 +78,11 @@ describe('Transient', function () {
       chainId: 8453,
       expected: {
         name: 'Volumina 8',
-        description: 'Volumina 8 is one of a series of manipulated image sequences derived from photography of Australian landscapes taken in Spring 2022. Various phone and laptop apps have been utilised to construct mosaics, kaleidoscopic patterns and other structures from the original photos, in an exploration of expanding and contracting symmetries implied and derived from organic forms and processes of the natural world.',
+        description:
+          'Volumina 8 is one of a series of manipulated image sequences derived from photography of Australian landscapes taken in Spring 2022. Various phone and laptop apps have been utilised to construct mosaics, kaleidoscopic patterns and other structures from the original photos, in an exploration of expanding and contracting symmetries implied and derived from organic forms and processes of the natural world.',
         contractAddress: '0x384092784cfaa91efaa77870c04d958e20840242',
         contractMethod: 'purchase',
-        contractParams: '["0x999f084f06ee49a3deef0c9d1511d2f040da4034", 0, address, 1, 0, []]',
+        contractParams: '["0x999f084f06ee49a3deef0c9d1511d2f040da4034", address, 1, 0, []]',
         priceWei: '150900000000000000',
         featuredImageUrlPattern: /^https:\/\/dv0xp0uwyoh8r\.cloudfront\.net\/stacks\/[0-9a-fA-F\-]+\/media/,
         availableForPurchaseStart: 1720600200000,
@@ -123,7 +129,7 @@ describe('Transient', function () {
           chainId: testCase.chainId,
           contractAddress: testCase.expected.outputContractAddress,
           url: testCase.input.url,
-        }
+        };
         const template = await ingestor.createMintForContract(resources, contract);
 
         // Verify that the mint template passed validation
@@ -131,16 +137,12 @@ describe('Transient', function () {
         builder.validateMintTemplate();
 
         expect(template.name).to.equal(testCase.expected.name);
-        expect(template.description).to.equal(
-          testCase.expected.description
-        );
+        expect(template.description).to.equal(testCase.expected.description);
         const mintInstructions = template.mintInstructions as EVMMintInstructions;
 
         expect(mintInstructions.contractAddress).to.equal(testCase.expected.contractAddress);
         expect(mintInstructions.contractMethod).to.equal('purchase');
-        expect(mintInstructions.contractParams).to.equal(
-          testCase.expected.contractParams
-        );
+        expect(mintInstructions.contractParams).to.equal(testCase.expected.contractParams);
         expect(mintInstructions.priceWei).to.equal(testCase.expected.priceWei);
 
         expect(template.mintOutputContract?.address).to.equal(testCase.expected.outputContractAddress);

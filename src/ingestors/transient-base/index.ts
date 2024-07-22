@@ -1,6 +1,7 @@
 import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../lib/types/mint-ingestor';
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
+import { TRANSIENT_BASE_ABI, TRANSIENT_ERC7160TL_ABI } from './abi';
 import {
   getTransientBaseMintByAddressAndChain,
   getTransientBaseMintByURL,
@@ -9,7 +10,6 @@ import {
 
 import { BigNumber } from 'alchemy-sdk';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { TRANSIENT_BASE_ABI } from './abi';
 import { getTransientProtocolFeeInEth } from './onchain-metadata';
 
 export class TransientIngestor implements MintIngestor {
@@ -76,6 +76,7 @@ export class TransientIngestor implements MintIngestor {
       public_sale_start_at,
       public_sale_end_at,
       token_id,
+      contract_type,
       user,
     } = await getTransientBaseMintByAddressAndChain(resources, contract.chainId, contract.contractAddress);
 
@@ -98,8 +99,11 @@ export class TransientIngestor implements MintIngestor {
       chainId,
       contractAddress: mintAddress,
       contractMethod: 'purchase',
-      contractParams: `["${contractAddress}", ${token_id}, address, 1, 0, []]`,
-      abi: TRANSIENT_BASE_ABI,
+      contractParams:
+        contract_type == 'ERC1155TL'
+          ? `["${contractAddress}", ${token_id}, address, 1, 0, []]`
+          : `["${contractAddress}", address, 1, 0, []]`,
+      abi: contract_type == 'ERC1155TL' ? TRANSIENT_BASE_ABI : TRANSIENT_ERC7160TL_ABI,
       priceWei: totalPrice,
     });
 
