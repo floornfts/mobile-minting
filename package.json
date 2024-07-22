@@ -35,12 +35,14 @@
     "format": "eslint src/**/*.ts --fix",
     "test": "NODE_OPTIONS=\"--loader ts-node/esm\" c8 mocha --require ts-node/register",
     "release": "npm run build && np",
-    "dry-run": "ts-node src/dry-run/index.ts"
+    "dry-run": "ts-node src/dry-run/index.ts",
+    "test-fork": "cd ./test/forks/ && sh ./test-fork.sh"
   },
   "dependencies": {
     "alchemy-sdk": "^3.3.1",
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
+    "ethers": "^6.13.1",
     "np": "^10.0.6",
     "ts-node": "10.9.1",
     "tslib": "^2.6.3"
