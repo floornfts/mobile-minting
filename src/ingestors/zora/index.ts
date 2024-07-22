@@ -51,15 +51,14 @@ export class ZoraIngestor implements MintIngestor {
       .setMintOutputContract({chainId, address: contractAddress })
       .setMarketingUrl(contract.url || `https://zora.co/collect/${'base'}:${contractAddress}${tokenId ? `/${tokenId}` : ''}`);
       
-    const { name, description, imageUrl, startAt, creatorAddress } = await getZoraContractMetadata(Number(tokenId), contractAddress);
+   const { name, description, imageUrl, startAt, creatorAddress } = await getZoraContractMetadata(Number(tokenId), contractAddress);
     mintBuilder.setName(name)
       .setDescription(description)
       .setFeaturedImageUrl(imageUrl);
 
       const ZORA_FIXED_PRICE_MINTER_ADDRESS = '0x04e2516a2c207e84a1839755675dfd8ef6302f0a';
-    const totalPriceWei = await getZoraMintPriceInEth(chainId, contractAddress, resources.alchemy);
+      const totalPriceWei = await getZoraMintPriceInEth(chainId, contractAddress, resources.alchemy);
 
-    // contractParams: `["${fixedPriceMinter}", ${tokenId}, 1, "bytes", "${creatorAddress}"]`,
     mintBuilder.setMintInstructions({
       chainId,
       contractAddress,
