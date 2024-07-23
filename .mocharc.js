@@ -8,7 +8,7 @@ module.exports = {
   extension: ['ts', 'js'],
   package: path.join(__dirname, './package.json'),
   ui: 'bdd',
-  spec: ['./test/**/foundation.test.*'],
+  spec: ['./test/**/*.test.*'],
   exit: true,
   timeout: 10000,
   recursive: true,
