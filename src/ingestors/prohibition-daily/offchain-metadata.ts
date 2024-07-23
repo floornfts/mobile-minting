@@ -13,7 +13,7 @@ export const urlForValidProhibitionPage = async (chainId: number, contractAddres
     }
 };
 
-export const prohibitionOnchainDataFromUrl = async (url: string, fetcher: Axios): Promise<{ chainId: number | undefined, contractAddress: string | undefined }> => {
+export const prohibitionOnchainDataFromUrl = async (url: string): Promise<{ chainId: number | undefined, contractAddress: string | undefined }> => {
     // https://daily.prohibition.art/mint/8453/0x20479b19ca05e0b63875a65acf24d81cd0973331
     const urlParts = url.split('/');
     const contractAddress = urlParts.pop();
