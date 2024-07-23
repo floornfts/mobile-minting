@@ -1,4 +1,29 @@
-export const urlForValidRaribleCollection = async (
+import { Alchemy, Contract } from 'alchemy-sdk';
+import { RARIBLE_ABI } from './abi';
+
+
+/**
+ * 
+ *  validUrlPattern: https://rarible.com/collection/base/0x968ca01b5C32234F4d6Bfd44fF079BE14789bA10/drops
+ * 
+*/
+
+export const raribleOnchainDataFromUrl = async (
+    url: string,
+): Promise<{ chainId: number | undefined, contractAddress: string | undefined }> => {
+    const chainIdx = 4;
+    const contractAddressIdx = 5;
+    const urlParts = url.split('/');
+    const chainId = urlParts[chainIdx] === 'base' ? 8453 : undefined;
+
+    if (!chainId || !urlParts[contractAddressIdx] || !urlParts[contractAddressIdx].startsWith('0x')) {
+        return { chainId: undefined, contractAddress: undefined };
+    }
+    
+    return { chainId, contractAddress: urlParts[contractAddressIdx] };
+};
+
+export const raribleUrlForValidCollection = async (
     chainId: number,
     contractAddress: string,
 ): Promise<string | undefined> => {
@@ -6,40 +31,62 @@ export const urlForValidRaribleCollection = async (
     if (!apiKey) {
         throw new Error('RARIBLE_API_KEY is not defined in the environment variables');
     }
+
     const chain = chainId === 8453 ? 'BASE' : undefined;
     if (!chain) {
-        return undefined;
+        throw new Error(`CHAIN ID is not valid: ${chainId}`);
     }
 
-    const url = `https://api.rarible.org/v0.1/collections/${chain}%3A${contractAddress}`;
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json', 
-                'X-API-KEY': apiKey
-            }
-        })
-        if (response.status !== 200) {
-            return undefined;
+    const endpoint = `https://api.rarible.org/v0.1/collections/${chain}%3A${contractAddress}`;
+
+    const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json', 
+            'X-API-KEY': apiKey
         }
-        return url;
-    } catch (error) {
-        console.error('Error fetching the Rarible page:', error); // Optional: Log the error for debugging
-        return undefined;
+    }) 
+
+    if (response.status === 200) {
+        return `https://rarible.com/collection/${chain.toLowerCase()}/${contractAddress}/drops`;
     }
+    if (response.status === 404) {
+        return '';
+    }
+
+    throw new Error(`Request failed with status code ${response.status} and Text: ${response.statusText}.`);
 };
 
-export const raribleOnchainDataFromUrl = async (
-    url: string,
-): Promise<{ chainId: number | undefined, contractAddress: string | undefined }> => {
-    const urlParts = url.split('/');
-    const chainId = urlParts[4] === 'base' ? 8453 : undefined;
-    const contractAddress = urlParts[5];
+export const raribleUrlForValidBaseEthCollection = async (
+    chainId: number,
+    contractAddress: string, 
+    alchemy: Alchemy
+): Promise<string | undefined> => {
+    const START_IDX = 0;
+    const contractAddressIdx = 5;
+    const TOKEN_ADDR_IDX = 6;
+    const ETH_MINT = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
-    if (!chainId || !contractAddress || !contractAddress.startsWith('0x')) {
-        return { chainId: undefined, contractAddress: undefined };
+    const collectionUrl = await raribleUrlForValidCollection(chainId, contractAddress);
+    if (!!!collectionUrl) {
+        return '';
+    }
+   
+    const urlParts = collectionUrl?.split('/');
+    if (!urlParts) {
+        throw new Error('urlForValidRaribleBaseEthCollection: undefined urlParts of the collection url.');
     }
 
-    return { chainId, contractAddress };
+    const collectionAddress = urlParts[contractAddressIdx];
+    const ethersProvider = await alchemy.config.getProvider();
+    const contract = new Contract(collectionAddress, RARIBLE_ABI, ethersProvider);
+    const activeClaimId = await contract.functions.getActiveClaimConditionId();
+    const claimCondition = await contract.functions.getClaimConditionById(parseInt(activeClaimId));
+    const mintTokenAddress = claimCondition[START_IDX][TOKEN_ADDR_IDX];
+
+    if (mintTokenAddress == ETH_MINT) {
+        return collectionUrl;
+    }
+
+    throw new Error(`urlForValidRaribleBaseEthCollection: Not a Base Eth mint`);
 };
