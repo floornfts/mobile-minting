@@ -9,7 +9,7 @@ describe('rarible', function () {
     this.timeout(60000);
 
     const chainId = 8453;
-    const ITER_IDX = 2;
+    const ITER_IDX = 0;
     const supportedUrlsWithBlock = [
       {
         url: 'https://rarible.com/collection/base/0x3e28E3ad52f64E67934D844fD3265f16c01E71D1/drops', 
@@ -135,6 +135,11 @@ describe('rarible', function () {
         expect(mintInstructions.contractParams).to.equal('[address, 1, "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed", "425000000000000000000", [["0x0000000000000000000000000000000000000000000000000000000000000000"], 0, "425000000000000000000", "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed"], "0x"]');
         expect(template.featuredImageUrl).to.equal('ipfs://bafybeiaviu3k3ohx7kzouz5q4i3h5eccivzckaldiywq7wepujg4vuo4ga/new.gif');
         expect(template.marketingUrl).to.equal(contract.url);
+        expect(template.creator?.name).to.equal('ZafGod.eth');
+        expect(template.creator?.imageUrl).to.equal('https://ipfs.raribleuserdata.com/ipfs/QmaM3Lvd8kiwCekq6cuhWh5SA7RpbN2upQM1R6QoefWHuS');
+        expect(template.creator?.description).to.equal('Artist-- 👽 \nJoin the club on discord https://discord.gg/muHgNMa9XH');
+        expect(template.creator?.websiteUrl).to.equal('https://rarible.com/artshop');
+        expect(template.creator?.walletAddress).to.equal('0xe744D23107c9C98df5311ff8C1C8637Ec3ECF9F3');
         expect(template.availableForPurchaseStart?.getTime()).to.equal(1721221200000);
         expect(template.availableForPurchaseEnd?.getTime()).to.equal(1721480400000);
     });
@@ -159,6 +164,11 @@ describe('rarible', function () {
       expect(mintInstructions.contractParams).to.equal('[address, 1, "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", "25650000000000000", [["0x0000000000000000000000000000000000000000000000000000000000000000"], 0, "25650000000000000", "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], "0x"]');
       expect(template.featuredImageUrl).to.equal('ipfs://bafybeiak3uyymizjs3jhwn4ld5zjverl3dlyxeneleh5ppn56l37sj76ue/Project_Pharos_Logo_(BW).png');
       expect(template.marketingUrl).to.equal(contract.url);
+      expect(template.creator?.name).to.equal('Matt Monday');
+      expect(template.creator?.imageUrl).to.equal('');
+      expect(template.creator?.description).to.equal('Matt Monday is an artist & creative director. ');
+      expect(template.creator?.websiteUrl).to.equal('https://rarible.com/musebymonday');
+      expect(template.creator?.walletAddress).to.equal('0xa48F751B466706F84746D23f3AeC7357Ed20000D');
       expect(template.availableForPurchaseStart?.getTime()).to.equal(1720800000000);
       expect(template.availableForPurchaseEnd?.getTime()).to.equal(1722430800000);
     });
@@ -179,3 +189,6 @@ describe('rarible', function () {
         expect(error.message).to.equal('Incompatible URL');
     });
 });
+
+
+

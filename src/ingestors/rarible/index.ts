@@ -2,7 +2,7 @@ import { MintContractOptions, MintIngestorResources } from '../../lib/types/mint
 import { MintInstructionType } from '../../lib/types/mint-template';
 import {  MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { raribleOnchainDataFromUrl, raribleUrlForValidBaseEthCollection } from "./offchain-metadata";
+import { raribleOnchainDataFromUrl, raribleUrlForValidBaseEthCollection, raribleCreatorProfileDataGetter } from "./offchain-metadata";
 import { raribleContractMetadataGetter} from './onchain-metadata';
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { RARIBLE_ABI } from './abi';
@@ -59,7 +59,8 @@ export class RaribleIngestor {
         if (contract.url) {
             mintBuilder.setMarketingUrl(contract.url);
         }
-       const { 
+
+        const { 
             name, 
             description, 
             imageURI, 
@@ -72,10 +73,20 @@ export class RaribleIngestor {
             stopDate
         } = await raribleContractMetadataGetter(chainId, contractAddress, resources.alchemy)
         
+        const {
+            pName,
+            pImageUrl,
+            pDescription,
+            pWebsiteUrl, 
+        } = await raribleCreatorProfileDataGetter(ownerAddress);
+        
         mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(imageURI);
         mintBuilder.setMintOutputContract({ chainId: chainId, address: contractAddress });
         mintBuilder.setCreator({
-                name: 'not available',
+                name: pName,
+                imageUrl: pImageUrl,
+                description: pDescription,
+                websiteUrl: pWebsiteUrl,
                 walletAddress: ownerAddress,
         });
 

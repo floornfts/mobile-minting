@@ -45,10 +45,11 @@ export const raribleContractMetadataGetter = async (
     }
 
     const metadataJSON = await response.json();
-    const ownerAddress = await contract.functions.owner();
+    const ownerAddresses = await contract.functions.owner();
     const activeClaimId = await contract.functions.getActiveClaimConditionId();
     let claimCondition = await contract.functions.getClaimConditionById(parseInt(activeClaimId));
     
+    const ownerAddress = ownerAddresses[START_IDX];
     const maxClaimableSupply = BigInt(claimCondition[START_IDX][MAX_CLAIMABLE_SUPPLY_IDX]._hex).valueOf();
     let mintTokenAddress: string;
     let mintPrice: number;
