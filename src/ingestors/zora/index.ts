@@ -5,7 +5,7 @@ import { DATE_DISTANT_FUTURE, MintTemplateBuilder } from '../../lib/builder/mint
 import { zoraMintAbi } from './abi';
 import { getZoraMintPriceInEth,getZoraContractMetadata } from './onchain-zora';
 import { fetchCreatorProfile, urlForValidZoraPage,zoraOnchainIdDataFromUrl } from './offchain-metadata';
-import { parseEther } from 'viem';
+import {ethers} from "ethers"
 export class ZoraIngestor implements MintIngestor {
 
   configuration = {
@@ -65,7 +65,7 @@ export class ZoraIngestor implements MintIngestor {
       contractMethod: 'mintWithRewards',
       contractParams: `["${ZORA_FIXED_PRICE_MINTER_ADDRESS}", ${tokenId}, 1, encodedAddress, "${creatorAddress}"]`,
       abi: zoraMintAbi,
-      priceWei: parseEther(totalPriceWei).toString(),
+      priceWei: ethers.parseEther(totalPriceWei).toString(),
     });
   
     const token=await fetchCreatorProfile(creatorAddress,resources.fetcher);
