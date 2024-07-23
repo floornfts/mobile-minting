@@ -76,36 +76,6 @@ describe('foundation', function () {
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2030-01-01T00:00:00.000Z'));
   });
 
-  it.skip('createMintTemplateForUrl: Returns a mint template for a supported URL with fixed price contract', async function () {
-    const ingestor = new FoundationIngestor();
-    const url = 'https://foundation.app/mint/base/0x89e63f58da71e800000000000000000000000000';
-    const resources = mintIngestorResources();
-    const template = await ingestor.createMintTemplateForUrl(resources, url);
-
-    // Verify that the mint template passed validation
-    const builder = new MintTemplateBuilder(template);
-    builder.validateMintTemplate();
-
-    expect(template.name).to.equal('Eternal Beauty');
-    expect(template.description).to.contain('Beauty carved into the eternal marble.');
-    const mintInstructions = template.mintInstructions as EVMMintInstructions;
-
-    expect(mintInstructions.contractAddress).to.equal('0x62037b26fff91800000000000000000000000000');
-    expect(mintInstructions.contractMethod).to.equal('mintFromFixedPriceSaleV2');
-    expect(mintInstructions.contractParams).to.equal(
-      '["0x89e63f58da71e800000000000000000000000000", 1, address, "0x0000000000000000000000000000000000000000"]',
-    );
-    expect(mintInstructions.priceWei).to.equal('7699999999999999');
-
-    expect(template.featuredImageUrl).to.equal(
-      'https://f7n-production-collection-assets.imgix.net/8453/0x89E63F58da71E9CD4DA439C3D1194917c67eb869/pre_reveal/nft.jpg',
-    );
-
-    expect(template.marketingUrl).to.equal(url);
-    expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2023-07-04T16:00:00.000Z'));
-    expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2029-01-01T00:00:00.000Z'));
-  });
-
   it('createMintTemplateForUrl: Returns a mint template for a supported URL with dynamic price contract', async function () {
     const ingestor = new FoundationIngestor();
     const url = 'https://foundation.app/mint/base/0x0C92Ce2aECc651Dd3733008A301f126662ae4A50';
