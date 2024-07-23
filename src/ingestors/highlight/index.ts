@@ -3,7 +3,12 @@ import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { getHighlightMetadata, getHighlightMintPriceInWei } from './onchain-metadata';
-import { getHighlightCollectionByAddress, getHighlightCollectionById, getHighlightCollectionOwnerDetails, getHighlightVectorId } from './offchain-metadata';
+import {
+  getHighlightCollectionByAddress,
+  getHighlightCollectionById,
+  getHighlightCollectionOwnerDetails,
+  getHighlightVectorId,
+} from './offchain-metadata';
 import { MINT_CONTRACT_ABI } from './abi';
 
 const CONTRACT_ADDRESS = '0x8087039152c472Fa74F47398628fF002994056EA';
@@ -89,7 +94,7 @@ export class HighlightIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Id not available');
     }
 
-    const totalPriceWei = await getHighlightMintPriceInWei(vectorId, resources.alchemy);
+    const totalPriceWei = await getHighlightMintPriceInWei(+vectorId, resources.alchemy);
 
     if (!totalPriceWei) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Price not available');
