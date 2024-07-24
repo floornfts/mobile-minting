@@ -14,5 +14,5 @@ jobs:
       - name: Run Tests
         env:
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
-          SIMULATE_DURING_TESTS: ${{ var.SIMULATE_DURING_TESTS }}
+          SIMULATE_DURING_TESTS: ${{ vars.SIMULATE_DURING_TESTS }}
         run: yarn install --userconfig=/dev/null && yarn test
