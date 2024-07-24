@@ -10,7 +10,7 @@ const resources = mintIngestorResources();
 describe('foundation', function () {
   basicIngestorTests(new FoundationIngestor(), resources, {
     successUrls: [
-      'https://foundation.app/mint/base/0xCb6B679F5cD8E5c153CDC627F16C730f91e1fBfd',
+      'https://foundation.app/mint/base/0x8D41Ef1EB5113c2E55a08a0C299526ef6d027c80',
       'https://foundation.app/mint/base/0x36F38d3fCE10AD959b3A21ddfC8bDA8EE254B595'
     ],
     failureUrls: [
@@ -18,10 +18,11 @@ describe('foundation', function () {
       'https://foundation.app/mint/base/the-billows',
     ],
     successContracts: [
-      { chainId: 8453, contractAddress: '0xCb6B679F5cD8E5c153CDC627F16C730f91e1fBfd' },
-      { chainId: 8453, contractAddress: '0x36F38d3fCE10AD959b3A21ddfC8bDA8EE254B595' }
+      { chainId: 8453, contractAddress: '0x36F38d3fCE10AD959b3A21ddfC8bDA8EE254B595' },
+      { chainId: 8453, contractAddress: '0x89E63F58da71E9CD4DA439C3D1194917c67eb869' }
     ],
     failureContracts: [
+      { chainId: 8453, contractAddress: '0xCb6B679F5cD8E5c153CDC627F16C730f91e1fBfd' },
       { chainId: 1, contractAddress: '0xcc5C8eb0108d85f091e4468999E0D6fd4273eD99' },
       { chainId: 8453, contractAddress: 'the-billows' }
     ]
