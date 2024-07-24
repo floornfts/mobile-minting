@@ -118,13 +118,16 @@ export class FoundationIngestor implements MintIngestor {
       priceWei: totalPriceWei,
     });
 
+    const now = new Date();
+    const nowUTCString = now.toISOString();
+
     const liveDate =
       new Date() > collection.generalAvailabilityStartTime
-        ? new Date()
+        ? new Date(nowUTCString)
         : new Date(collection.generalAvailabilityStartTime);
     mintBuilder
-      .setAvailableForPurchaseStart(new Date(collection.generalAvailabilityStartTime || Date.now()))
-      .setAvailableForPurchaseEnd(new Date(collection.endTime || '2030-01-01'))
+      .setAvailableForPurchaseStart(new Date(collection.generalAvailabilityStartTime ? `${collection.generalAvailabilityStartTime}Z` : nowUTCString))
+      .setAvailableForPurchaseEnd(new Date(collection.endTime ? `${collection.endTime}Z` : '2030-01-01T00:00:00Z'))
       .setLiveDate(liveDate);
 
     return mintBuilder.build();

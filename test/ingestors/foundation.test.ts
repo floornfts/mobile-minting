@@ -73,7 +73,7 @@ describe('foundation', function () {
     );
 
     expect(template.marketingUrl).to.equal(url);
-    expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2024-07-04T16:00:00.000Z'));
+    expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2024-07-04T19:00:00.000Z'));
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2030-01-01T00:00:00.000Z'));
   });
 
@@ -100,8 +100,8 @@ describe('foundation', function () {
     );
 
     expect(template.marketingUrl).to.equal(url);
-    expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2024-08-10T21:00:00.000Z'));
-    expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2024-08-15T21:00:00.000Z'));
+    expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2024-08-11T00:00:00.000Z'));
+    expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2024-08-16T00:00:00.000Z'));
   });
 
   it('supportsContract: Returns false for a non supported contract', async function () {
