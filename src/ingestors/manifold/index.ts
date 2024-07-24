@@ -3,9 +3,10 @@ import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { MANIFOLD_CLAIMS_ABI } from './abi';
-import { getManifoldMintPriceInEth } from './onchain-metadata';
+import { getManifoldMintPriceInEth, urlForValidManifoldContract } from './onchain-metadata';
 import { manifoldOnchainDataFromUrl } from './offchain-metadata';
 
+const MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT = "0x26BBEA7803DcAc346D5F5f135b57Cf2c752A02bE";
 export class ManifoldIngestor implements MintIngestor {
 
   configuration = {
@@ -17,12 +18,6 @@ export class ManifoldIngestor implements MintIngestor {
       return false;
     }
     const { chainId, contractAddress } = await manifoldOnchainDataFromUrl(url, resources.fetcher);
-
-    // Check if the chainId is not 8453
-    if (chainId !== 8453) {
-      return false;
-    } 
-    
     return !!chainId && !!contractAddress;
   }
 
@@ -32,7 +27,8 @@ export class ManifoldIngestor implements MintIngestor {
       return false;
     }
 
-    return false;
+    const url = await urlForValidManifoldContract(chainId, contractAddress, resources.alchemy, resources.fetcher);
+    return !!url;
   }
 
   async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
@@ -52,24 +48,22 @@ export class ManifoldIngestor implements MintIngestor {
 
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
 
-    const { chainId, contractAddress, url: mintUrl } = contract;
+    const { chainId, contractAddress } = contract;
     if (!chainId || !contractAddress) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
     }
 
-    if (!mintUrl) {
-      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing mint URL');
-    }
-
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('Manifold'); 
+      .setPartnerName('Manifold');
 
-    if (mintUrl) {
-      mintBuilder.setMarketingUrl(mintUrl);
+    const url = await urlForValidManifoldContract(chainId, contractAddress, resources.alchemy, resources.fetcher);
+
+    if (url) {
+      mintBuilder.setMarketingUrl(url);
     }
 
-    const metadata  = await manifoldOnchainDataFromUrl(mintUrl, resources.fetcher);
+    const metadata  = await manifoldOnchainDataFromUrl(url, resources.fetcher);
     
     mintBuilder
       .setName(metadata.name)
@@ -81,13 +75,13 @@ export class ManifoldIngestor implements MintIngestor {
       walletAddress: metadata.creatorAddress
     })
 
-    const totalPriceWei = await getManifoldMintPriceInEth(chainId, contractAddress, metadata.mintPrice, resources.alchemy);
+    const totalPriceWei = await getManifoldMintPriceInEth(metadata.mintPrice);
 
     mintBuilder.setMintInstructions({
       chainId,
-      contractAddress,
-      contractMethod: 'mintBaseNew',
-      contractParams: '[address, 1, ...]',
+      contractAddress: MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT,
+      contractMethod: 'mintProxy',
+      contractParams: `["${contractAddress}", 22534384, 1, [], [], address]`,
       abi: MANIFOLD_CLAIMS_ABI,
       priceWei: totalPriceWei,
     });

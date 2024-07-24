@@ -1,7 +1,7 @@
 import { Axios } from "axios";
 
 export const manifoldOnchainDataFromUrl = async (
-    url: string,
+    url: any,
     fetcher: Axios
   ): Promise<any> => {
     const slug = url.match(/\/c\/([^\/]+)/)?.[1];
@@ -14,7 +14,7 @@ export const manifoldOnchainDataFromUrl = async (
       const { name, description, image_url: imageUrl } = asset || {};
       const { contractAddress } = contract || {};
   
-      // Check if all required fields are present
+      // check if all required fields are present
       if (!creator?.name || !creator?.address || !name || !description || !imageUrl || !chainId || !contractAddress || !mintPrice?.value || !startDate) {
         return false;
       }
