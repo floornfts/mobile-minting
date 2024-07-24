@@ -17,13 +17,41 @@ export class ManifoldIngestor implements MintIngestor {
     if (new URL(url).hostname !== 'app.manifold.xyz') {
       return false;
     }
-    const { chainId, contractAddress } = await manifoldOnchainDataFromUrl(url, resources.fetcher);
-    return !!chainId && !!contractAddress;
+  
+    const slug = url.split('/').pop() || '';
+  
+    try {
+      const { data } = await resources.fetcher.get(`https://apps.api.manifoldxyz.dev/public/instance/data?appId=2522713783&instanceSlug=${slug}`);
+      const { publicData } = data || {};
+      const { network: chainId, contract: contractAddress } = publicData || {};
+  
+      if (chainId !== 8453) {
+        return false;
+      }
+  
+      return !!chainId && !!contractAddress;
+
+    } catch (error) {
+      return false;
+    }
   }
 
   async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
     const { chainId, contractAddress } = contract;
+
     if (!chainId || !contractAddress) {
+      return false;
+    }
+
+    if (chainId !== 8453) {
+      return false;
+    }
+
+    if (!contractAddress.startsWith('0x')) {
+      return false;
+    }
+
+    if (contractAddress.length !== 42) {
       return false;
     }
 
@@ -49,8 +77,10 @@ export class ManifoldIngestor implements MintIngestor {
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
 
     const { chainId, contractAddress } = contract;
-    if (!chainId || !contractAddress) {
-      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
+    
+    const isBaseContract = await this.supportsContract(resources, contract);
+    if (!isBaseContract) {
+      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Incompatible contract');
     }
 
     const mintBuilder = new MintTemplateBuilder()
