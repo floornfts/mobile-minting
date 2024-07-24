@@ -40,6 +40,9 @@ export class FoundationIngestor implements MintIngestor {
     if (!contract) {
       return false;
     }
+    if (contract.contractType !== 'FND_BATCH_MINT_REVEAL') {
+      return false;
+    }
     return true;
   }
 
@@ -47,6 +50,12 @@ export class FoundationIngestor implements MintIngestor {
     resources: MintIngestorResources,
     contractOptions: MintContractOptions,
   ): Promise<MintTemplate> {
+
+    const isCompatible = await this.supportsContract(resources, contractOptions);
+    if (!isCompatible) {
+      throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Contract not supported');
+    }
+
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
       .setPartnerName('Foundation');

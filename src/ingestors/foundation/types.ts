@@ -25,6 +25,7 @@ export type Collection = {
   endTime: string;
   generalAvailabilityStartTime: Date;
   saleType: "FIXED_PRICE_DROP";
+  contractType: "FND_BATCH_MINT_REVEAL" | "HIGHLIGHT_GENERATIVE_SERIES";
   creator: any;
   coverImageUrl: string;
   media: any;
