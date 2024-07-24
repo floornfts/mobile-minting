@@ -9,23 +9,30 @@ import { mintIngestorResources } from '../../src/lib/resources';
 const resources = mintIngestorResources();
 
 describe('Transient', function () {
-  basicIngestorTests(new TransientIngestor(), resources, {
-    successUrls: [
-      'https://www.transient.xyz/stacks/kansas-smile',
-      'https://www.transient.xyz/stacks/16384',
-      'https://www.transient.xyz/stacks/volumina-8',
-    ],
-    failureUrls: ['https://www.transient.xyz/stacks/kansas-smiles', 'https://www.transient.xyz/stacks'],
-    successContracts: [
-      { chainId: 8453, contractAddress: '0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8' },
-      { chainId: 8453, contractAddress: '0xd2f9c0ef092d7ffd1a5de43b6ee546065461887d' },
-      { chainId: 8453, contractAddress: '0x999f084f06ee49a3deef0c9d1511d2f040da4034' },
-    ],
-    failureContracts: [
-      { chainId: 8453, contractAddress: '0x965ef172b303b0bcdc38669df1de3c26bad2db8a' },
-      { chainId: 8453, contractAddress: 'derp' },
-    ],
-  });
+  basicIngestorTests(
+    new TransientIngestor(),
+    resources,
+    {
+      successUrls: [
+        'https://www.transient.xyz/stacks/kansas-smile',
+        'https://www.transient.xyz/stacks/16384',
+        'https://www.transient.xyz/stacks/volumina-8',
+      ],
+      failureUrls: ['https://www.transient.xyz/stacks/kansas-smiles', 'https://www.transient.xyz/stacks'],
+      successContracts: [
+        { chainId: 8453, contractAddress: '0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8' },
+        { chainId: 8453, contractAddress: '0xd2f9c0ef092d7ffd1a5de43b6ee546065461887d' },
+        { chainId: 8453, contractAddress: '0x999f084f06ee49a3deef0c9d1511d2f040da4034' },
+      ],
+      failureContracts: [
+        { chainId: 8453, contractAddress: '0x965ef172b303b0bcdc38669df1de3c26bad2db8a' },
+        { chainId: 8453, contractAddress: 'derp' },
+      ],
+    },
+    {
+      '8453': '0x1081832',
+    },
+  );
   const testCases = [
     {
       name: 'ERC1155TL',

@@ -6,7 +6,6 @@ import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder
 import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 
 describe('fxhash', function () {
-
   basicIngestorTests(
     new FxHashIngestor(),
     mintIngestorResources(),
@@ -14,23 +13,25 @@ describe('fxhash', function () {
       successUrls: [
         'https://fxhash.xyz/generative/slug/allegro',
         'https://fxhash.xyz/generative/slug/graphomania',
-        'https://www.fxhash.xyz/generative/slug/the-space-in-between'
+        'https://www.fxhash.xyz/generative/slug/the-space-in-between',
       ],
       failureUrls: ['https://example.com'],
-      successContracts: [{
-        chainId: 8453,
-        contractAddress: '0x914cf2d92b087C9C01a062111392163c3B35B60e'
-      }],
+      successContracts: [
+        {
+          chainId: 8453,
+          contractAddress: '0x914cf2d92b087C9C01a062111392163c3B35B60e',
+        },
+      ],
       failureContracts: [
         {
           chainId: 8453,
-          contractAddress: '0x6140F00e4Ff3936702E68744f2b5978885464cbB'
-        }
-      ]
+          contractAddress: '0x6140F00e4Ff3936702E68744f2b5978885464cbB',
+        },
+      ],
     },
     {
-      // 8453: '0x107A60C'
-    }
+      '8453': '0x1081832',
+    },
   );
 
   it('supportsUrl: Returns false for an unsupported URL', async function () {
