@@ -36,7 +36,7 @@
     "test": "NODE_OPTIONS=\"--loader ts-node/esm\" c8 mocha --require ts-node/register",
     "release": "npm run build && np",
     "dry-run": "ts-node src/dry-run/index.ts",
-    "test-fork": "cd ./test/forks/ && sh ./test-fork.sh"
+    "test-fork": "cd ./scripts/ && sh ./test-fork.sh"
   },
   "dependencies": {
     "alchemy-sdk": "^3.3.1",
