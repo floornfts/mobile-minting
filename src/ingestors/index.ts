@@ -3,6 +3,7 @@ import { ProhibitionDailyIngestor } from './prohibition-daily';
 import { FxHashIngestor } from './fxhash';
 import { HighlightIngestor } from './highlight';
 import { TransientIngestor } from './transient-base';
+import { FoundationIngestor } from './foundation';
 
 export type MintIngestionMap = {
   [key: string]: MintIngestor;
@@ -13,6 +14,7 @@ export const ALL_MINT_INGESTORS: MintIngestionMap = {
   fxhash: new FxHashIngestor(),
   highlight: new HighlightIngestor(),
   transient: new TransientIngestor(),
+  foundation: new FoundationIngestor(),
 };
 
 export * from './';
