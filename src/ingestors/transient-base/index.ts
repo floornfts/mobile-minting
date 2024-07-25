@@ -1,23 +1,32 @@
 import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../lib/types/mint-ingestor';
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
+import { TRANSIENT_BASE_ABI, TRANSIENT_ERC7160TL_ABI } from './abi';
+import {
+  getTransientBaseMintByAddressAndChain,
+  getTransientBaseMintByURL,
+  transientSupports,
+} from './offchain-metadata';
+
+import { BigNumber } from 'alchemy-sdk';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { PROHIBITION_DAILY_ABI } from './abi';
-import { getProhibitionContractMetadata, getProhibitionMintPriceInEth } from './onchain-metadata';
-import { prohibitionOnchainDataFromUrl, urlForValidProhibitionPage } from './offchain-metadata';
+import { getTransientProtocolFeeInEth } from './onchain-metadata';
 
-export class ProhibitionDailyIngestor implements MintIngestor {
-
+export class TransientIngestor implements MintIngestor {
   configuration = {
     supportsContractIsExpensive: true,
   };
 
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
-    if (new URL(url).hostname !== 'daily.prohibition.art') {
+    if (new URL(url).hostname !== 'www.transient.xyz') {
       return false;
     }
-    const { chainId, contractAddress } = await prohibitionOnchainDataFromUrl(url);
-    return !!chainId && !!contractAddress;
+    try {
+      const { chainId, contractAddress } = await getTransientBaseMintByURL(resources, url);
+      return !!chainId && !!contractAddress;
+    } catch (error) {
+      return false;
+    }
   }
 
   async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
@@ -25,9 +34,7 @@ export class ProhibitionDailyIngestor implements MintIngestor {
     if (!chainId || !contractAddress) {
       return false;
     }
-
-    const url = await urlForValidProhibitionPage(chainId, contractAddress, resources.fetcher);
-    return !!url;
+    return await transientSupports(contract, resources);
   }
 
   async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
@@ -36,7 +43,7 @@ export class ProhibitionDailyIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    const { chainId, contractAddress } = await prohibitionOnchainDataFromUrl(url);
+    const { chainId, contractAddress } = await getTransientBaseMintByURL(resources, url);
 
     if (!chainId || !contractAddress) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
@@ -46,7 +53,6 @@ export class ProhibitionDailyIngestor implements MintIngestor {
   }
 
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
-
     const { chainId, contractAddress } = contract;
     if (!chainId || !contractAddress) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
@@ -54,30 +60,55 @@ export class ProhibitionDailyIngestor implements MintIngestor {
 
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('Prohibition');
+      .setPartnerName('Transient');
 
     if (contract.url) {
       mintBuilder.setMarketingUrl(contract.url);
     }
 
-    const { name, description, image, startDate, endDate } = await getProhibitionContractMetadata(
-      chainId,
-      contractAddress,
-      resources.alchemy,
-    );
+    // asides name and image no other metadata we need is onchain so we can just use the offchain metadata
+    const {
+      name,
+      image,
+      description,
+      priceInWei,
+      mintAddress,
+      public_sale_start_at,
+      public_sale_end_at,
+      token_id,
+      contract_type,
+      user,
+    } = await getTransientBaseMintByAddressAndChain(resources, contract.chainId, contract.contractAddress);
 
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
+    const protocolFee = await getTransientProtocolFeeInEth(chainId, mintAddress, resources.alchemy);
+    const totalPrice = BigNumber.from(priceInWei).add(BigNumber.from(protocolFee)).toString();
 
-    const totalPriceWei = await getProhibitionMintPriceInEth(chainId, contractAddress, resources.alchemy);
+    mintBuilder.setMintOutputContract({
+      chainId,
+      address: contractAddress,
+    });
+
+    mintBuilder.setCreator({
+      name: user.name,
+      imageUrl: user.image,
+      websiteUrl: user.website,
+    });
 
     mintBuilder.setMintInstructions({
       chainId,
-      contractAddress,
-      contractMethod: 'mint',
-      contractParams: '[address, 1]',
-      abi: PROHIBITION_DAILY_ABI,
-      priceWei: totalPriceWei,
+      contractAddress: mintAddress,
+      contractMethod: 'purchase',
+      contractParams:
+        contract_type == 'ERC1155TL'
+          ? `["${contractAddress}", ${token_id}, address, 1, 0, []]`
+          : `["${contractAddress}", address, 1, 0, []]`,
+      abi: contract_type == 'ERC1155TL' ? TRANSIENT_BASE_ABI : TRANSIENT_ERC7160TL_ABI,
+      priceWei: totalPrice,
     });
+
+    const startDate = public_sale_start_at ? new Date(public_sale_start_at) : new Date();
+    const endDate = public_sale_end_at ? new Date(public_sale_end_at) : null;
 
     const liveDate = new Date() > startDate ? new Date() : startDate;
     mintBuilder
