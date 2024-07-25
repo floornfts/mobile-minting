@@ -1,10 +1,31 @@
 import { expect } from 'chai';
-import { OpenSeaIngestor } from '../../src/ingestors/opensea'
+import { OpenSeaIngestor } from '../../src/ingestors/opensea';
 import { mintIngestorResources } from '../../src/lib/resources';
 import { EVMMintInstructions } from '../../src/lib/types/mint-template';
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
+import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 
 describe('opensea', function () {
+  basicIngestorTests(
+    new OpenSeaIngestor(),
+    mintIngestorResources(),
+    {
+      successUrls: [
+        'https://opensea.io/collection/parallel-ocs-24-starter-bundle/overview',
+        'https://opensea.io/collection/basedghosts/overview',
+      ],
+      failureUrls: ['https://www.example.com/', 'https://opensea.io/'],
+      successContracts: [
+        { chainId: 8453, contractAddress: '0x7210587dd3df11efb7d6f34f970b32bf30bbc967' },
+        { chainId: 8453, contractAddress: '0x16085fcb829d6be599eaa31ba602b50f454c814c' },
+
+      ],
+      failureContracts: [{ chainId: 8453, contractAddress: '0x6140F00e4Ff3936702E68744f2b5978885464cbB' }],
+    },
+    // {
+    //   8453: '0xF469C6',
+    // },
+  );
   it('supportsUrl: Returns false for an unsupported URL', async function () {
     const ingestor = new OpenSeaIngestor();
     const url = 'https://example.com';
@@ -35,14 +56,16 @@ describe('opensea', function () {
     const builder = new MintTemplateBuilder(template);
     builder.validateMintTemplate();
 
-    expect(template.name).to.equal('Parallel OCS \'24 Starter Bundle');
+    expect(template.name).to.equal("Parallel OCS '24 Starter Bundle");
     expect(template.description).to.contain('Parallel Starter Bundle includes a Marcolian Assault');
     const mintInstructions = template.mintInstructions as EVMMintInstructions;
 
     expect(mintInstructions.contractAddress).to.equal('0x00005EA00Ac477B1030CE78506496e8C2dE24bf5');
     expect(mintInstructions.contractMethod).to.equal('mintPublic');
-    expect(mintInstructions.contractParams).to.equal('["0x7210587dd3df11efb7d6f34f970b32bf30bbc967", "0x0000a26b00c1f0df003000390027140000faa719", "0x0000000000000000000000000000000000000000", 1]');
-    expect(mintInstructions.priceWei).to.equal('10750000000000000');
+    expect(mintInstructions.contractParams).to.equal(
+      '["0x7210587dd3df11efb7d6f34f970b32bf30bbc967", "0x0000a26b00c1f0df003000390027140000faa719", "0x0000000000000000000000000000000000000000", 1]',
+    );
+    expect(mintInstructions.priceWei).to.equal('10000000000000000');
 
     expect(template.featuredImageUrl).to.contain('cd729f7fce09a974c5dd2588f219393e.png');
 
@@ -119,14 +142,16 @@ describe('opensea', function () {
     const builder = new MintTemplateBuilder(template);
     builder.validateMintTemplate();
 
-    expect(template.name).to.equal('Parallel OCS \'24 Starter Bundle');
+    expect(template.name).to.equal("Parallel OCS '24 Starter Bundle");
     expect(template.description).to.contain('Parallel Starter Bundle includes a Marcolian Assault');
     const mintInstructions = template.mintInstructions as EVMMintInstructions;
 
     expect(mintInstructions.contractAddress).to.equal('0x00005EA00Ac477B1030CE78506496e8C2dE24bf5');
     expect(mintInstructions.contractMethod).to.equal('mintPublic');
-    expect(mintInstructions.contractParams).to.equal('["0x7210587dd3df11efb7d6f34f970b32bf30bbc967", "0x0000a26b00c1f0df003000390027140000faa719", "0x0000000000000000000000000000000000000000", 1]');
-    expect(mintInstructions.priceWei).to.equal('10750000000000000');
+    expect(mintInstructions.contractParams).to.equal(
+      '["0x7210587dd3df11efb7d6f34f970b32bf30bbc967", "0x0000a26b00c1f0df003000390027140000faa719", "0x0000000000000000000000000000000000000000", 1]',
+    );
+    expect(mintInstructions.priceWei).to.equal('10000000000000000');
 
     expect(template.featuredImageUrl).to.contain('cd729f7fce09a974c5dd2588f219393e.png');
 
