@@ -77,24 +77,22 @@ export class ManifoldIngestor implements MintIngestor {
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
 
     const { chainId, contractAddress } = contract;
-    
-    const isBaseContract = await this.supportsContract(resources, contract);
-    if (!isBaseContract) {
-      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Incompatible contract');
+
+    if (!contract.url) {
+      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Ingesting via contract address not supported');
     }
 
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
       .setPartnerName('Manifold');
 
-    const url = await urlForValidManifoldContract(chainId, contractAddress, resources.alchemy, resources.fetcher);
-
-    if (url) {
-      mintBuilder.setMarketingUrl(url);
+  
+    if (contract.url) {
+      mintBuilder.setMarketingUrl(contract.url);
     }
 
-    const metadata  = await manifoldOnchainDataFromUrl(url, resources.fetcher);
-    
+    const metadata  = await manifoldOnchainDataFromUrl(contract.url, resources.fetcher);
+
     mintBuilder
       .setName(metadata.name)
       .setDescription(metadata.description)
@@ -111,7 +109,7 @@ export class ManifoldIngestor implements MintIngestor {
       chainId,
       contractAddress: MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT,
       contractMethod: 'mintProxy',
-      contractParams: `["${contractAddress}", 22534384, 1, [], [], address]`,
+      contractParams: `["${contractAddress}", "${metadata.instanceId}", 1, [], [], address]`,
       abi: MANIFOLD_CLAIMS_ABI,
       priceWei: totalPriceWei,
     });
