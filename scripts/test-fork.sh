@@ -52,7 +52,7 @@ git fetch floor
 git merge floor/main --no-edit
 
 # copy the .env.example file to .env
-cp ../../../../.env .env
+cp ../../../.env .env
 
 # Run tests
 yarn test
