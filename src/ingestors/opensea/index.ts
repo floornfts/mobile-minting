@@ -11,6 +11,15 @@ const CONTRACT_ADDRESS = '0x00005EA00Ac477B1030CE78506496e8C2dE24bf5';
 
 export class OpenSeaIngestor implements MintIngestor {
   async supportsUrl(_resources: MintIngestorResources, url: string): Promise<boolean> {
+    const splitUrl = url.split('/');
+    splitUrl.pop();
+    const slug = splitUrl.pop();
+    if (splitUrl.length < 4) {
+      return false;
+    }
+    if (!slug) {
+      return false;
+    }
     return new URL(url).hostname === 'www.opensea.io' || new URL(url).hostname === 'opensea.io';
   }
 
@@ -86,7 +95,6 @@ export class OpenSeaIngestor implements MintIngestor {
       chainId: 8453,
       contractAddress: CONTRACT_ADDRESS,
       contractMethod: 'mintPublic',
-      // The payer is always the mint recipient
       contractParams: `["${contract.address}", "${feeRecipient}", "0x0000000000000000000000000000000000000000", 1]`,
       abi: OPENSEA_ABI,
       priceWei: totalPriceWei,

@@ -25,10 +25,10 @@ export const getOpenSeaMintPriceInEth = async (
   dropAddress: string,
   alchemy: Alchemy,
 ): Promise<any> => {
+  const { mintPrice, feeBps } = await getProhibitionContractMetadata(chainId, contractAddress, dropAddress, alchemy);
 
-  const {mintPrice, feeBps} = await getProhibitionContractMetadata(chainId, contractAddress, dropAddress, alchemy);
-  
-  const feePrice = feeBps / 10000 * mintPrice;
+  // const feePrice = feeBps / 10000 * mintPrice;
+  const feePrice = 0;
   const totalFee = parseInt(feePrice.toString()) + parseInt(mintPrice.toString());
 
   return `${totalFee}`;

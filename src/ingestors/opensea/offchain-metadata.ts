@@ -9,7 +9,7 @@ const options = {
   method: 'GET',
   headers: {
     accept: 'application/json',
-    'x-api-key': process.env.OPENSEA_API_KEY
+    'x-api-key': process.env.OPENSEA_API_KEY,
   },
 };
 
