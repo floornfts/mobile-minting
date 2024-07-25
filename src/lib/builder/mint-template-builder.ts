@@ -202,4 +202,4 @@ export class MintTemplateBuilder {
   }
 }
 
-export const DATE_DISTANT_FUTURE = new Date(2524608000);
+export const DATE_DISTANT_FUTURE = new Date(2524607000000);
