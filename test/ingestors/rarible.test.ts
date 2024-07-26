@@ -8,24 +8,9 @@ import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 describe('rarible', function () {
     this.timeout(60000);
 
-    const chainId = 8453;
-    const ITER_IDX = 0;
-    const supportedUrlsWithBlock = [
-      {
-        url: 'https://rarible.com/collection/base/0x3e28E3ad52f64E67934D844fD3265f16c01E71D1/drops', 
-        block: 16500757 
-      },
-      {
-        url: 'https://rarible.com/collection/base/0x54DcE142f2a3064c2CEF6CDebdCdb73DBd2f57f3/drops', 
-        block: 15177765 
-      },
-      {
-        url: 'https://rarible.com/collection/base/0x0d3649f403780676F65e2B4A5CCD4F14EdDFaEA3/drops', 
-        block: 14926038 
-      },
-    ]
     const supportedUrls = [
-      supportedUrlsWithBlock[ITER_IDX].url,
+      'https://rarible.com/collection/base/0x7ab45Ce14349b5b66f7d8ECA627A29397BC4d26B/drops',
+      'https://rarible.com/collection/base/0x4aDca8bCD15aeEB58949fEE1a38fAEf7d5138121/drops',
     ]
     const notSupportedUrls = [
       'https://example.com',
@@ -34,6 +19,10 @@ describe('rarible', function () {
       'https://farcaster.xyz',
       'https://opensea.io',
     ] 
+
+    const chainId = 8453;
+    const blockHeight = 13332646;
+
     const suppContract = [
       { chainId, contractAddress: '0x1F4dcFc919863324887225dD4E7E92112dff64D9'},
       { chainId, contractAddress: '0x968ca01b5C32234F4d6Bfd44fF079BE14789bA10'},
@@ -65,7 +54,7 @@ describe('rarible', function () {
         failureContracts: notSuppContract,
       },
       {
-        8453: `0x${supportedUrlsWithBlock[ITER_IDX].block.toString(16)}`,
+        8453: `0x${blockHeight.toString(16)}`,
       }
     );
 
