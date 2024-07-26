@@ -13,7 +13,7 @@ export class RaribleIngestor {
             return false;
         }
              
-        const { chainId,  contractAddress } = await await raribleOnchainDataFromUrl(url)
+        const { chainId,  contractAddress } = await raribleOnchainDataFromUrl(url)
         return !!chainId && !!contractAddress
     }   
        
