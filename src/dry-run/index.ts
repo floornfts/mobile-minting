@@ -1,8 +1,8 @@
-import { simulateEVMTransactionWithAlchemy } from "../lib/simulation/simulation";
-import { ALL_MINT_INGESTORS } from "../ingestors";
-import { mintIngestorResources } from "../lib/resources";
+import { simulateEVMTransactionWithAlchemy } from '../lib/simulation/simulation';
+import { ALL_MINT_INGESTORS } from '../ingestors';
+import { mintIngestorResources } from '../lib/resources';
 import dotenv from 'dotenv';
-import { EVMMintInstructions } from "src/lib";
+import { EVMMintInstructions } from 'src/lib';
 dotenv.config();
 
 const args = process.argv.slice(2);
@@ -13,8 +13,8 @@ if (!ingestorName || !inputType || !input) {
   process.exit(1);
 }
 
-console.log(`Running dry-run\n
-  ingestory: ${ingestorName}\n
+console.log(`Running dry-run
+  ingestory: ${ingestorName}
   inputType: ${inputType}
   input: ${input}`);
 
@@ -35,7 +35,7 @@ const resources = mintIngestorResources();
         result = await ingestor.createMintTemplateForUrl(resources, input);
         break;
       case 'contract':
-        const [ chainId, contractAddress, tokenId ] = input.split(':');
+        const [chainId, contractAddress, tokenId] = input.split(':');
         if (!chainId || !contractAddress) {
           console.error('Invalid contract input');
           process.exit(1);
@@ -43,7 +43,7 @@ const resources = mintIngestorResources();
         result = await ingestor.createMintForContract(resources, {
           chainId: parseInt(chainId),
           contractAddress,
-          tokenId
+          tokenId,
         });
         break;
       default:
