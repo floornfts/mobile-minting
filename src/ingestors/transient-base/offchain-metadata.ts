@@ -109,7 +109,7 @@ export const getTransientBaseMintBySlug = async (
   const { nft_contract, media_url, name } = data;
 
   return {
-    chainId: nft_contract.address.chain,
+    chainId: parseInt(nft_contract.address.chain),
     contractAddress: nft_contract.address.raw_address,
     image: media_url,
     name,

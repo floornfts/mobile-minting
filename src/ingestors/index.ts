@@ -1,8 +1,10 @@
-import { FxHashIngestor } from './fxhash';
 import { MintIngestor } from '../lib/types/mint-ingestor';
 import { ProhibitionDailyIngestor } from './prohibition-daily';
-import { TransientIngestor } from './transient-base';
 import { ManifoldIngestor } from './manifold';
+import { FxHashIngestor } from './fxhash';
+import { TransientIngestor } from './transient-base';
+import { HighlightIngestor } from './highlight';
+import { FoundationIngestor } from './foundation';
 
 export type MintIngestionMap = {
   [key: string]: MintIngestor;
@@ -13,6 +15,8 @@ export const ALL_MINT_INGESTORS: MintIngestionMap = {
   fxhash: new FxHashIngestor(),
   manifold: new ManifoldIngestor(),
   transient: new TransientIngestor(),
+  highlight: new HighlightIngestor(),
+  foundation: new FoundationIngestor(),
 };
 
 export * from './';
