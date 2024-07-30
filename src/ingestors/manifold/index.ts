@@ -3,7 +3,7 @@ import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { MANIFOLD_CLAIMS_ABI } from './abi';
-import { getManifoldMintPriceInEth, urlForValidManifoldContract } from './onchain-metadata';
+import { getManifoldMintOwner, getManifoldMintPriceInEth, urlForValidManifoldContract } from './onchain-metadata';
 import { manifoldOnchainDataFromUrl } from './offchain-metadata';
 
 const MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT = "0x26BBEA7803DcAc346D5F5f135b57Cf2c752A02bE";
@@ -92,6 +92,7 @@ export class ManifoldIngestor implements MintIngestor {
     }
 
     const metadata  = await manifoldOnchainDataFromUrl(contract.url, resources.fetcher);
+    const owner = await getManifoldMintOwner(metadata.chainId, metadata.contractAddress, resources.alchemy);
 
     mintBuilder
       .setName(metadata.name)
@@ -100,7 +101,7 @@ export class ManifoldIngestor implements MintIngestor {
 
     mintBuilder.setCreator({
       name: metadata.creatorName,
-      walletAddress: metadata.creatorAddress
+      walletAddress: owner
     })
 
     const totalPriceWei = await getManifoldMintPriceInEth(metadata.mintPrice);

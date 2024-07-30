@@ -58,3 +58,15 @@ export const getManifoldMintPriceInEth = async (
   const totalFee = parseInt(feePrice.toString()) + parseInt(mintPrice.toString());
   return `${totalFee}`;
 };
+
+export const getManifoldMintOwner = async (
+  chainId: number,
+  contractAddress: string,
+  alchemy: Alchemy,
+): Promise<any> => {
+  const contract = await getContract(chainId, contractAddress, alchemy);
+  const response = await contract.functions.owner();
+  const owner = response[0];
+  
+  return owner;
+};

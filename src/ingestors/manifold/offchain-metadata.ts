@@ -13,8 +13,9 @@ export const manifoldOnchainDataFromUrl = async (
       const { asset, network: chainId, contract, mintPrice, startDate, endDate } = publicData || {};
       const { name, description, image_url: imageUrl } = asset || {};
       const { contractAddress } = contract || {};
-      
-      if (!creator?.name || !creator?.address || !name || !description || !imageUrl || !chainId || !contractAddress || !mintPrice?.value ) {
+      // const creatorAddress = creator.address || " ";
+
+      if (!creator?.name || !name || !description || !imageUrl || !chainId || !contractAddress || !mintPrice?.value ) {
         return false;
       }
       
@@ -27,6 +28,8 @@ export const manifoldOnchainDataFromUrl = async (
 
       if (!endDate){
         endTime = new Date('2030-01-01')
+      } else if (new Date(endDate) < new Date()){
+        return false;
       }
 
       return { 
