@@ -4,6 +4,7 @@ import { FxHashIngestor } from './fxhash';
 import { HighlightIngestor } from './highlight';
 import { TransientIngestor } from './transient-base';
 import { FoundationIngestor } from './foundation';
+import { MagicEdenIngestor } from './magiceden';
 
 export type MintIngestionMap = {
   [key: string]: MintIngestor;
@@ -15,6 +16,7 @@ export const ALL_MINT_INGESTORS: MintIngestionMap = {
   highlight: new HighlightIngestor(),
   transient: new TransientIngestor(),
   foundation: new FoundationIngestor(),
+  magiceden: new MagicEdenIngestor(),
 };
 
 export * from './';

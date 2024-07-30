@@ -23,9 +23,14 @@ export const simulateEVMTransactionWithAlchemy = async (mintInstructions: EVMMin
     const abi = mintInstructions.abi;
     const iface = new Utils.Interface(abi);
 
-    const paramsArray = prepareContractParams(mintInstructions.contractParams);
+    let data;
+    if (mintInstructions.contractParams.startsWith('0x')) {
+      data = mintInstructions.contractParams;
+    } else {
+      const paramsArray = prepareContractParams(mintInstructions.contractParams);
 
-    const data = iface.encodeFunctionData(mintInstructions.contractMethod, paramsArray);
+      data = iface.encodeFunctionData(mintInstructions.contractMethod, paramsArray);
+    }
 
     const tx = {
         to: mintInstructions.contractAddress,
