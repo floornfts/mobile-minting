@@ -41,7 +41,7 @@ export class ProhibitionDailyIngestor implements MintIngestor {
     if (!chainId || !contractAddress) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
     }
-
+            
     return this.createMintForContract(resources, { chainId, contractAddress, url });
   }
 
@@ -77,6 +77,7 @@ export class ProhibitionDailyIngestor implements MintIngestor {
       contractParams: '[address, 1]',
       abi: PROHIBITION_DAILY_ABI,
       priceWei: totalPriceWei,
+      
     });
 
     const liveDate = new Date() > startDate ? new Date() : startDate;

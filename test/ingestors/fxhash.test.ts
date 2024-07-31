@@ -3,6 +3,7 @@ import { FxHashIngestor } from '../../src/ingestors/fxhash';
 import { mintIngestorResources } from '../../src/lib/resources';
 import { EVMMintInstructions } from '../../src/lib/types/mint-template';
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
+
 import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 
 describe('fxhash', function () {
@@ -40,14 +41,14 @@ describe('fxhash', function () {
     const resources = mintIngestorResources();
     const result = await ingestor.supportsUrl(resources, url);
     expect(result).to.be.false;
-  });
+  });        
   it('supportsUrl: Returns true for a supported URL', async function () {
     const ingestor = new FxHashIngestor();
     const url = 'https://www.fxhash.xyz/generative/slug/1x4-shape-study';
     const resources = mintIngestorResources();
     const result = await ingestor.supportsUrl(resources, url);
     expect(result).to.be.true;
-
+       
     const url2 = 'https://fxhash.xyz/generative/slug/allegro';
     const result2 = await ingestor.supportsUrl(resources, url2);
     expect(result2).to.be.true;
@@ -170,7 +171,7 @@ describe('fxhash', function () {
       contractAddress: '0x914cf2d92b087C9C01a062111392163c3B35B60e',
     };
     const template = await ingestor.createMintForContract(resources, contract);
-
+       
     // Verify that the mint template passed validation
     const builder = new MintTemplateBuilder(template);
     builder.validateMintTemplate();
@@ -247,3 +248,4 @@ describe('fxhash', function () {
     expect(supported).to.be.false;
   });
 });
+      

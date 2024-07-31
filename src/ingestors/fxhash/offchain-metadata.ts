@@ -72,7 +72,7 @@ export const getFxHashMintsBySlug = async (resources: MintIngestorResources, slu
         return cur;
       }
       return acc;
-    }, '');
+    }, '');       
 
     try {
       const graphQLRes = await resources.fetcher({

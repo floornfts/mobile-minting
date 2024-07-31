@@ -6,7 +6,7 @@ const getContract = async (chainId: number, contractAddress: string, alchemy: Al
   const contract = new Contract(contractAddress, PROHIBITION_DAILY_ABI, ethersProvider);
   return contract;
 };
-
+             
 export const getProhibitionContractMetadata = async (
   chainId: number,
   contractAddress: string,
