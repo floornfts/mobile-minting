@@ -28,13 +28,8 @@ export class ZoraInternalIngestor implements MintIngestor {
   }
 
   async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
-    const { chainId, contractAddress, tokenId } = contract;
-    if (!chainId || !contractAddress) {
-      return false;
-    }
-
     try {
-      const url = this.zoraSourceTranslator.urlForZoraContract(contract, resources.fetcher);
+      const url = await this.zoraSourceTranslator.urlForZoraContract(contract, resources.fetcher);
       return !!url;
     } catch (error) {
       return false;
@@ -89,7 +84,6 @@ export class ZoraInternalIngestor implements MintIngestor {
     const mintInstructions = await this.zoraMetadataProvider.mintInstructionsForToken(tokenDetails);
     mintBuilder.setMintInstructions(mintInstructions);
 
-    console.log(JSON.stringify(tokenDetails, null, 2));
     const startDate = tokenDetails.mintable?.start_datetime
       ? new Date(tokenDetails.mintable.start_datetime)
       : new Date();

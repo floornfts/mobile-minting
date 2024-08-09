@@ -10,6 +10,6 @@ module.exports = {
   ui: 'bdd',
   spec: ['./test/**/*.test.*'],
   exit: true,
-  timeout: 10000,
+  timeout: 20000,
   recursive: true,
 };

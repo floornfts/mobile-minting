@@ -4,9 +4,7 @@ import { MintContractOptions } from 'src/lib/types';
 export class ZoraSourceTranslator {
   urlForZoraContract = async (contract: MintContractOptions, fetcher: Axios): Promise<string> => {
     let { chainId, contractAddress, tokenId, url } = contract;
-    if (url) {
-      return url;
-    } else {
+    if (!url) {
       url = `https://zora.co/collect/${this.chainNameFromChainId(chainId)}:${contractAddress}${
         tokenId ? `/${tokenId}` : ''
       }`;
@@ -33,10 +31,6 @@ export class ZoraSourceTranslator {
     const chainName = chainContract?.split(':')[0];
     const chainId = this.chainIdFromChainName(chainName || '');
     const contractAddress = chainContract?.split(':')[1];
-
-    console.log('chainId', chainId);
-    console.log('contractAddress', contractAddress);
-    console.log('tokenId', tokenId);
 
     if (!chainId || !contractAddress) {
       throw new Error('Invalid chain or contract address');

@@ -40,7 +40,6 @@ export class ZoraMetadataProvider {
   };
 
   mintInstructionsForToken = async (tokenDetails: ZoraTokenDetails): Promise<EVMMintInstructions> => {
-    const mintPrice = await this._mintPriceWeiForToken(tokenDetails);
     const chainName = tokenDetails.chain_name.split('-')[0].toLowerCase();
     const chainId = new ZoraSourceTranslator().chainIdFromChainName(chainName);
 
@@ -48,7 +47,7 @@ export class ZoraMetadataProvider {
       throw new Error(`Unsupported chain: ${tokenDetails.chain_name}`);
     }
 
-    const { address, method, params, abi } = this._contractAddressMethodAndParams(tokenDetails);
+    const { address, method, params, abi, priceWei } = await this._contractAddressMethodAndParams(tokenDetails);
 
     const mintInstructions: EVMMintInstructions = {
       chainId: chainId,
@@ -56,7 +55,7 @@ export class ZoraMetadataProvider {
       abi: abi,
       contractMethod: method,
       contractParams: params,
-      priceWei: mintPrice,
+      priceWei: priceWei,
     };
 
     return mintInstructions;
@@ -68,13 +67,13 @@ export class ZoraMetadataProvider {
       throw new Error(`No mint fee per token for token`);
     }
     const mintFeePerTokenWei = BigInt(mintFeePerTokenString);
-    const mintPriceWei = mintFeePerTokenWei * BigInt(tokenDetails.mintable?.cost?.eth_price?.raw || '');
+    const mintPriceWei = BigInt(tokenDetails.mintable?.cost?.eth_price?.raw || '0');
     return (mintFeePerTokenWei + mintPriceWei).toString();
   };
 
-  _contractAddressMethodAndParams = (
+  _contractAddressMethodAndParams = async (
     tokenDetails: ZoraTokenDetails,
-  ): { address: string; method: string; params: string; abi: any } => {
+  ): Promise<{ address: string; method: string; params: string; abi: any; priceWei: string }> => {
     const mintType = tokenDetails.mintable?.mint_context?.sale_strategies[0].sale_strategies_type;
     const tokenId = tokenDetails.token_id;
 
@@ -82,24 +81,34 @@ export class ZoraMetadataProvider {
     var method = '';
     var params = '';
     var abi: any = [];
+    var quantity = 1;
+    var priceWei = '';
+
+    const mintPrice = await this._mintPriceWeiForToken(tokenDetails);
 
     if (mintType === 'ZORA_TIMED') {
+      // if the price is 0 then default to minting 11
+      if (tokenDetails.mintable?.cost?.eth_price?.raw === '0') {
+        quantity = 11;
+        priceWei = (BigInt(mintPrice) * BigInt(quantity)).toString();
+      }
       //mint(address mintTo, uint256 quantity, address collection, uint256 tokenId, address mintReferral, string comment)
-      params = `[address, 1, "${tokenDetails.collection.address}", ${
+      params = `[address, ${quantity}, "${tokenDetails.collection.address}", ${
         tokenId || '1'
       }, "${FLOOR_REFERRER_REWARDS_ADDRESS}", "Minted on floor.fun"]`;
       contractAddress = ZORA_TIMED_MINT_STRATEGY_ADDRESS;
       method = 'mint';
       abi = ZORA_TIMED_MINT_ABI;
     } else if (mintType === 'FIXED_PRICE') {
+      priceWei = mintPrice;
       abi = ZORA_FIXED_PRICE_ABI;
       contractAddress = tokenDetails.collection.address;
       method = 'mint';
       params = `["${ZORA_FIXED_PRICE_STRATEGY_ADDRESS}", ${
         tokenId || '1'
-      }, 1, ["${FLOOR_REFERRER_REWARDS_ADDRESS}"], encodedAddress]`;
+      }, ${quantity}, ["${FLOOR_REFERRER_REWARDS_ADDRESS}"], encodedAddress]`;
     }
 
-    return { address: contractAddress, method: method, params: params, abi: abi };
+    return { address: contractAddress, method: method, params: params, abi: abi, priceWei: priceWei };
   };
 }
