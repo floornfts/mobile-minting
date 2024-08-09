@@ -24,12 +24,19 @@ export class ZoraSourceTranslator {
 
   tokenDetailsFromUrl = async (url: string): Promise<{ chainId: number; contractAddress: string; tokenId: string }> => {
     // https://zora.co/collect/zora:0x20479b19ca05e0b63875a65acf24d81cd0973331/1
-    const urlParts = url.split('/');
+    var tokenId = '1';
+    const urlParts = new URL(url).pathname.split('/');
+    if (urlParts.length > 2) {
+      tokenId = urlParts.pop() || '1';
+    }
     const chainContract = urlParts.pop();
     const chainName = chainContract?.split(':')[0];
     const chainId = this.chainIdFromChainName(chainName || '');
     const contractAddress = chainContract?.split(':')[1];
-    const tokenId = urlParts.pop() || '1';
+
+    console.log('chainId', chainId);
+    console.log('contractAddress', contractAddress);
+    console.log('tokenId', tokenId);
 
     if (!chainId || !contractAddress) {
       throw new Error('Invalid chain or contract address');

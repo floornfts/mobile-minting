@@ -4,9 +4,8 @@ import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { ZoraSourceTranslator } from './zora-sources';
 import { ZoraMetadataProvider } from './offchain-metadata';
-import { ZORA_TIMED_MINT_ABI } from './abi';
 
-export class ProhibitionDailyIngestor implements MintIngestor {
+export class ZoraInternalIngestor implements MintIngestor {
   configuration = {
     supportsContractIsExpensive: true,
     supportsUrlIsExpensive: true,
@@ -87,21 +86,16 @@ export class ProhibitionDailyIngestor implements MintIngestor {
       imageUrl: tokenDetails.creator_profile.avatar,
     });
 
-    const totalPriceWei = await this.zoraMetadataProvider.mintPriceWeiForToken(tokenDetails);
+    const mintInstructions = await this.zoraMetadataProvider.mintInstructionsForToken(tokenDetails);
+    mintBuilder.setMintInstructions(mintInstructions);
 
-    mintBuilder.setMintInstructions({
-      chainId,
-      contractAddress,
-      contractMethod: 'mint',
-      contractParams: '[address, 1]',
-      abi: ZORA_TIMED_MINT_ABI,
-      priceWei: totalPriceWei,
-    });
-
-    const startDate = tokenDetails.mintable?.end_datetime
+    console.log(JSON.stringify(tokenDetails, null, 2));
+    const startDate = tokenDetails.mintable?.start_datetime
+      ? new Date(tokenDetails.mintable.start_datetime)
+      : new Date();
+    const endDate = tokenDetails.mintable?.end_datetime
       ? new Date(tokenDetails.mintable.end_datetime)
       : new Date('2030-01-01');
-    const endDate = tokenDetails.mintable?.start_datetime ? new Date(tokenDetails.mintable.start_datetime) : new Date();
     const liveDate = new Date() > startDate ? new Date() : startDate;
     mintBuilder.setAvailableForPurchaseEnd(endDate).setAvailableForPurchaseStart(startDate).setLiveDate(liveDate);
 

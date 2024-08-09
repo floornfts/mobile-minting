@@ -1,10 +1,13 @@
 import { Alchemy, Contract } from 'alchemy-sdk';
-import { ZORA_TIMED_MINT_ABI } from './abi';
+import { ZORA_FIXED_PRICE_ABI, ZORA_TIMED_MINT_ABI } from './abi';
 import { ZoraSourceTranslator } from './zora-sources';
 import { Axios } from 'axios';
 import { ZoraTokenDetails } from './zora-types';
 import { EVMMintInstructions } from 'src/lib';
 
+const FLOOR_REFERRER_REWARDS_ADDRESS = '0xBcaf781ddD26054AF684fb8785c8410EDddCC98a'.toLowerCase();
+const ZORA_FIXED_PRICE_STRATEGY_ADDRESS = '0x04e2516a2c207e84a1839755675dfd8ef6302f0a';
+const ZORA_TIMED_MINT_STRATEGY_ADDRESS = '0x777777722D078c97c6ad07d9f36801e653E356Ae';
 export class ZoraMetadataProvider {
   getContract = async (chainId: number, contractAddress: string, alchemy: Alchemy): Promise<Contract> => {
     const ethersProvider = await alchemy.config.getProvider();
@@ -37,7 +40,7 @@ export class ZoraMetadataProvider {
   };
 
   mintInstructionsForToken = async (tokenDetails: ZoraTokenDetails): Promise<EVMMintInstructions> => {
-    const mintPrice = await this.mintPriceWeiForToken(tokenDetails);
+    const mintPrice = await this._mintPriceWeiForToken(tokenDetails);
     const chainName = tokenDetails.chain_name.split('-')[0].toLowerCase();
     const chainId = new ZoraSourceTranslator().chainIdFromChainName(chainName);
 
@@ -45,19 +48,58 @@ export class ZoraMetadataProvider {
       throw new Error(`Unsupported chain: ${tokenDetails.chain_name}`);
     }
 
+    const { address, method, params, abi } = this._contractAddressMethodAndParams(tokenDetails);
+
     const mintInstructions: EVMMintInstructions = {
       chainId: chainId,
-      contractAddress: tokenDetails.mintable.mint_context.mint_contract_address,
-      abi: ZORA_TIMED_MINT_ABI,
-      contractMethod: 'mint',
-      contractMethodArgs: [tokenDetails.mintable.mint_context.mint_token_id],
-      mintPrice,
+      contractAddress: address,
+      abi: abi,
+      contractMethod: method,
+      contractParams: params,
+      priceWei: mintPrice,
     };
+
+    return mintInstructions;
   };
 
-  mintPriceWeiForToken = async (tokenDetails: ZoraTokenDetails): Promise<string> => {
-    const mintFeePerTokenWei = BigInt(tokenDetails.mintable.mint_context.mint_fee_per_token);
-    const mintPriceWei = mintFeePerTokenWei * BigInt(tokenDetails.mintable.cost.eth_price.raw || '');
+  _mintPriceWeiForToken = async (tokenDetails: ZoraTokenDetails): Promise<string> => {
+    const mintFeePerTokenString = tokenDetails.mintable?.mint_context?.mint_fee_per_token;
+    if (!mintFeePerTokenString) {
+      throw new Error(`No mint fee per token for token`);
+    }
+    const mintFeePerTokenWei = BigInt(mintFeePerTokenString);
+    const mintPriceWei = mintFeePerTokenWei * BigInt(tokenDetails.mintable?.cost?.eth_price?.raw || '');
     return (mintFeePerTokenWei + mintPriceWei).toString();
+  };
+
+  _contractAddressMethodAndParams = (
+    tokenDetails: ZoraTokenDetails,
+  ): { address: string; method: string; params: string; abi: any } => {
+    const mintType = tokenDetails.mintable?.mint_context?.sale_strategies[0].sale_strategies_type;
+    const tokenId = tokenDetails.token_id;
+
+    var contractAddress = '';
+    var method = '';
+    var params = '';
+    var abi: any = [];
+
+    if (mintType === 'ZORA_TIMED') {
+      //mint(address mintTo, uint256 quantity, address collection, uint256 tokenId, address mintReferral, string comment)
+      params = `[address, 1, "${tokenDetails.collection.address}", ${
+        tokenId || '1'
+      }, "${FLOOR_REFERRER_REWARDS_ADDRESS}", "Minted on floor.fun"]`;
+      contractAddress = ZORA_TIMED_MINT_STRATEGY_ADDRESS;
+      method = 'mint';
+      abi = ZORA_TIMED_MINT_ABI;
+    } else if (mintType === 'FIXED_PRICE') {
+      abi = ZORA_FIXED_PRICE_ABI;
+      contractAddress = tokenDetails.collection.address;
+      method = 'mint';
+      params = `["${ZORA_FIXED_PRICE_STRATEGY_ADDRESS}", ${
+        tokenId || '1'
+      }, 1, ["${FLOOR_REFERRER_REWARDS_ADDRESS}"], encodedAddress]`;
+    }
+
+    return { address: contractAddress, method: method, params: params, abi: abi };
   };
 }

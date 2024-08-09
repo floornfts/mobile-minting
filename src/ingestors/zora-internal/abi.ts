@@ -2,8 +2,18 @@ export const ZORA_TIMED_MINT_ABI = [
   {
     inputs: [
       {
-        internalType: 'contract IMinter1155',
-        name: 'minter',
+        internalType: 'address',
+        name: 'mintTo',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'quantity',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'collection',
         type: 'address',
       },
       {
@@ -12,14 +22,14 @@ export const ZORA_TIMED_MINT_ABI = [
         type: 'uint256',
       },
       {
-        internalType: 'uint256',
-        name: 'quantity',
-        type: 'uint256',
+        internalType: 'address',
+        name: 'mintReferral',
+        type: 'address',
       },
       {
-        internalType: 'bytes',
-        name: 'minterArguments',
-        type: 'bytes',
+        internalType: 'string',
+        name: 'comment',
+        type: 'string',
       },
     ],
     name: 'mint',
@@ -27,19 +37,9 @@ export const ZORA_TIMED_MINT_ABI = [
     stateMutability: 'payable',
     type: 'function',
   },
-  {
-    inputs: [],
-    name: 'mintFee',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'pure',
-    type: 'function',
-  },
+];
+
+export const ZORA_FIXED_PRICE_ABI_MINT_WITH_REWARDS = [
   {
     inputs: [
       {
@@ -69,6 +69,30 @@ export const ZORA_TIMED_MINT_ABI = [
       },
     ],
     name: 'mintWithRewards',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+];
+
+export const ZORA_FIXED_PRICE_ABI = [
+  {
+    inputs: [
+      {
+        internalType: 'contract IMinter1155',
+        name: 'minter',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'tokenId', type: 'uint256' },
+      { internalType: 'uint256', name: 'quantity', type: 'uint256' },
+      {
+        internalType: 'address[]',
+        name: 'rewardsRecipients',
+        type: 'address[]',
+      },
+      { internalType: 'bytes', name: 'minterArguments', type: 'bytes' },
+    ],
+    name: 'mint',
     outputs: [],
     stateMutability: 'payable',
     type: 'function',
