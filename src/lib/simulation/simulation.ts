@@ -100,21 +100,24 @@ const dataForMintInstructions = (mintInstructions: EVMMintInstructions) => {
   const abi = mintInstructions.abi;
   const iface = new Utils.Interface(abi);
 
-  const paramsArray = prepareContractParams(mintInstructions.contractParams);
+  const paramsArray = prepareContractParams(mintInstructions);
+  console.log(`Params: ${JSON.stringify(paramsArray)}`);
   const data = iface.encodeFunctionData(mintInstructions.contractMethod, paramsArray);
 
   return data;
 };
 
-export const prepareContractParams = (template: string): any[] => {
+export const prepareContractParams = (mintInstructions: EVMMintInstructions): any[] => {
   const regex = /{{(\w+)}}|tokenId|address|encodedAddress/g;
 
-  const replacedTemplate = template.replace(regex, (match) => {
+  const replacedTemplate = mintInstructions.contractParams.replace(regex, (match) => {
     switch (match) {
       case 'address':
         return `"${TEST_RECIPIENT}"`;
       case 'encodedAddress':
         return `"${encodeAddress(TEST_RECIPIENT)}"`;
+      case 'tokenId':
+        return `"${mintInstructions.tokenId || '1'}"`;
       default:
         return '""';
     }

@@ -41,6 +41,7 @@ export type EVMMintInstructions = {
         ['1', address]
     */
   contractParams: string;
+  tokenId?: number | null;
 
   /* The price in wei to be submitted to the contract */
   priceWei: string;
@@ -80,4 +81,5 @@ export type MintArtistMetadata = {
 export type CollectionContract = {
   address: string;
   chainId: number;
-}
+  tokenId?: number | null;
+};

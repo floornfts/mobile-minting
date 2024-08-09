@@ -82,7 +82,9 @@ export class ZoraMetadataProvider {
       throw new Error(`Unsupported chain: ${tokenDetails.chain_name}`);
     }
 
-    const { address, method, params, abi, priceWei } = await this._contractAddressMethodAndParams(tokenDetails);
+    const { address, method, params, abi, priceWei, tokenId } = await this._contractAddressMethodAndParams(
+      tokenDetails,
+    );
 
     const mintInstructions: EVMMintInstructions = {
       chainId: chainId,
@@ -91,6 +93,7 @@ export class ZoraMetadataProvider {
       contractMethod: method,
       contractParams: params,
       priceWei: priceWei,
+      tokenId: parseInt(tokenId || '1'),
     };
 
     return mintInstructions;
@@ -108,7 +111,14 @@ export class ZoraMetadataProvider {
 
   _contractAddressMethodAndParams = async (
     tokenDetails: ZoraTokenDetails,
-  ): Promise<{ address: string; method: string; params: string; abi: any; priceWei: string }> => {
+  ): Promise<{
+    address: string;
+    method: string;
+    params: string;
+    abi: any;
+    priceWei: string;
+    tokenId: string | null;
+  }> => {
     const mintType = tokenDetails.mintable?.mint_context?.sale_strategies[0].sale_strategies_type;
     const tokenId = tokenDetails.token_id;
 
@@ -128,9 +138,7 @@ export class ZoraMetadataProvider {
         priceWei = (BigInt(mintPrice) * BigInt(quantity)).toString();
       }
       //mint(address mintTo, uint256 quantity, address collection, uint256 tokenId, address mintReferral, string comment)
-      params = `[address, ${quantity}, "${tokenDetails.collection.address}", ${
-        tokenId || '1'
-      }, "${FLOOR_REFERRER_REWARDS_ADDRESS}", "Minted on floor.fun"]`;
+      params = `[address, ${quantity}, "${tokenDetails.collection.address}", tokenId, "${FLOOR_REFERRER_REWARDS_ADDRESS}", "Minted on floor.fun"]`;
       contractAddress = ZORA_TIMED_MINT_STRATEGY_ADDRESS;
       method = 'mint';
       abi = ZORA_TIMED_MINT_ABI;
@@ -139,11 +147,9 @@ export class ZoraMetadataProvider {
       abi = ZORA_FIXED_PRICE_ABI;
       contractAddress = tokenDetails.collection.address;
       method = 'mint';
-      params = `["${ZORA_FIXED_PRICE_STRATEGY_ADDRESS}", ${
-        tokenId || '1'
-      }, ${quantity}, ["${FLOOR_REFERRER_REWARDS_ADDRESS}"], encodedAddress]`;
+      params = `["${ZORA_FIXED_PRICE_STRATEGY_ADDRESS}", tokenId, ${quantity}, ["${FLOOR_REFERRER_REWARDS_ADDRESS}"], encodedAddress]`;
     }
 
-    return { address: contractAddress, method: method, params: params, abi: abi, priceWei: priceWei };
+    return { address: contractAddress, method: method, params: params, abi: abi, priceWei: priceWei, tokenId: tokenId };
   };
 }

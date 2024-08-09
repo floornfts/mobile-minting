@@ -73,7 +73,8 @@ export class ZoraInternalIngestor implements MintIngestor {
     mintBuilder
       .setName(tokenDetails.metadata?.name || tokenDetails.collection.name)
       .setDescription(tokenDetails.metadata?.description || tokenDetails.collection.description || '')
-      .setFeaturedImageUrl(tokenDetails.media?.image_preview?.raw);
+      .setFeaturedImageUrl(tokenDetails.media?.image_preview?.raw)
+      .setMintOutputContract({ chainId, address: contractAddress, tokenId: tokenId ? parseInt(tokenId) : null });
 
     mintBuilder.setCreator({
       name: tokenDetails.creator_profile.display_name,
