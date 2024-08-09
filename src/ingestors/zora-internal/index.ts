@@ -3,7 +3,7 @@ import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { ZoraSourceTranslator } from './zora-sources';
-import { ZoraMetadataProvider } from './offchain-metadata';
+import { ZoraMetadataProvider } from './zora-metadata';
 
 export class ZoraInternalIngestor implements MintIngestor {
   configuration = {
@@ -84,13 +84,7 @@ export class ZoraInternalIngestor implements MintIngestor {
     const mintInstructions = await this.zoraMetadataProvider.mintInstructionsForToken(tokenDetails);
     mintBuilder.setMintInstructions(mintInstructions);
 
-    const startDate = tokenDetails.mintable?.start_datetime
-      ? new Date(tokenDetails.mintable.start_datetime)
-      : new Date();
-    const endDate = tokenDetails.mintable?.end_datetime
-      ? new Date(tokenDetails.mintable.end_datetime)
-      : new Date('2030-01-01');
-    const liveDate = new Date() > startDate ? new Date() : startDate;
+    const { startDate, endDate, liveDate } = await this.zoraMetadataProvider.availabilityDatesForToken(tokenDetails);
     mintBuilder.setAvailableForPurchaseEnd(endDate).setAvailableForPurchaseStart(startDate).setLiveDate(liveDate);
 
     const output = mintBuilder.build();

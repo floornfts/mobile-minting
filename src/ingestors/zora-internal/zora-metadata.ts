@@ -39,6 +39,41 @@ export class ZoraMetadataProvider {
     return tokenData;
   };
 
+  availabilityDatesForToken = async (
+    tokenDetails: ZoraTokenDetails,
+  ): Promise<{ startDate: Date; endDate: Date; liveDate: Date }> => {
+    let startDate = new Date();
+    let endDate = new Date('2030-01-01');
+
+    let startDateISO8601 = tokenDetails.mintable?.start_datetime;
+    let endDateISO8601 = tokenDetails.mintable?.end_datetime;
+
+    if (startDateISO8601) {
+      startDate = new Date(startDateISO8601);
+    }
+    if (endDateISO8601) {
+      endDate = new Date(endDateISO8601);
+    }
+
+    let fallbackStartDateValue =
+      tokenDetails.mintable?.mint_context.sale_strategies[0].fixed_price?.sale_start ||
+      tokenDetails.mintable?.mint_context.sale_strategies[0].zora_timed_minter?.sale_start;
+    if (fallbackStartDateValue) {
+      startDate = new Date(parseInt(fallbackStartDateValue) * 1000);
+    }
+
+    let fallbackEndDateValue =
+      tokenDetails.mintable?.mint_context.sale_strategies[0].fixed_price?.sale_end ||
+      tokenDetails.mintable?.mint_context.sale_strategies[0].zora_timed_minter?.sale_end;
+    if (fallbackEndDateValue) {
+      endDate = new Date(parseInt(fallbackEndDateValue) * 1000);
+    }
+
+    let liveDate = startDate > new Date() ? startDate : new Date();
+
+    return { startDate, endDate, liveDate };
+  };
+
   mintInstructionsForToken = async (tokenDetails: ZoraTokenDetails): Promise<EVMMintInstructions> => {
     const chainName = tokenDetails.chain_name.split('-')[0].toLowerCase();
     const chainId = new ZoraSourceTranslator().chainIdFromChainName(chainName);
