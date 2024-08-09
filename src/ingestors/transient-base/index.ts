@@ -87,6 +87,7 @@ export class TransientIngestor implements MintIngestor {
     mintBuilder.setMintOutputContract({
       chainId,
       address: contractAddress,
+      tokenId: token_id,
     });
 
     mintBuilder.setCreator({
@@ -99,6 +100,7 @@ export class TransientIngestor implements MintIngestor {
       chainId,
       contractAddress: mintAddress,
       contractMethod: 'purchase',
+      tokenId: token_id,
       contractParams:
         contract_type == 'ERC1155TL'
           ? `["${contractAddress}", ${token_id}, address, 1, 0, []]`
