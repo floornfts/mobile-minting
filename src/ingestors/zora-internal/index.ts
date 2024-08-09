@@ -58,7 +58,7 @@ export class ZoraInternalIngestor implements MintIngestor {
 
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('Zora');
+      .setPartnerName('ZORA');
 
     const url = await this.zoraSourceTranslator.urlForZoraContract(contract, resources.fetcher);
     mintBuilder.setMarketingUrl(url);
