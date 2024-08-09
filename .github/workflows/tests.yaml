@@ -15,7 +15,7 @@ jobs:
         env:
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
           SIMULATE_DURING_TESTS: ${{ vars.SIMULATE_DURING_TESTS }}
-          TENDERLY_ACCOUNT_SLUG: ${{ vars.TENDERLY_ACCOUNT_SLUG }}
-          TENDERLY_PROJECT_SLUG: ${{ vars.TENDERLY_PROJECT_SLUG }}
-          TENDERLY_ACCESS_KEY: ${{ vars.TENDERLY_ACCESS_KEY }}
+          TENDERLY_ACCOUNT_SLUG: ${{ secrets.TENDERLY_ACCOUNT_SLUG }}
+          TENDERLY_PROJECT_SLUG: ${{ secrets.TENDERLY_PROJECT_SLUG }}
+          TENDERLY_ACCESS_KEY: ${{ secrets.TENDERLY_ACCESS_KEY }}
         run: yarn install --userconfig=/dev/null && yarn test
