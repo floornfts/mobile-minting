@@ -1,5 +1,5 @@
-import { Alchemy, BigNumber, Network, Utils } from "alchemy-sdk";
-import { EVMMintInstructions } from "../types";
+import { Alchemy, BigNumber, Network, Utils } from 'alchemy-sdk';
+import { EVMMintInstructions } from '../types';
 import Tenderly from './tenderly';
 export const SIGNER1_WALLET = '0x965EF172b303B0BcdC38669DF1De3c26BAD2dB8a';
 export const TEST_RECIPIENT = '0x0cc9601298361e844451a7e35e1d7fcd72750e47';
@@ -108,7 +108,7 @@ const dataForMintInstructions = (mintInstructions: EVMMintInstructions) => {
 };
 
 export const prepareContractParams = (mintInstructions: EVMMintInstructions): any[] => {
-  const regex = /{{(\w+)}}|tokenId|address|encodedAddress/g;
+  const regex = /{{(\w+)}}|tokenId|address|encodedAddress|quantity/g;
 
   const replacedTemplate = mintInstructions.contractParams.replace(regex, (match) => {
     switch (match) {
@@ -118,6 +118,8 @@ export const prepareContractParams = (mintInstructions: EVMMintInstructions): an
         return `"${encodeAddress(TEST_RECIPIENT)}"`;
       case 'tokenId':
         return `"${mintInstructions.tokenId || '1'}"`;
+      case 'quantity':
+        return `${mintInstructions.defaultQuantity}`;
       default:
         return '""';
     }

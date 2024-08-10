@@ -82,9 +82,8 @@ export class ZoraMetadataProvider {
       throw new Error(`Unsupported chain: ${tokenDetails.chain_name}`);
     }
 
-    const { address, method, params, abi, priceWei, tokenId } = await this._contractAddressMethodAndParams(
-      tokenDetails,
-    );
+    const { address, method, params, abi, priceWei, tokenId, supportsQuantity, priceWeiPerUnit, defaultQuantity } =
+      await this._contractAddressMethodAndParams(tokenDetails);
 
     const mintInstructions: EVMMintInstructions = {
       chainId: chainId,
@@ -94,6 +93,9 @@ export class ZoraMetadataProvider {
       contractParams: params,
       priceWei: priceWei,
       tokenId: parseInt(tokenId || '1'),
+      supportsQuantity: supportsQuantity,
+      priceWeiPerUnit: priceWeiPerUnit,
+      defaultQuantity: defaultQuantity,
     };
 
     return mintInstructions;
@@ -118,6 +120,9 @@ export class ZoraMetadataProvider {
     abi: any;
     priceWei: string;
     tokenId: string | null;
+    supportsQuantity: boolean;
+    priceWeiPerUnit: string;
+    defaultQuantity: number;
   }> => {
     const mintType = tokenDetails.mintable?.mint_context?.sale_strategies[0].sale_strategies_type;
     const tokenId = tokenDetails.token_id;
@@ -126,30 +131,44 @@ export class ZoraMetadataProvider {
     var method = '';
     var params = '';
     var abi: any = [];
-    var quantity = 1;
     var priceWei = '';
+    var supportsQuantity = false;
+    var priceWeiPerUnit = '';
+    var defaultQuantity = 1;
 
     const mintPrice = await this._mintPriceWeiForToken(tokenDetails);
 
     if (mintType === 'ZORA_TIMED') {
       // if the price is 0 then default to minting 11
       if (tokenDetails.mintable?.cost?.eth_price?.raw === '0') {
-        quantity = 11;
-        priceWei = (BigInt(mintPrice) * BigInt(quantity)).toString();
+        defaultQuantity = 11;
+        priceWei = (BigInt(mintPrice) * BigInt(defaultQuantity)).toString();
       }
       //mint(address mintTo, uint256 quantity, address collection, uint256 tokenId, address mintReferral, string comment)
-      params = `[address, ${quantity}, "${tokenDetails.collection.address}", tokenId, "${FLOOR_REFERRER_REWARDS_ADDRESS}", "Minted on floor.fun"]`;
+      params = `[address, quantity, "${tokenDetails.collection.address}", tokenId, "${FLOOR_REFERRER_REWARDS_ADDRESS}", "Minted on floor.fun"]`;
       contractAddress = ZORA_TIMED_MINT_STRATEGY_ADDRESS;
       method = 'mint';
       abi = ZORA_TIMED_MINT_ABI;
+      supportsQuantity = true;
+      priceWeiPerUnit = mintPrice;
     } else if (mintType === 'FIXED_PRICE') {
       priceWei = mintPrice;
       abi = ZORA_FIXED_PRICE_ABI;
       contractAddress = tokenDetails.collection.address;
       method = 'mint';
-      params = `["${ZORA_FIXED_PRICE_STRATEGY_ADDRESS}", tokenId, ${quantity}, ["${FLOOR_REFERRER_REWARDS_ADDRESS}"], encodedAddress]`;
+      params = `["${ZORA_FIXED_PRICE_STRATEGY_ADDRESS}", tokenId, quantity, ["${FLOOR_REFERRER_REWARDS_ADDRESS}"], encodedAddress]`;
     }
 
-    return { address: contractAddress, method: method, params: params, abi: abi, priceWei: priceWei, tokenId: tokenId };
+    return {
+      address: contractAddress,
+      method: method,
+      params: params,
+      abi: abi,
+      priceWei: priceWei,
+      tokenId: tokenId,
+      supportsQuantity: supportsQuantity,
+      defaultQuantity: defaultQuantity,
+      priceWeiPerUnit: priceWeiPerUnit,
+    };
   };
 }
