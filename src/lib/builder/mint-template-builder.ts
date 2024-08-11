@@ -106,8 +106,6 @@ export class MintTemplateBuilder {
   setMintInstructions(mintInstructions: EVMMintInstructionsInput) {
     const mintInstructionsWithQuantity: EVMMintInstructions = {
       supportsQuantity: false,
-      priceWeiPerUnit: mintInstructions.priceWei,
-      defaultQuantity: 1,
       ...mintInstructions,
     };
     this.mintTemplate.mintInstructions = mintInstructionsWithQuantity;

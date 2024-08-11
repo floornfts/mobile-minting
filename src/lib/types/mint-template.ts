@@ -45,15 +45,11 @@ export type EVMMintInstructionsInput = {
 
   /* The price in wei to be submitted to the contract */
   priceWei: string;
-  priceWeiPerUnit?: string | undefined;
   supportsQuantity?: boolean | undefined;
-  defaultQuantity?: number | undefined;
 };
 
 export type EVMMintInstructions = EVMMintInstructionsInput & {
-  priceWeiPerUnit: string;
   supportsQuantity: boolean;
-  defaultQuantity: number;
 };
 
 export type SolanaMintInstructions = {

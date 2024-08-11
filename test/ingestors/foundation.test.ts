@@ -11,7 +11,7 @@ describe('foundation', function () {
   basicIngestorTests(new FoundationIngestor(), resources, {
     successUrls: [
       'https://foundation.app/mint/base/0x8D41Ef1EB5113c2E55a08a0C299526ef6d027c80',
-      'https://foundation.app/mint/base/0x36F38d3fCE10AD959b3A21ddfC8bDA8EE254B595'
+      'https://foundation.app/mint/base/0x36F38d3fCE10AD959b3A21ddfC8bDA8EE254B595',
     ],
     failureUrls: [
       'https://foundation.app/mint/eth/0xcc5C8eb0108d85f091e4468999E0D6fd4273eD99',
@@ -19,13 +19,13 @@ describe('foundation', function () {
     ],
     successContracts: [
       { chainId: 8453, contractAddress: '0x36F38d3fCE10AD959b3A21ddfC8bDA8EE254B595' },
-      { chainId: 8453, contractAddress: '0x89E63F58da71E9CD4DA439C3D1194917c67eb869' }
+      { chainId: 8453, contractAddress: '0x89E63F58da71E9CD4DA439C3D1194917c67eb869' },
     ],
     failureContracts: [
       { chainId: 8453, contractAddress: '0xCb6B679F5cD8E5c153CDC627F16C730f91e1fBfd' },
       { chainId: 1, contractAddress: '0xcc5C8eb0108d85f091e4468999E0D6fd4273eD99' },
-      { chainId: 8453, contractAddress: 'the-billows' }
-    ]
+      { chainId: 8453, contractAddress: 'the-billows' },
+    ],
   });
   it('supportsUrl: Returns false for an unsupported URL', async function () {
     const ingestor = new FoundationIngestor();
@@ -93,7 +93,9 @@ describe('foundation', function () {
     expect(mintInstructions.contractAddress).to.equal('0x62037b26ffF91929655AA3A060F327b47d1e2b3e');
     expect(mintInstructions.contractMethod).to.equal('mintFromDutchAuctionV2');
     expect(mintInstructions.contractParams).to.equal('["0x0C92Ce2aECc651Dd3733008A301f126662ae4A50", 1, address]');
-    expect(mintInstructions.priceWei).to.equal('9900800000000000000');
+    const priceWeiFloat = parseFloat(mintInstructions.priceWei);
+    // Hopefully the don't "dynamically set" it to be 0 lol
+    expect(priceWeiFloat).to.be.greaterThan(0);
 
     expect(template.featuredImageUrl).to.equal(
       'https://f8n-production-collection-assets.imgix.net/8453/0x0C92Ce2aECc651Dd3733008A301f126662ae4A50/pre_reveal/nft.jpg',

@@ -17,6 +17,7 @@ export const NETWORKS: Record<number, Network> = {
 
 export const simulateEVMTransactionWithAlchemy = async (
   mintInstructions: EVMMintInstructions,
+  quantity: number,
   blockNumber?: string,
 ): Promise<{ message: string; success: boolean; rawSimulationResult: any }> => {
   const network = NETWORKS[mintInstructions.chainId];
@@ -29,7 +30,7 @@ export const simulateEVMTransactionWithAlchemy = async (
     network: network,
   });
 
-  const data = dataForMintInstructions(mintInstructions);
+  const data = dataForMintInstructions(mintInstructions, quantity);
   const tx = {
     to: mintInstructions.contractAddress,
     from: SIGNER1_WALLET,
@@ -55,6 +56,7 @@ export const simulateEVMTransactionWithAlchemy = async (
 
 export const simulateEVMTransaction = async (
   mintInstructions: EVMMintInstructions,
+  quantity: number,
   blockNumber?: string,
 ): Promise<{ message: string; success: boolean; rawSimulationResult: any }> => {
   const TENDERLY_ACCESS_KEY = process.env.TENDERLY_ACCESS_KEY;
@@ -62,10 +64,10 @@ export const simulateEVMTransaction = async (
 
   if (TENDERLY_ACCESS_KEY) {
     console.log('Simulating with Tenderly');
-    return simulateEVMTransactionWithTenderly(mintInstructions, blockNumber);
+    return simulateEVMTransactionWithTenderly(mintInstructions, quantity, blockNumber);
   } else if (ALCHEMY_API_KEY) {
     console.log('Simulating with Alchemy');
-    return simulateEVMTransactionWithAlchemy(mintInstructions, blockNumber);
+    return simulateEVMTransactionWithAlchemy(mintInstructions, quantity, blockNumber);
   } else {
     throw new Error('No API key found');
   }
@@ -73,6 +75,7 @@ export const simulateEVMTransaction = async (
 
 export const simulateEVMTransactionWithTenderly = async (
   mintInstructions: EVMMintInstructions,
+  quantity: number,
   blockNumber?: string,
 ): Promise<{ message: string; success: boolean; rawSimulationResult: any }> => {
   const tenderly = new Tenderly();
@@ -80,7 +83,7 @@ export const simulateEVMTransactionWithTenderly = async (
   const tx = {
     to: mintInstructions.contractAddress,
     from: SIGNER1_WALLET,
-    data: dataForMintInstructions(mintInstructions),
+    data: dataForMintInstructions(mintInstructions, quantity),
     value: BigNumber.from(mintInstructions.priceWei || '0')
       .toHexString()
       .replace('0x0', '0x'),
@@ -96,18 +99,18 @@ export const simulateEVMTransactionWithTenderly = async (
   };
 };
 
-const dataForMintInstructions = (mintInstructions: EVMMintInstructions) => {
+const dataForMintInstructions = (mintInstructions: EVMMintInstructions, quantity: number) => {
   const abi = mintInstructions.abi;
   const iface = new Utils.Interface(abi);
 
-  const paramsArray = prepareContractParams(mintInstructions);
+  const paramsArray = prepareContractParams(mintInstructions, quantity);
   console.log(`Params: ${JSON.stringify(paramsArray)}`);
   const data = iface.encodeFunctionData(mintInstructions.contractMethod, paramsArray);
 
   return data;
 };
 
-export const prepareContractParams = (mintInstructions: EVMMintInstructions): any[] => {
+export const prepareContractParams = (mintInstructions: EVMMintInstructions, quantity: number): any[] => {
   const regex = /{{(\w+)}}|tokenId|address|encodedAddress|quantity/g;
 
   const replacedTemplate = mintInstructions.contractParams.replace(regex, (match) => {
@@ -119,7 +122,7 @@ export const prepareContractParams = (mintInstructions: EVMMintInstructions): an
       case 'tokenId':
         return `"${mintInstructions.tokenId || '1'}"`;
       case 'quantity':
-        return `${mintInstructions.defaultQuantity}`;
+        return `${quantity}`;
       default:
         return '""';
     }

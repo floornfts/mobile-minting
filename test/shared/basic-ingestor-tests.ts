@@ -1,6 +1,6 @@
-import { expect } from "chai";
-import { MintContractOptions, MintIngestor, MintIngestorResources } from "../../src/lib/types/mint-ingestor";
-import { MintTemplateBuilder } from "../../src/lib/builder/mint-template-builder";
+import { expect, should } from 'chai';
+import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../src/lib/types/mint-ingestor';
+import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
 import { simulateEVMTransaction } from '../../src/lib/simulation/simulation';
 import { EVMMintInstructions } from '../../src/lib/types';
 
@@ -51,13 +51,19 @@ export const basicIngestorTests = (
         // Verify that the mint template passed validation
         const builder = new MintTemplateBuilder(template);
         builder.validateMintTemplate();
-
+        const mintInstructions = template.mintInstructions as EVMMintInstructions;
         if (shouldSimulate) {
-          const mintInstructions = template.mintInstructions as EVMMintInstructions;
-          const result = await simulateEVMTransaction(mintInstructions, simulationBlocks[mintInstructions.chainId]);
+          const result = await simulateEVMTransaction(mintInstructions, 1, simulationBlocks[mintInstructions.chainId]);
           expect(result.success).to.be.true;
           if (result.success) {
             console.log(`✅ Simulation success`);
+          }
+        }
+        if (shouldSimulate && mintInstructions.supportsQuantity) {
+          const result = await simulateEVMTransaction(mintInstructions, 2, simulationBlocks[mintInstructions.chainId]);
+          expect(result.success).to.be.true;
+          if (result.success) {
+            console.log(`✅ Simulation of quanitity success`);
           }
         }
       }
