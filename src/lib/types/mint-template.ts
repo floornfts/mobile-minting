@@ -28,7 +28,7 @@ export enum MintInstructionType {
   SOLANA_MINT = 'SOLANA_MINT',
 }
 
-export type EVMMintInstructions = {
+export type EVMMintInstructionsInput = {
   chainId: number;
   contractAddress: string;
   abi: any;
@@ -45,6 +45,11 @@ export type EVMMintInstructions = {
 
   /* The price in wei to be submitted to the contract */
   priceWei: string;
+  supportsQuantity?: boolean | undefined;
+};
+
+export type EVMMintInstructions = EVMMintInstructionsInput & {
+  supportsQuantity: boolean;
 };
 
 export type SolanaMintInstructions = {
