@@ -47,8 +47,8 @@ describe('Rodeo', function () {
         contractParams: `[5562, 1, address, "0x18FfAD7FEc51119C55368607e43E6a986edaa831"]`,
         priceWei: '100000000000000',
         featuredImageUrlPattern: /https:\/\/f8n-production-collection-ass.+/,
-        availableForPurchaseStart: 1722919639000,
-        availableForPurchaseEnd: 1723006032000,
+        availableForPurchaseStart: '2024-08-06T05:47:19',
+        availableForPurchaseEnd: '2024-08-07T05:47:12',
         outputContractAddress: '0x98E9116a26E1cf014770122b2f5b7EE4Cad067bA',
       },
     },
@@ -77,8 +77,8 @@ describe('Rodeo', function () {
         expect(template.featuredImageUrl).to.match(expected.featuredImageUrlPattern);
 
         expect(template.marketingUrl).to.equal(input.url);
-        expect(template.availableForPurchaseStart?.getTime()).to.equal(expected.availableForPurchaseStart);
-        expect(template.availableForPurchaseEnd?.getTime()).to.equal(expected.availableForPurchaseEnd);
+        expect(template.availableForPurchaseStart?.getTime()).to.equal(new Date(expected.availableForPurchaseStart).getTime());
+        expect(template.availableForPurchaseEnd?.getTime()).to.equal(new Date(expected.availableForPurchaseEnd).getTime());
       });
     });
   });
