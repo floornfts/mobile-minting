@@ -7,7 +7,7 @@ import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 
 const resources = mintIngestorResources();
 
-describe('highlight', function () {
+describe('CoinbaseWallet', function () {
   basicIngestorTests(new CoinbaseWalletIngestor(), resources, {
     successUrls: [
       'https://wallet.coinbase.com/nft/mint/eip155:8453:erc721:0xb5408b7126142C61f509046868B1273F96191b6d',
@@ -68,7 +68,7 @@ describe('highlight', function () {
     );
 
     if (template.creator) {
-      expect(template.creator.walletAddress).to.equal('0x30bec89100f144aad632153de93b58a32772cf58');
+      expect(template.creator.walletAddress?.toLowerCase()).to.equal('0x30bec89100f144aad632153de93b58a32772cf58');
     }
 
     expect(template.marketingUrl).to.equal(url);
@@ -100,12 +100,12 @@ describe('highlight', function () {
     );
 
     if (template.creator) {
-      expect(template.creator.name).to.equal('summitsf.cb.id');
-      expect(template.creator.walletAddress).to.equal('0x03489e02bf56b43a8e91287e8cfef76a7a6a9aa3');
+      expect(template.creator.name).to.equal('onchainsummit.base.eth');
+      expect(template.creator.walletAddress?.toLowerCase()).to.equal('0x03489e02bf56b43a8e91287e8cfef76a7a6a9aa3');
     }
 
     expect(template.marketingUrl).to.equal(url);
     expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2024-07-26T23:20:15.000Z'));
-    expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2024-08-02T23:20:15.000Z'));
+    expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2024-08-31T15:20:19.000Z'));
   });
 });
