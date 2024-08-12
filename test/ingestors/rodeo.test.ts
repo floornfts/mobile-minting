@@ -1,7 +1,6 @@
 import { EVMMintInstructions } from '../../src/lib/types/mint-template';
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
 import { RodeoIngestor } from '../../src/ingestors/rodeo/index';
-import { TransientIngestor } from '../../src/ingestors/transient-base/index';
 import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 import { expect } from 'chai';
 import { mintIngestorResources } from '../../src/lib/resources';
@@ -18,7 +17,7 @@ describe('Rodeo', function () {
         'https://rodeo.club/post/0x6511cB5ec4dbe28a6F2cbc40d2d1030b6CaBC911/10',
         'https://rodeo.club/post/0x98E9116a26E1cf014770122b2f5b7EE4Cad067bA/1?utm_source=twitter&utm_medium=tweet&utm_campaign=hot_ones',
       ],
-      failureUrls: ['https://rodeo.club/post/0x68227a4390c15AcEf9265d9B8F65d3fb5cD9f85B/1999', 'https://www.transient.xyz/stacks'],
+      failureUrls: ['https://rodeo.club/post/0x68227a4390c15AcEf9265d9B8F65d3fb5cD9f85', 'https://www.transient.xyz/stacks'],
       successContracts: [
         // { chainId: 8453, contractAddress: '0x6511cB5ec4dbe28a6F2cbc40d2d1030b6CaBC911' },
         // { chainId: 8453, contractAddress: '0x6511cB5ec4dbe28a6F2cbc40d2d1030b6CaBC911' },
@@ -28,9 +27,9 @@ describe('Rodeo', function () {
         // { chainId: 8453, contractAddress: 'derp' },
       ],
     },
-    // {
-    //   // '8453': '0x1081832',
-    // },
+    {
+      '8453': '0x11609a2',
+    },
   );
   const testCases = [
     {
@@ -41,21 +40,21 @@ describe('Rodeo', function () {
       },
       chainId: 8453,
       expected: {
-        name: 'https://rodeo.club/post/0x98E9116a26E1cf014770122b2f5b7EE4Cad067bA/1?utm_source=twitter&utm_medium=tweet&utm_campaign=hot_ones',
+        name: 'IMG 0284',
         description: null,
         contractAddress: '0x132363a3bbf47E06CF642dd18E9173E364546C99',
         contractMethod: 'mintFromFixedPriceSale',
         contractParams: `[5562, 1, address, "0x18FfAD7FEc51119C55368607e43E6a986edaa831"]`,
-        priceWei: 0,
-        featuredImageUrlPattern: /https:\/\/ipfs.io\/ipfs\/.+\/media/,
-        availableForPurchaseStart: '2024-08-06T05:47:19',
-        availableForPurchaseEnd: '2024-08-07T05:47:12',
+        priceWei: '0',
+        featuredImageUrlPattern: /https:\/\/f8n-production-collection-ass.+/,
+        availableForPurchaseStart: 1722919639000,
+        availableForPurchaseEnd: 1723006032000,
         outputContractAddress: '0x98E9116a26E1cf014770122b2f5b7EE4Cad067bA',
       },
     },
   ];
   describe(`createMintTemplateForUrl: Returns a mint template for`, async function () {
-    const ingestor = new TransientIngestor();
+    const ingestor = new RodeoIngestor();
     testCases.forEach(({ name, input, expected }) => {
       it(`${name} stack`, async function () {
         const template = await ingestor.createMintTemplateForUrl(input.resources, input.url);
@@ -85,7 +84,7 @@ describe('Rodeo', function () {
   });
 
   describe('createMintTemplateForContract: Returns a mint template for a supported contract', async function () {
-    const ingestor = new TransientIngestor();
+    const ingestor = new RodeoIngestor();
     for (const testCase of testCases) {
       it(`${testCase.name} contract at ${testCase.expected.outputContractAddress}`, async function () {
         const contract = {
@@ -104,7 +103,7 @@ describe('Rodeo', function () {
         const mintInstructions = template.mintInstructions as EVMMintInstructions;
 
         expect(mintInstructions.contractAddress).to.equal(testCase.expected.contractAddress);
-        expect(mintInstructions.contractMethod).to.equal('purchase');
+        expect(mintInstructions.contractMethod).to.equal('mintFromFixedPriceSale');
         expect(mintInstructions.contractParams).to.equal(testCase.expected.contractParams);
         expect(mintInstructions.priceWei).to.equal(testCase.expected.priceWei);
 
