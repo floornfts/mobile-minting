@@ -1,28 +1,23 @@
 import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../lib/types/mint-ingestor';
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
-import { TRANSIENT_BASE_ABI, TRANSIENT_ERC7160TL_ABI } from './abi';
-import {
-  getTransientBaseMintByAddressAndChain,
-  getTransientBaseMintByURL,
-  transientSupports,
-} from './offchain-metadata';
+import { getRodeoMintByAddressAndChain, getRodeoMintByURL, rodeoSupports } from './offchain-metadata';
 
 import { BigNumber } from 'alchemy-sdk';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { getTransientProtocolFeeInEth } from './onchain-metadata';
+import { RODEO_ABI } from './abi';
 
-export class TransientIngestor implements MintIngestor {
+export class RodeoIngestor implements MintIngestor {
   configuration = {
     supportsContractIsExpensive: true,
   };
 
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
-    if (new URL(url).hostname !== 'www.transient.xyz') {
+    if (new URL(url).hostname !== 'rodeo.club') {
       return false;
     }
     try {
-      const { chainId, contractAddress } = await getTransientBaseMintByURL(resources, url);
+      const { chainId, contractAddress } = await getRodeoMintByURL(resources, url);
       return !!chainId && !!contractAddress;
     } catch (error) {
       return false;
@@ -34,7 +29,7 @@ export class TransientIngestor implements MintIngestor {
     if (!chainId || !contractAddress) {
       return false;
     }
-    return await transientSupports(contract, resources);
+    return await rodeoSupports(contract, resources);
   }
 
   async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
@@ -43,7 +38,7 @@ export class TransientIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    const { chainId, contractAddress } = await getTransientBaseMintByURL(resources, url);
+    const { chainId, contractAddress } = await getRodeoMintByURL(resources, url);
 
     if (!chainId || !contractAddress) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
@@ -60,7 +55,7 @@ export class TransientIngestor implements MintIngestor {
 
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('Transient');
+      .setPartnerName('RodeoClub');
 
     if (contract.url) {
       mintBuilder.setMarketingUrl(contract.url);
@@ -75,14 +70,12 @@ export class TransientIngestor implements MintIngestor {
       mintAddress,
       public_sale_start_at,
       public_sale_end_at,
-      token_id,
-      contract_type,
+      sale_terms_id,
       user,
-    } = await getTransientBaseMintByAddressAndChain(resources, contract.chainId, contract.contractAddress);
+    } = await getRodeoMintByAddressAndChain(resources, contract.chainId, contract.contractAddress);
 
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
-    const protocolFee = await getTransientProtocolFeeInEth(chainId, mintAddress, resources.alchemy);
-    const totalPrice = BigNumber.from(priceInWei).add(BigNumber.from(protocolFee)).toString();
+    const totalPrice = BigNumber.from(priceInWei).toString();
 
     mintBuilder.setMintOutputContract({
       chainId,
@@ -92,18 +85,14 @@ export class TransientIngestor implements MintIngestor {
     mintBuilder.setCreator({
       name: user.name,
       imageUrl: user.image,
-      websiteUrl: user.website,
     });
 
     mintBuilder.setMintInstructions({
       chainId,
       contractAddress: mintAddress,
-      contractMethod: 'purchase',
-      contractParams:
-        contract_type == 'ERC1155TL'
-          ? `["${contractAddress}", ${token_id}, address, 1, 0, []]`
-          : `["${contractAddress}", address, 1, 0, []]`,
-      abi: contract_type == 'ERC1155TL' ? TRANSIENT_BASE_ABI : TRANSIENT_ERC7160TL_ABI,
+      contractMethod: 'mintFromFixedPriceSale',
+      contractParams:`[${sale_terms_id}, 1, address, "${user.address}"]`,
+      abi: RODEO_ABI,
       priceWei: totalPrice,
     });
 
