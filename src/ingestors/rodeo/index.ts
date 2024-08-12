@@ -6,6 +6,7 @@ import { getRodeoMintByAddressAndChain, getRodeoMintByURL, rodeoSupports } from 
 import { BigNumber } from 'alchemy-sdk';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { RODEO_ABI } from './abi';
+import { getRodeoFeeInEth } from './onchain-metadata';
 
 export class RodeoIngestor implements MintIngestor {
   configuration = {
@@ -17,16 +18,16 @@ export class RodeoIngestor implements MintIngestor {
       return false;
     }
     try {
-      const { chainId, contractAddress } = await getRodeoMintByURL(resources, url);
-      return !!chainId && !!contractAddress;
+      const { chainId, contractAddress, tokenId } = await getRodeoMintByURL(resources, url);
+      return !!chainId && !!contractAddress && !!tokenId;
     } catch (error) {
       return false;
     }
   }
 
   async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
-    const { chainId, contractAddress } = contract;
-    if (!chainId || !contractAddress) {
+    const { chainId, contractAddress, tokenId } = contract;
+    if (!chainId || !contractAddress || !tokenId) {
       return false;
     }
     return await rodeoSupports(contract, resources);
@@ -38,18 +39,18 @@ export class RodeoIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    const { chainId, contractAddress } = await getRodeoMintByURL(resources, url);
+    const { chainId, contractAddress, tokenId } = await getRodeoMintByURL(resources, url);
 
-    if (!chainId || !contractAddress) {
+    if (!chainId || !contractAddress || !tokenId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
     }
 
-    return this.createMintForContract(resources, { chainId, contractAddress, url });
+    return this.createMintForContract(resources, { chainId, contractAddress, url, tokenId });
   }
 
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
-    const { chainId, contractAddress } = contract;
-    if (!chainId || !contractAddress) {
+    const { chainId, contractAddress, tokenId } = contract;
+    if (!chainId || !contractAddress || !tokenId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
     }
 
@@ -72,10 +73,16 @@ export class RodeoIngestor implements MintIngestor {
       public_sale_end_at,
       sale_terms_id,
       user,
-    } = await getRodeoMintByAddressAndChain(resources, contract.chainId, contract.contractAddress);
+    } = await getRodeoMintByAddressAndChain(
+      resources,
+      contract.chainId,
+      contract.contractAddress,
+      contract.tokenId as string,
+    );
 
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
-    const totalPrice = BigNumber.from(priceInWei).toString();
+    const fee = await getRodeoFeeInEth(sale_terms_id, user.address, mintAddress, resources.alchemy);
+    const totalPrice = BigNumber.from(priceInWei).add(BigNumber.from(fee)).toString();
 
     mintBuilder.setMintOutputContract({
       chainId,
@@ -91,7 +98,7 @@ export class RodeoIngestor implements MintIngestor {
       chainId,
       contractAddress: mintAddress,
       contractMethod: 'mintFromFixedPriceSale',
-      contractParams:`[${sale_terms_id}, 1, address, "${user.address}"]`,
+      contractParams: `[${sale_terms_id}, 1, address, "${user.address}"]`,
       abi: RODEO_ABI,
       priceWei: totalPrice,
     });
