@@ -1,4 +1,4 @@
-export const RODEP_ABI = [
+export const RODEO_ABI = [
   {
     "inputs": [
       { "internalType": "address payable", "name": "_treasury", "type": "address" },
