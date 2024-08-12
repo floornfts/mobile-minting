@@ -1,5 +1,6 @@
 import { Alchemy, Contract } from 'alchemy-sdk';
 import { MINT_CONTRACT_ABI } from './abi';
+import { CollectionMetadata } from './types';
 
 const getContract = async (chainId: number, contractAddress: string, alchemy: Alchemy): Promise<Contract> => {
   const ethersProvider = await alchemy.config.getProvider();
@@ -7,22 +8,11 @@ const getContract = async (chainId: number, contractAddress: string, alchemy: Al
   return contract;
 };
 
-type MintMetadata = {
-  creator: string,
-  name: string,
-  description: string,
-  image: string,
-  mintType: 'OPEN_EDITION_721',
-  cost: number,
-  startTime: number,
-  endTime: number,
-}
-
 export const getCoinbaseWalletMetadata = async (
   chainId: number,
   contractAddress: string,
   alchemy: Alchemy,
-): Promise<MintMetadata | undefined> => {
+): Promise<CollectionMetadata | undefined> => {
   try {
     const contract = await getContract(chainId, contractAddress, alchemy);
     const metadata = await contract.functions.metadata();
