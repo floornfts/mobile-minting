@@ -113,8 +113,8 @@ describe('Rodeo', function () {
         expect(template.featuredImageUrl?.length).to.be.greaterThan(0);
 
         expect(template.marketingUrl).to.equal(contract.url);
-        expect(template.availableForPurchaseStart?.getTime()).to.equal(testCase.expected.availableForPurchaseStart);
-        expect(template.availableForPurchaseEnd?.getTime()).to.equal(testCase.expected.availableForPurchaseEnd);
+        expect(template.availableForPurchaseStart?.getTime()).to.equal(new Date(testCase.expected.availableForPurchaseStart).getTime());
+        expect(template.availableForPurchaseEnd?.getTime()).to.equal(new Date(testCase.expected.availableForPurchaseEnd).getTime());
       });
     }
   });
