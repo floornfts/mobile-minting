@@ -1,6 +1,6 @@
-import { EVMMintInstructions, SolanaMintInstructions } from '../../src/lib/types/mint-template';
-
+import { EVMMintInstructions } from '../../src/lib/types/mint-template';
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
+import { RodeoIngestor } from '../../src/ingestors/rodeo/index';
 import { TransientIngestor } from '../../src/ingestors/transient-base/index';
 import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 import { expect } from 'chai';
@@ -8,93 +8,49 @@ import { mintIngestorResources } from '../../src/lib/resources';
 
 const resources = mintIngestorResources();
 
-describe('Transient', function () {
+describe('Rodeo', function () {
   basicIngestorTests(
-    new TransientIngestor(),
+    new RodeoIngestor(),
     resources,
     {
       successUrls: [
-        'https://www.transient.xyz/stacks/kansas-smile',
-        'https://www.transient.xyz/stacks/16384',
-        'https://www.transient.xyz/stacks/volumina-8',
+        'https://rodeo.club/post/0x68227a4390c15AcEf9265d9B8F65d3fb5cD9f85B/1',
+        'https://rodeo.club/post/0x6511cB5ec4dbe28a6F2cbc40d2d1030b6CaBC911/10',
+        'https://rodeo.club/post/0x98E9116a26E1cf014770122b2f5b7EE4Cad067bA/1?utm_source=twitter&utm_medium=tweet&utm_campaign=hot_ones',
       ],
-      failureUrls: ['https://www.transient.xyz/stacks/kansas-smiles', 'https://www.transient.xyz/stacks'],
+      failureUrls: ['https://rodeo.club/post/0x68227a4390c15AcEf9265d9B8F65d3fb5cD9f85B/1999', 'https://www.transient.xyz/stacks'],
       successContracts: [
-        { chainId: 8453, contractAddress: '0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8' },
-        { chainId: 8453, contractAddress: '0xd2f9c0ef092d7ffd1a5de43b6ee546065461887d' },
-        { chainId: 8453, contractAddress: '0x999f084f06ee49a3deef0c9d1511d2f040da4034' },
+        // { chainId: 8453, contractAddress: '0x6511cB5ec4dbe28a6F2cbc40d2d1030b6CaBC911' },
+        // { chainId: 8453, contractAddress: '0x6511cB5ec4dbe28a6F2cbc40d2d1030b6CaBC911' },
       ],
       failureContracts: [
-        { chainId: 8453, contractAddress: '0x965ef172b303b0bcdc38669df1de3c26bad2db8a' },
-        { chainId: 8453, contractAddress: 'derp' },
+        // { chainId: 8453, contractAddress: '0x965ef172b303b0bcdc38669df1de3c26bad2db8a' },
+        // { chainId: 8453, contractAddress: 'derp' },
       ],
     },
-    {
-      '8453': '0x1081832',
-    },
+    // {
+    //   // '8453': '0x1081832',
+    // },
   );
   const testCases = [
     {
-      name: 'ERC1155TL',
+      name: 'IMG 0284',
       input: {
-        url: 'https://www.transient.xyz/stacks/kansas-smile',
+        url: 'https://rodeo.club/post/0x98E9116a26E1cf014770122b2f5b7EE4Cad067bA/1?utm_source=twitter&utm_medium=tweet&utm_campaign=hot_ones',
         resources,
       },
       chainId: 8453,
       expected: {
-        name: 'Kansas Smile',
-        description:
-          "'Kansas Smile' explores how our longing for the past connects with modern technology. It shows how digital tools can recreate and reimagine the past, allowing us to experience nostalgia in new ways through AI.\n\nExhibited at 'Digital Dreams' Kansas City 2024, part of the Digital Collage exhibition.\n\n(Analog and digital processes with AI)",
-        contractAddress: '0x32953d7ae37b05075b88c34e800ae80c1cb1b794',
-        contractMethod: 'purchase',
-        contractParams: '["0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8", 1, address, 1, 0, []]',
-        priceWei: '20900000000000000',
+        name: 'https://rodeo.club/post/0x98E9116a26E1cf014770122b2f5b7EE4Cad067bA/1?utm_source=twitter&utm_medium=tweet&utm_campaign=hot_ones',
+        description: null,
+        contractAddress: '0x132363a3bbf47E06CF642dd18E9173E364546C99',
+        contractMethod: 'mintFromFixedPriceSale',
+        contractParams: `[5562, 1, address, "0x18FfAD7FEc51119C55368607e43E6a986edaa831"]`,
+        priceWei: 0,
         featuredImageUrlPattern: /https:\/\/ipfs.io\/ipfs\/.+\/media/,
-        availableForPurchaseStart: 1717777800000,
-        availableForPurchaseEnd: 3294577800000,
-        outputContractAddress: '0x7c3a99d4a7adddc04ad05d7ca87f4949c1a62fa8',
-      },
-    },
-    {
-      name: 'ERC7160TL',
-      input: {
-        url: 'https://www.transient.xyz/stacks/16384',
-        resources,
-      },
-      chainId: 8453,
-      expected: {
-        name: '16384 Squares',
-        description:
-          'By exposing a 1px 8x8 grid to simulated physics turbulence, the grid interferes with the diodes in a ever changing moiré patterns, revealing a subtle breeze of random generated palm leaves behind the grid. \n\nThe colors of the leaves are then transferred back into the squares of the grid as large pixels.\n\n16384 are the amount of emitting diodes on the 128px LED artworks from Spøgelsesmaskinen. \n\nEach token holds both a 4K MP4 version and the original 128x128px GIF artwork for low res LED screens.\nOn mint a new generative variation of the art piece will be added by the artist to the token, also as both MP4 and GIF.\n\nEach piece is 60 seconds loop, of 2161 frames\n\nCollectors are able to require a physical custom assembled LED display made specifically for this artwork on https://spogel.xyz/led',
-        contractAddress: '0x384092784cfaa91efaa77870c04d958e20840242',
-        contractMethod: 'purchase',
-        contractParams: '["0xd2f9c0ef092d7ffd1a5de43b6ee546065461887d", address, 1, 0, []]',
-        priceWei: '50900000000000000',
-        featuredImageUrlPattern: /^https:\/\/dv0xp0uwyoh8r\.cloudfront\.net\/stacks\/[0-9a-fA-F\-]+\/media/,
-        availableForPurchaseStart: 1720465200000,
-        availableForPurchaseEnd: 3297265200000,
-        outputContractAddress: '0xd2f9c0ef092d7ffd1a5de43b6ee546065461887d',
-      },
-    },
-    {
-      name: 'ERC721TL',
-      input: {
-        url: 'https://www.transient.xyz/stacks/volumina-8',
-        resources,
-      },
-      chainId: 8453,
-      expected: {
-        name: 'Volumina 8',
-        description:
-          'Volumina 8 is one of a series of manipulated image sequences derived from photography of Australian landscapes taken in Spring 2022. Various phone and laptop apps have been utilised to construct mosaics, kaleidoscopic patterns and other structures from the original photos, in an exploration of expanding and contracting symmetries implied and derived from organic forms and processes of the natural world.',
-        contractAddress: '0x384092784cfaa91efaa77870c04d958e20840242',
-        contractMethod: 'purchase',
-        contractParams: '["0x999f084f06ee49a3deef0c9d1511d2f040da4034", address, 1, 0, []]',
-        priceWei: '150900000000000000',
-        featuredImageUrlPattern: /^https:\/\/dv0xp0uwyoh8r\.cloudfront\.net\/stacks\/[0-9a-fA-F\-]+\/media/,
-        availableForPurchaseStart: 1720600200000,
-        availableForPurchaseEnd: 3297400200000,
-        outputContractAddress: '0x999f084f06ee49a3deef0c9d1511d2f040da4034',
+        availableForPurchaseStart: '2024-08-06T05:47:19',
+        availableForPurchaseEnd: '2024-08-07T05:47:12',
+        outputContractAddress: '0x98E9116a26E1cf014770122b2f5b7EE4Cad067bA',
       },
     },
   ];
