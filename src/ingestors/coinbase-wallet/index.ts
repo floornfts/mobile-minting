@@ -2,8 +2,9 @@ import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { getCoinbaseWalletCollectionByAddress, getCoinbaseWalletCreator } from './offchain-metadata';
+import { getCoinbaseWalletCreator } from './offchain-metadata';
 import { MINT_CONTRACT_ABI } from './abi';
+import { getCoinbaseWalletMetadata, getCoinbaseWalletPriceInWei } from './onchain-metadata';
 
 export class CoinbaseWalletIngestor implements MintIngestor {
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
@@ -22,7 +23,7 @@ export class CoinbaseWalletIngestor implements MintIngestor {
     if (contractOptions.chainId !== 8453) {
       return false;
     }
-    const collection = await getCoinbaseWalletCollectionByAddress(resources, contractOptions.contractAddress);
+    const collection = await getCoinbaseWalletMetadata(8453, contractOptions.contractAddress, resources.alchemy);
     if (!collection) {
       return false;
     }
@@ -35,39 +36,39 @@ export class CoinbaseWalletIngestor implements MintIngestor {
   ): Promise<MintTemplate> {
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('Highlight');
+      .setPartnerName('CoinbaseWallet');
 
     if (contractOptions.url) {
       mintBuilder.setMarketingUrl(contractOptions.url);
     }
 
-    const collection = await getCoinbaseWalletCollectionByAddress(resources, contractOptions.contractAddress);
+    const collectionMetadata = await getCoinbaseWalletMetadata(
+      8453,
+      contractOptions.contractAddress as string,
+      resources.alchemy,
+    );
 
-    if (!collection) {
-      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection not found');
+    if (!collectionMetadata) {
+      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'No such collection');
     }
 
-    const contractAddress = collection.address;
-    const description = collection.description;
-    const formattedImage = `https://ipfs.io/ipfs/${collection.imageUrl.split('//').pop()}`
+    const contractAddress = contractOptions.contractAddress;
+    const description = collectionMetadata.description;
+    const formattedImage = `https://ipfs.io/ipfs/${collectionMetadata.image.split('//').pop()}`;
 
-    mintBuilder
-      .setName(collection.name)
-      .setDescription(description)
-      .setFeaturedImageUrl(formattedImage);
+    mintBuilder.setName(collectionMetadata.name).setDescription(description).setFeaturedImageUrl(formattedImage);
     mintBuilder.setMintOutputContract({ chainId: 8453, address: contractAddress });
 
     // Some collections creators do not have valid metadata, only address
-    const creator = await getCoinbaseWalletCreator(resources, collection.creatorAddress);
+    const creator = await getCoinbaseWalletCreator(resources, collectionMetadata.creator);
 
     mintBuilder.setCreator({
       name: creator?.name ?? '',
-      walletAddress: collection.creatorAddress,
+      walletAddress: collectionMetadata.creator,
       imageUrl: creator?.avatar,
     });
 
-    const publicSale = collection.stages.find(stage => stage.stage === 'public-sale');
-    const totalPriceWei = publicSale?.price.Amount.Raw;
+    const totalPriceWei = await getCoinbaseWalletPriceInWei(8453, contractAddress, resources.alchemy);
 
     if (!totalPriceWei) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Price not available');
@@ -82,10 +83,11 @@ export class CoinbaseWalletIngestor implements MintIngestor {
       priceWei: totalPriceWei,
     });
 
-    const liveDate = +new Date() > +publicSale.startTime * 1000 ? new Date() : new Date(+publicSale.startTime * 1000);
+    const liveDate =
+      +new Date() > collectionMetadata.startTime * 1000 ? new Date() : new Date(collectionMetadata.startTime * 1000);
     mintBuilder
-      .setAvailableForPurchaseStart(new Date(+publicSale.startTime * 1000 || Date.now()))
-      .setAvailableForPurchaseEnd(new Date(+publicSale.endTime * 1000 || '2030-01-01'))
+      .setAvailableForPurchaseStart(new Date(+collectionMetadata.startTime * 1000 || Date.now()))
+      .setAvailableForPurchaseEnd(new Date(+collectionMetadata.endTime * 1000 || '2030-01-01'))
       .setLiveDate(liveDate);
 
     return mintBuilder.build();
@@ -103,16 +105,19 @@ export class CoinbaseWalletIngestor implements MintIngestor {
     }
 
     const collectionDescriptorSplit = collectionDescriptor.split(':');
+    const contractAddress = collectionDescriptorSplit.pop() as string;
+    collectionDescriptorSplit.pop();
+    const chainId = collectionDescriptorSplit.pop() as string;
 
-    const collection = await getCoinbaseWalletCollectionByAddress(resources, collectionDescriptorSplit.pop() as string);
+    const collectionMetadata = await getCoinbaseWalletMetadata(+chainId, contractAddress as string, resources.alchemy);
 
-    if (!collection) {
+    if (!collectionMetadata) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'No such collection');
     }
 
     return this.createMintForContract(resources, {
       chainId: 8453,
-      contractAddress: collection.address,
+      contractAddress,
       url,
     });
   }
