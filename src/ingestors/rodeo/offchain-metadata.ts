@@ -176,7 +176,6 @@ export const getRodeoMintByAddressAndChain = async (
     name: data.token.name,
     mintAddress: '0x132363a3bbf47E06CF642dd18E9173E364546C99',
     priceInWei: data.token.saleConfiguration.mintPrice,
-    // priceInWei: '100000000000000',
     description: data.token.description,
     public_sale_start_at: data.token.saleConfiguration.startTime,
     public_sale_end_at: data.token.saleConfiguration.endTime,
