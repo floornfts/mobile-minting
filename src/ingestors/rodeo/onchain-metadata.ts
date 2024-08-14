@@ -26,13 +26,15 @@ export const getRodeoFeeInEth = async (
     referrerRewardPerQuantity,
     worldCuratorRevenuePerQuantity,
     protocolFeePerQuantity,
+    pricePerQuantity,
   } = results;
 
   // Sum up all the fees
   const totalFee = BigNumber.from(creatorRevenuePerQuantity)
     .add(referrerRewardPerQuantity)
     .add(worldCuratorRevenuePerQuantity)
-    .add(protocolFeePerQuantity);
+    .add(protocolFeePerQuantity)
+    .add(pricePerQuantity);
 
   return totalFee.toString();
 };

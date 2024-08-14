@@ -16,7 +16,6 @@ export const getRodeoMintByURL = async (
   image: string;
   name: string;
   mintAddress: string;
-  priceInWei: string;
   description: string;
   tokenId: string;
 }> => {
@@ -175,7 +174,6 @@ export const getRodeoMintByAddressAndChain = async (
     image: data.token.media.url,
     name: data.token.name,
     mintAddress: '0x132363a3bbf47E06CF642dd18E9173E364546C99',
-    priceInWei: data.token.saleConfiguration.mintPrice,
     description: data.token.description,
     public_sale_start_at: data.token.saleConfiguration.startTime,
     public_sale_end_at: data.token.saleConfiguration.endTime,

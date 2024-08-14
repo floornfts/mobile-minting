@@ -63,26 +63,16 @@ export class RodeoIngestor implements MintIngestor {
     }
 
     // asides name and image no other metadata we need is onchain so we can just use the offchain metadata
-    const {
-      name,
-      image,
-      description,
-      priceInWei,
-      mintAddress,
-      public_sale_start_at,
-      public_sale_end_at,
-      sale_terms_id,
-      user,
-    } = await getRodeoMintByAddressAndChain(
-      resources,
-      contract.chainId,
-      contract.contractAddress,
-      contract.tokenId as string,
-    );
+    const { name, image, description, mintAddress, public_sale_start_at, public_sale_end_at, sale_terms_id, user } =
+      await getRodeoMintByAddressAndChain(
+        resources,
+        contract.chainId,
+        contract.contractAddress,
+        contract.tokenId as string,
+      );
 
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
-    const fee = await getRodeoFeeInEth(sale_terms_id, user.address, mintAddress, resources.alchemy);
-    const totalPrice = BigNumber.from(priceInWei).add(BigNumber.from(fee)).toString();
+    const totalPrice = await getRodeoFeeInEth(sale_terms_id, user.address, mintAddress, resources.alchemy);
 
     mintBuilder.setMintOutputContract({
       chainId,
