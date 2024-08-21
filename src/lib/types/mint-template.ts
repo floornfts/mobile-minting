@@ -52,6 +52,7 @@ export type EVMMintInstructionsInput = {
 export type EVMMintInstructions = EVMMintInstructionsInput & {
   supportsQuantity: boolean;
   defaultQuantity: number;
+  mintFeePerTokenWei: string;
 };
 
 export type SolanaMintInstructions = {
