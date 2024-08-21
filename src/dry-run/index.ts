@@ -54,7 +54,8 @@ const resources = mintIngestorResources();
 
     console.log('Simulating transaction....');
     const mintInstructions = result.mintInstructions as EVMMintInstructions;
-    const simulationResult = await simulateEVMTransaction(mintInstructions, 1);
+    const quantity = mintInstructions.supportsQuantity ? mintInstructions.defaultQuantity : 1;
+    const simulationResult = await simulateEVMTransaction(mintInstructions, quantity);
     if (simulationResult.success) {
       console.log('✅ Simulation Success');
     } else {
