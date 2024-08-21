@@ -46,10 +46,12 @@ export type EVMMintInstructionsInput = {
   /* The price in wei to be submitted to the contract */
   priceWei: string;
   supportsQuantity?: boolean | undefined;
+  defaultQuantity?: number | undefined;
 };
 
 export type EVMMintInstructions = EVMMintInstructionsInput & {
   supportsQuantity: boolean;
+  defaultQuantity: number;
 };
 
 export type SolanaMintInstructions = {

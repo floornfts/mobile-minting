@@ -94,6 +94,7 @@ export class ZoraMetadataProvider {
       priceWei: priceWei,
       tokenId: parseInt(tokenId || '1'),
       supportsQuantity: supportsQuantity,
+      defaultQuantity: 1,
     };
 
     return mintInstructions;
@@ -119,6 +120,7 @@ export class ZoraMetadataProvider {
     priceWei: string;
     tokenId: string | null;
     supportsQuantity: boolean;
+    defaultQuantity: number;
   }> => {
     if (tokenDetails.mintable?.mint_context.mint_context_type === 'zora_uniswap_v3_secondary_market') {
       throw new Error('Uniswap V3 secondary market not supported');
@@ -131,6 +133,7 @@ export class ZoraMetadataProvider {
     var params = '';
     var abi: any = [];
     var supportsQuantity = false;
+    var defaultQuantity = 1;
 
     const mintPriceWei = await this._mintPriceWeiForToken(tokenDetails);
 
@@ -141,6 +144,9 @@ export class ZoraMetadataProvider {
       method = 'mint';
       abi = ZORA_TIMED_MINT_ABI;
       supportsQuantity = true;
+      if (parseInt(mintPriceWei) <= 111000000000000) {
+        defaultQuantity = 11;
+      }
     } else if (mintType === 'FIXED_PRICE') {
       abi = ZORA_FIXED_PRICE_ABI;
       contractAddress = tokenDetails.collection.address;
@@ -156,6 +162,7 @@ export class ZoraMetadataProvider {
       priceWei: mintPriceWei,
       tokenId: tokenId,
       supportsQuantity: supportsQuantity,
+      defaultQuantity: defaultQuantity,
     };
   };
 }
