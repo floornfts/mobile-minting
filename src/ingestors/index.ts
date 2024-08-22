@@ -5,6 +5,7 @@ import { HighlightIngestor } from './highlight';
 import { TransientIngestor } from './transient-base';
 import { FoundationIngestor } from './foundation';
 import { CoinbaseWalletIngestor } from './coinbase-wallet';
+import { ZoraInternalIngestor } from './zora-internal';
 
 export type MintIngestionMap = {
   [key: string]: MintIngestor;
@@ -17,6 +18,7 @@ export const ALL_MINT_INGESTORS: MintIngestionMap = {
   transient: new TransientIngestor(),
   foundation: new FoundationIngestor(),
   'coinbase-wallet': new CoinbaseWalletIngestor(),
+  'zora-internal': new ZoraInternalIngestor(),
 };
 
 export * from './';
