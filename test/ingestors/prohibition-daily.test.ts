@@ -6,7 +6,7 @@ import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder
 import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 
 const resources = mintIngestorResources();
-
+      
 describe('prohibition-daily', function () {
     basicIngestorTests(new ProhibitionDailyIngestor(), resources, {
         successUrls: [
@@ -16,7 +16,7 @@ describe('prohibition-daily', function () {
             'https://daily.prohibition.art/',
             'https://daily.prohibition.art/mint/8453/0x4680c6a96941a977feaf71e503f3d0409157e02f/extra'
         ],
-        successContracts: [
+        successContracts: [     
             { chainId: 8453, contractAddress: '0x4680c6a96941a977feaf71e503f3d0409157e02f' }
         ],
         failureContracts: [
