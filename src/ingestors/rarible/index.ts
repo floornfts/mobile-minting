@@ -1,15 +1,15 @@
-import { MintContractOptions, MintIngestorResources } from '../../lib/types/mint-ingestor';
-import { MintInstructionType } from '../../lib/types/mint-template';
-import {  MintTemplate } from '../../lib/types/mint-template';
-import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
+import { MintContractOptions, MintIngestorResources } from "../../lib/types/mint-ingestor";
+import { MintInstructionType } from "../../lib/types/mint-template";
+import {  MintTemplate } from "../../lib/types/mint-template";
+import { MintTemplateBuilder } from "../../lib/builder/mint-template-builder";
 import { raribleOnchainDataFromUrl, raribleUrlForValidBaseEthCollection, raribleCreatorProfileDataGetter } from "./offchain-metadata";
-import { raribleContractMetadataGetter} from './onchain-metadata';
-import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
-import { RARIBLE_ABI } from './abi';
+import { raribleContractMetadataGetter} from "./onchain-metadata";
+import { MintIngestionErrorName, MintIngestorError } from "../../lib/types/mint-ingestor-error";
+import { RARIBLE_ABI } from "./abi";
 
 export class RaribleIngestor {
     async supportsUrl(_resources: MintIngestorResources, url: string): Promise<boolean> {
-        if (new URL(url).hostname !== 'www.rarible.com' && new URL(url).hostname !== 'rarible.com') {
+        if (new URL(url).hostname !== "www.rarible.com" && new URL(url).hostname !== "rarible.com") {
             return false;
         }
              
@@ -30,12 +30,12 @@ export class RaribleIngestor {
     async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
         const isCompatible = await this.supportsUrl(resources, url);
         if (!isCompatible) {
-          throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
+          throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, "Incompatible URL");
         }
 
         const { chainId, contractAddress } = await raribleOnchainDataFromUrl(url);
         if (!chainId || !contractAddress) {
-          throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
+          throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, "Missing required data");
         }
 
         return this.createMintForContract(resources, { chainId, contractAddress, url });
@@ -44,17 +44,17 @@ export class RaribleIngestor {
     async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
         const { chainId, contractAddress } = contract;
         if (!chainId || !contractAddress) {
-            throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
+            throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, "Missing required data");
         }
         
         const isValid = await raribleUrlForValidBaseEthCollection(chainId, contractAddress, resources.alchemy)
         if (!isValid) {
-          throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Project not found');
+          throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, "Project not found");
         }
         
         const mintBuilder = new MintTemplateBuilder()
             .setMintInstructionType(MintInstructionType.EVM_MINT)
-            .setPartnerName('Rarible');
+            .setPartnerName("Rarible");
 
         if (contract.url) {
             mintBuilder.setMarketingUrl(contract.url);
@@ -93,8 +93,8 @@ export class RaribleIngestor {
         mintBuilder.setMintInstructions({
             chainId,
             contractAddress,
-            contractMethod: 'claim',
-            contractParams: `[address, 1, "${unitMintTokenAddress}", "${unitMintPrice.toString()}", [["${conditionProof}"], ${unitPerWallet}, "${unitMintPrice.toString()}", "${unitMintTokenAddress}"], "${'0x'}"]`,
+            contractMethod: "claim",
+            contractParams: `[address, 1, "${unitMintTokenAddress}", "${unitMintPrice.toString()}", [["${conditionProof}"], ${unitPerWallet}, "${unitMintPrice.toString()}", "${unitMintTokenAddress}"], "${"0x"}"]`,
             abi: RARIBLE_ABI,
             priceWei: unitMintPrice.toString(),
         });

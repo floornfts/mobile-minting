@@ -14,9 +14,90 @@ interface Tokendata {
     stopDate: Date;
 }
 
+enum ContractURIIndex {
+    CID = 2
+}
+
+enum ClaimConditionIndex {
+    StartTimestamp = 0,
+    MaxClaimableSupply = 1,
+    ConditionProof = 4,
+    MintPrice = 5,
+    TokenAddress = 6
+}
+
+class InvalidInputError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'InvalidInputError';
+    }
+}
+
+class ContractInteractionError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'ContractInteractionError';
+    }
+}
+
 const getContract = async (chainId: number, contractAddress: string, alchemy: Alchemy): Promise<Contract> => {
-    const ethersProvider = await alchemy.config.getProvider();
-    return new Contract(contractAddress, RARIBLE_ABI, ethersProvider);
+    try {
+        const ethersProvider = await alchemy.config.getProvider();
+        return new Contract(contractAddress, RARIBLE_ABI, ethersProvider);
+    } catch (error: unknown) {
+        let errorMessage = 'Failed to initialize contract';
+        if (error instanceof Error) {
+            errorMessage += `: ${error.message}`;
+        } else if (typeof error === 'string') {
+            errorMessage += `: ${error}`;
+        } else {
+            errorMessage += ': Unknown error occurred';
+        }
+        throw new ContractInteractionError(errorMessage);
+    }
+};
+const fetchIPFSMetadata = async (cid: string): Promise<any> => {
+    const response = await fetch(`https://ipfs.io/ipfs/${cid}/0`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    if (!response.ok) {
+        throw new Error(`IPFS request failed with status code ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
+};
+
+const getClaimCondition = async (contract: Contract, claimId: number): Promise<any> => {
+    try {
+        return await contract.functions.getClaimConditionById(claimId);
+    } catch (error: unknown) {
+        let errorMessage = 'Failed to get claim condition';
+        if (error instanceof Error) {
+            errorMessage += `: ${error.message}`;
+        } else if (typeof error === 'string') {
+            errorMessage += `: ${error}`;
+        } else {
+            errorMessage += ': Unknown error occurred';
+        }
+        throw new ContractInteractionError(errorMessage);
+    }
+};
+
+const processClaimCondition = (claimCondition: any): {
+    mintTokenAddress: string;
+    mintPrice: number;
+    unitPerWallet: number;
+    conditionProof: string;
+    mintTimestamp: Date;
+} => {
+    const [condition] = claimCondition;
+    return {
+        mintTokenAddress: condition[ClaimConditionIndex.TokenAddress],
+        mintPrice: parseInt(condition[ClaimConditionIndex.MintPrice]),
+        unitPerWallet: parseInt(condition[ClaimConditionIndex.ConditionProof]),
+        conditionProof: condition[ClaimConditionIndex.ConditionProof],
+        mintTimestamp: new Date(parseInt(condition[ClaimConditionIndex.StartTimestamp]) * 1000)
+    };
 };
 
 export const raribleContractMetadataGetter = async (
@@ -24,72 +105,57 @@ export const raribleContractMetadataGetter = async (
     contractAddress: string,
     alchemy: Alchemy
 ): Promise<Tokendata> => {
-    const START_IDX = 0;
-    const START_TIMESTAMP_IDX = 0;
-    const MAX_CLAIMABLE_SUPPLY_IDX = 1;
-    const CID_IDX = 2;
-    const COND_PROOF_IDX = 4;
-    const MINT_PRICE_IDX = 5;
-    const TOKEN_ADDR_IDX = 6;
-
-    const contract = await getContract(chainId, contractAddress, alchemy);
-    const contractURI = await contract.functions.contractURI();
-    const cid = contractURI[START_IDX].split('/')[CID_IDX];
-
-    const response = await fetch(`https://ipfs.io/ipfs/${cid}/0`, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' },
-    });
-    if (!response.ok) {
-        throw new Error(`Request failed with status code ${response.status} and text: ${response.statusText}.`);
+    if (!chainId || !contractAddress || !alchemy) {
+        throw new InvalidInputError('Invalid input: chainId, contractAddress, and alchemy are required');
     }
 
-    const metadataJSON = await response.json();
-    const ownerAddresses = await contract.functions.owner();
-    const activeClaimId = await contract.functions.getActiveClaimConditionId();
-    let claimCondition = await contract.functions.getClaimConditionById(parseInt(activeClaimId));
-    
-    const ownerAddress = ownerAddresses[START_IDX];
-    const maxClaimableSupply = BigInt(claimCondition[START_IDX][MAX_CLAIMABLE_SUPPLY_IDX]._hex).valueOf();
-    let mintTokenAddress: string;
-    let mintPrice: number;
-    let unitPerWallet: number;
-    let conditionProof: string;
-    let mintStartTimestamp: Date;
-    let mintStopTimestamp: Date;
+    try {
+        const contract = await getContract(chainId, contractAddress, alchemy);
+        const [contractURI] = await contract.functions.contractURI();
+        const cid = contractURI.split('/')[ContractURIIndex.CID];
 
-    if (maxClaimableSupply > BigInt(0).valueOf()) {
-        mintTokenAddress = claimCondition[START_IDX][TOKEN_ADDR_IDX];
-        mintPrice = parseInt(claimCondition[START_IDX][MINT_PRICE_IDX]);
-        unitPerWallet = parseInt(claimCondition[START_IDX][COND_PROOF_IDX]);
-        conditionProof = claimCondition[START_IDX][COND_PROOF_IDX];
-        mintStartTimestamp = new Date(parseInt(claimCondition[START_IDX][START_TIMESTAMP_IDX]) * 1000);
+        const [metadataJSON, [ownerAddress], activeClaimId] = await Promise.all([
+            fetchIPFSMetadata(cid),
+            contract.functions.owner(),
+            contract.functions.getActiveClaimConditionId()
+        ]);
 
-        const nextClaimId = parseInt(activeClaimId) + 1;
-        claimCondition = await contract.functions.getClaimConditionById(nextClaimId);
-        mintStopTimestamp = new Date(parseInt(claimCondition[START_IDX][START_TIMESTAMP_IDX]) * 1000);
-    } else {
-        mintStopTimestamp = new Date(parseInt(claimCondition[START_IDX][START_TIMESTAMP_IDX]) * 1000);
+        const activeClaimCondition = await getClaimCondition(contract, parseInt(activeClaimId));
+        const maxClaimableSupply = BigInt(activeClaimCondition[0][ClaimConditionIndex.MaxClaimableSupply]._hex).valueOf();
 
-        const prevClaimId = parseInt(activeClaimId) - 1;
-        claimCondition = await contract.functions.getClaimConditionById(prevClaimId);
-        mintTokenAddress = claimCondition[START_IDX][TOKEN_ADDR_IDX];
-        mintPrice = parseInt(claimCondition[START_IDX][MINT_PRICE_IDX]);
-        unitPerWallet = parseInt(claimCondition[START_IDX][COND_PROOF_IDX]);
-        conditionProof = claimCondition[START_IDX][COND_PROOF_IDX];
-        mintStartTimestamp = new Date(parseInt(claimCondition[START_IDX][START_TIMESTAMP_IDX]) * 1000);
+        let startCondition, stopCondition;
+        if (maxClaimableSupply > BigInt(0).valueOf()) {
+            startCondition = processClaimCondition(activeClaimCondition);
+            stopCondition = processClaimCondition(await getClaimCondition(contract, parseInt(activeClaimId) + 1));
+        } else {
+            stopCondition = processClaimCondition(activeClaimCondition);
+            startCondition = processClaimCondition(await getClaimCondition(contract, parseInt(activeClaimId) - 1));
+        }
+
+        return {
+            name: metadataJSON.name,
+            description: metadataJSON.description,
+            imageURI: metadataJSON.image,
+            unitMintPrice: startCondition.mintPrice,
+            unitPerWallet: startCondition.unitPerWallet,
+            unitMintTokenAddress: startCondition.mintTokenAddress,
+            conditionProof: startCondition.conditionProof,
+            ownerAddress: ownerAddress,
+            startDate: startCondition.mintTimestamp,
+            stopDate: stopCondition.mintTimestamp,
+        };
+    } catch (error: unknown) {
+        let errorMessage = 'Failed to get contract metadata';
+        if (error instanceof InvalidInputError || error instanceof ContractInteractionError) {
+            throw error;
+        }
+        if (error instanceof Error) {
+            errorMessage += `: ${error.message}`;
+        } else if (typeof error === 'string') {
+            errorMessage += `: ${error}`;
+        } else {
+            errorMessage += ': Unknown error occurred';
+        }
+        throw new ContractInteractionError(errorMessage);
     }
-
-    return {
-        name: metadataJSON.name,
-        description: metadataJSON.description,
-        imageURI: metadataJSON.image,
-        unitMintPrice: mintPrice,
-        unitPerWallet: unitPerWallet,
-        unitMintTokenAddress: mintTokenAddress,
-        conditionProof: conditionProof,
-        ownerAddress: ownerAddress,
-        startDate: mintStartTimestamp,
-        stopDate: mintStopTimestamp,
-    };
 };

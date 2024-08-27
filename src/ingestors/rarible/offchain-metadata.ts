@@ -1,5 +1,5 @@
-import { Alchemy, Contract } from 'alchemy-sdk';
-import { RARIBLE_ABI } from './abi';
+import { Alchemy, Contract } from "alchemy-sdk";
+import { RARIBLE_ABI } from "./abi";
 
 interface ProfileData {
     pName: string;
@@ -12,12 +12,12 @@ export const raribleCreatorProfileDataGetter = async (
     ownerAddress: string
 ): Promise<ProfileData> => {
     const START_IDX = 0;
-    const endpoint = 'https://rarible.com/marketplace/api/v4/profiles/list';
+    const endpoint = "https://rarible.com/marketplace/api/v4/profiles/list";
     const response = await fetch(endpoint, {
-        method: 'POST',
+        method: "POST",
         headers: { 
-            'Accept': '*/*',
-            'Content-Type': 'application/json'
+            "Accept": "*/*",
+            "Content-Type": "application/json"
         },
         body: JSON.stringify([ownerAddress])
     });
@@ -42,10 +42,10 @@ export const raribleOnchainDataFromUrl = async (
 ): Promise<{ chainId: number | undefined, contractAddress: string | undefined }> => {
     const CHAIN_IDX = 4;
     const CONTRACT_ADDRESS_IDX = 5;
-    const urlParts = url.split('/');
-    const chainId = urlParts[CHAIN_IDX] === 'base' ? 8453 : undefined;
+    const urlParts = url.split("/");
+    const chainId = urlParts[CHAIN_IDX] === "base" ? 8453 : undefined;
 
-    if (!chainId || !urlParts[CONTRACT_ADDRESS_IDX] || !urlParts[CONTRACT_ADDRESS_IDX].startsWith('0x')) {
+    if (!chainId || !urlParts[CONTRACT_ADDRESS_IDX] || !urlParts[CONTRACT_ADDRESS_IDX].startsWith("0x")) {
         return { chainId: undefined, contractAddress: undefined };
     }
 
@@ -58,10 +58,10 @@ export const raribleUrlForValidCollection = async (
 ): Promise<string | undefined> => {
     const apiKey = process.env.RARIBLE_API_KEY;
     if (!apiKey) {
-        throw new Error('RARIBLE_API_KEY is not defined in the environment variables');
+        throw new Error("RARIBLE_API_KEY is not defined in the environment variables");
     }
 
-    const chain = chainId === 8453 ? 'BASE' : undefined;
+    const chain = chainId === 8453 ? "BASE" : undefined;
     if (!chain) {
         throw new Error(`CHAIN ID is not valid: ${chainId}`);
     }
@@ -69,10 +69,10 @@ export const raribleUrlForValidCollection = async (
     const endpoint = `https://api.rarible.org/v0.1/collections/${chain}%3A${contractAddress}`;
 
     const response = await fetch(endpoint, {
-        method: 'GET',
+        method: "GET",
         headers: {
-            'Accept': 'application/json', 
-            'X-API-KEY': apiKey
+            "Accept": "application/json", 
+            "X-API-KEY": apiKey
         }
     });
 
@@ -80,7 +80,7 @@ export const raribleUrlForValidCollection = async (
         return `https://rarible.com/collection/${chain.toLowerCase()}/${contractAddress}/drops`;
     }
     if (response.status === 404) {
-        return '';
+        return "";
     }
 
     throw new Error(`Request failed with status code ${response.status} and text: ${response.statusText}.`);
@@ -94,16 +94,16 @@ export const raribleUrlForValidBaseEthCollection = async (
     const START_IDX = 0;
     const CONTRACT_ADDRESS_IDX = 5;
     const TOKEN_ADDR_IDX = 6;
-    const ETH_MINT = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+    const ETH_MINT = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
     const collectionUrl = await raribleUrlForValidCollection(chainId, contractAddress);
     if (!collectionUrl) {
-        return '';
+        return "";
     }
 
-    const urlParts = collectionUrl.split('/');
+    const urlParts = collectionUrl.split("/");
     if (!urlParts) {
-        throw new Error('urlForValidRaribleBaseEthCollection: undefined urlParts of the collection url.');
+        throw new Error("urlForValidRaribleBaseEthCollection: undefined urlParts of the collection url.");
     }
 
     const collectionAddress = urlParts[CONTRACT_ADDRESS_IDX];
@@ -117,8 +117,6 @@ export const raribleUrlForValidBaseEthCollection = async (
         return collectionUrl;
     }
 
-    throw new Error(`urlForValidRaribleBaseEthCollection: Not a Base Eth mint`);
+    throw new Error("urlForValidRaribleBaseEthCollection: Not a Base Eth mint");
 };
-
-
 
