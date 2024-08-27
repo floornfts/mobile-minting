@@ -88,9 +88,11 @@ export class RodeoIngestor implements MintIngestor {
       chainId,
       contractAddress: mintAddress,
       contractMethod: 'mintFromFixedPriceSale',
-      contractParams: `[${sale_terms_id}, 1, address, "${user.address}"]`,
+      contractParams: `[${sale_terms_id}, quantity, address, "${user.address}"]`,
       abi: RODEO_ABI,
       priceWei: totalPrice,
+      mintFeePerTokenWei: totalPrice,
+      supportsQuantity: true,
     });
 
     const startDate = public_sale_start_at ? new Date(public_sale_start_at) : new Date();

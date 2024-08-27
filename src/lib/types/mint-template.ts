@@ -47,6 +47,7 @@ export type EVMMintInstructionsInput = {
   priceWei: string;
   supportsQuantity?: boolean | undefined;
   defaultQuantity?: number | undefined;
+  mintFeePerTokenWei?: string | undefined;
 };
 
 export type EVMMintInstructions = EVMMintInstructionsInput & {
