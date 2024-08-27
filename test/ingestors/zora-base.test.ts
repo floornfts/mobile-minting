@@ -45,30 +45,27 @@ describe('zora-base', function () {
 
   it('createMintTemplateForUrl: Returns a mint template for a supported URL', async function () {
     const ingestor = new ZoraIngestor();
-    const url = 'https://zora.co/collect/base:0x1e1ad3d381bc0ccea5e44c29fb1f7a0981b97f37/1';
+    const url = 'https://zora.co/collect/base:0x923b382f3205c26efe706c53d69f71f0817aa954/1';
     const resources = mintIngestorResources();
     const template = await ingestor.createMintTemplateForUrl(resources, url);
 
     const builder = new MintTemplateBuilder(template);
     builder.validateMintTemplate();
 
-    expect(template.name).to.equal('Base x Doodles');
+    expect(template.name).to.equal('Vitalik: An Ethereum Story (Official Trailer)');
 
-    const description = 'Commemorating Doodles migration of the Stoodio to Base this July 2024.\n' +
-      '\n' +
-      "Note: All mints or purchases of this digital collectible are subject to Doodles' Digital Collectibles Media License Agreement (located at https://doodles.app/digital-collectibles-media-license-agreement) and Doodles' Terms of Service (located at https://doodles.app/terms).";
+    const description = "Trailer mint is now available! After three years of filming. 28 cities. 15 countries. We can finally share this feature documentary about Vitalik and Ethereum’s community of builders. Thank you to everyone who made it possible.  \n\nThe film showcases the humanity and heart behind this technology. And it’s only fitting that we release the film and trailer onchain, to put the power in the hands of the people, not big distributors. \n\nWE NEED YOUR HELP, to share this film with community members, the crypto-curious, and skeptics alike. Please mint the trailer (can be minted multiple times), and share it with your community. Every mint will help the film reach audiences everywhere, while also supporting Protocol Guild. Think of theatrical events globally. A streaming release. A short film series of “Ethereum Stories.” You can read our detailed plan at EthereumFilm.xyz.\n\nSEE THE FULL FILM by minting a ticket to stream it on Zora or by getting a ticket to an in person premiere! All at Ethereumfilm.xyz. \n\nBIG THANKS to Zora, Base, Bonfire, and the entire community of builders and enthusiasts who helped make this film. Thanks to you, it could remain entirely independent without pressure from major media companies to sensationalize the story.";
 
     expect(template.description).to.equal(description);
 
     const mintInstructions = template.mintInstructions as EVMMintInstructions;
-    expect(mintInstructions.contractAddress).to.equal('0x1e1ad3d381bc0ccea5e44c29fb1f7a0981b97f37');
+    expect(mintInstructions.contractAddress).to.equal('0x923b382f3205c26efe706c53d69f71f0817aa954');
     expect(mintInstructions.contractMethod).to.equal('mintWithRewards');
-    expect(mintInstructions.contractParams).to.equal('[address,1,1,bytes,address]');
-    expect(mintInstructions.priceWei).to.equal('0.000777');
-    expect(template.featuredImageUrl).to.equal('ipfs://bafybeicyqd4qdb74hm3e6vevdhpjmklhkjtdazwdptgpdbh4hprcsi7uea');
+    expect(mintInstructions.contractParams).to.equal('["0x04e2516a2c207e84a1839755675dfd8ef6302f0a",1,1,encodedAddress,"0xfda84eada14805bebd3583bba087769af91bbcfc"]');
+    expect(mintInstructions.priceWei).to.equal('777000000000000');
+    expect(template.featuredImageUrl).to.equal('ipfs://bafybeieq6bbknciskd4tfwq4gcnqrfha26crmmleld3xf2vtblq5aoofvu');
 
-    expect(template.availableForPurchaseStart?.getTime()).to.equal(1718202693000);
-    expect(template.liveDate?.getTime()).to.be.greaterThan(1718202693000);
+    expect(template.availableForPurchaseStart?.getTime()).to.equal(1721701059000);
   });
 
   it('createMintTemplateForContract: Throws error for a non-supported contract', async function () {
@@ -91,3 +88,4 @@ describe('zora-base', function () {
   });
 
 });
+
