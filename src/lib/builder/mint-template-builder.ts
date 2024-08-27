@@ -1,4 +1,12 @@
-import { CollectionContract, EVMMintInstructions, MintArtistMetadata, MintInstructionType, MintTemplate, SolanaMintInstructions } from '../types/mint-template';
+import {
+  CollectionContract,
+  EVMMintInstructions,
+  EVMMintInstructionsInput,
+  MintArtistMetadata,
+  MintInstructionType,
+  MintTemplate,
+  SolanaMintInstructions,
+} from '../types/mint-template';
 
 export class MintTemplateBuilder {
   private mintTemplate: any;
@@ -42,6 +50,12 @@ export class MintTemplateBuilder {
     }
     if (!this.mintTemplate.mintInstructions) {
       throw new Error('MintTemplate mintInstructions is required');
+    }
+    if (!this.mintTemplate.mintInstructions.chainId || !this.mintTemplate.mintInstructions.contractAddress) {
+      throw new Error('MintTemplate mintInstructions.chainId and mintInstructions.contractAddress are required');
+    }
+    if (typeof this.mintTemplate.mintInstructions.chainId !== 'number') {
+      throw new Error('MintTemplate mintInstructions.chainId must be an integer');
     }
     if (!this.mintTemplate.liveDate) {
       throw new Error('MintTemplate liveDate is required');
@@ -89,8 +103,14 @@ export class MintTemplateBuilder {
     return this;
   }
 
-  setMintInstructions(mintInstructions: EVMMintInstructions | SolanaMintInstructions) {
-    this.mintTemplate.mintInstructions = mintInstructions;
+  setMintInstructions(mintInstructions: EVMMintInstructionsInput) {
+    const mintInstructionsWithQuantity: EVMMintInstructions = {
+      supportsQuantity: false,
+      defaultQuantity: 1,
+      mintFeePerTokenWei: mintInstructions.priceWei,
+      ...mintInstructions,
+    };
+    this.mintTemplate.mintInstructions = mintInstructionsWithQuantity;
     return this;
   }
 

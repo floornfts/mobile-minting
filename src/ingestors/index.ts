@@ -5,6 +5,8 @@ import { FxHashIngestor } from './fxhash';
 import { HighlightIngestor } from './highlight';
 import { TransientIngestor } from './transient-base';
 import { FoundationIngestor } from './foundation';
+import { ZoraInternalIngestor } from './zora-internal';
+import { RodeoIngestor } from './rodeo';
 
 export type MintIngestionMap = {
   [key: string]: MintIngestor;
@@ -17,6 +19,8 @@ export const ALL_MINT_INGESTORS: MintIngestionMap = {
   highlight: new HighlightIngestor(),
   transient: new TransientIngestor(),
   foundation: new FoundationIngestor(),
+  'zora-internal': new ZoraInternalIngestor(),
+  rodeo: new RodeoIngestor(),
 };
 
 export * from './';
