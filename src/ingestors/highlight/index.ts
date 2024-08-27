@@ -80,15 +80,20 @@ export class HighlightIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Error finding creator');
     }
 
-    const creator = await getHighlightCollectionOwnerDetails(resources, collection.highlightCollection.id);
+    const collectionId = collection.highlightCollection?.id;
+
+    if (!collectionId) {
+      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Collection id not available');
+    }
+    const creator = await getHighlightCollectionOwnerDetails(resources, collectionId);
 
     mintBuilder.setCreator({
-      name: creator.creatorAccountSettings.displayName,
+      name: creator?.creatorAccountSettings?.displayName || '',
       walletAddress: collection.creator,
-      imageUrl: creator.creatorAccountSettings.displayAvatar,
+      imageUrl: creator?.creatorAccountSettings?.displayAvatar,
     });
 
-    const vectorId = await getHighlightVectorId(resources, collection.highlightCollection.id);
+    const vectorId = await getHighlightVectorId(resources, collectionId);
 
     if (!vectorId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Id not available');

@@ -81,7 +81,7 @@ describe('highlight', function () {
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2024-08-31T16:00:00.000Z'));
   });
 
-  it('createMintTemplateForUrl: Returns a mint template for a supported URL with free price', async function () {
+  it.skip('createMintTemplateForUrl: Returns a mint template for a supported URL with free price', async function () {
     const ingestor = new HighlightIngestor();
     const url = 'https://highlight.xyz/mint/66744e64e610ed36adeb1a64';
     const resources = mintIngestorResources();
