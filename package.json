@@ -44,7 +44,8 @@
     "dotenv": "^16.4.5",
     "np": "^10.0.6",
     "ts-node": "10.9.1",
-    "tslib": "^2.6.3"
+    "tslib": "^2.6.3",
+    "ethers": "^6.13.1"
   },
   "devDependencies": {
     "@types/chai": "^4.3.16",
