@@ -1,6 +1,6 @@
 {
   "name": "@floornfts/mobile-minting",
-  "version": "1.1.1",
+  "version": "1.1.8",
   "repository": "git://github.com/floornfts/mobile-minting.git",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
