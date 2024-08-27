@@ -63,7 +63,7 @@ export class ZoraIngestor implements MintIngestor {
       chainId,
       contractAddress,
       contractMethod: 'mintWithRewards',
-      contractParams: `["${ZORA_FIXED_PRICE_MINTER_ADDRESS}", ${tokenId}, 1, encodedAddress, "${creatorAddress}"]`,
+      contractParams: `["${ZORA_FIXED_PRICE_MINTER_ADDRESS}",${tokenId},1,encodedAddress,"${creatorAddress}"]`,
       abi: zoraMintAbi,
       priceWei: ethers.parseEther(totalPriceWei).toString(),
     });
