@@ -16,7 +16,10 @@ describe('Rodeo', function () {
         'https://rodeo.club/post/0x68227a4390c15AcEf9265d9B8F65d3fb5cD9f85B/1',
         'https://rodeo.club/post/0x6511cB5ec4dbe28a6F2cbc40d2d1030b6CaBC911/10',
       ],
-      failureUrls: ['https://rodeo.club/post/0x68227a4390c15AcEf9265d9B8F65d3fb5cD9f85', 'https://www.transient.xyz/stacks'],
+      failureUrls: [
+        'https://rodeo.club/post/0x68227a4390c15AcEf9265d9B8F65d3fb5cD9f85',
+        'https://www.transient.xyz/stacks',
+      ],
       successContracts: [
         { chainId: 8453, contractAddress: '0x68227a4390c15AcEf9265d9B8F65d3fb5cD9f85B', tokenId: '1' },
         { chainId: 8453, contractAddress: '0x6511cB5ec4dbe28a6F2cbc40d2d1030b6CaBC911', tokenId: '10' },
@@ -44,7 +47,7 @@ describe('Rodeo', function () {
         description: null,
         contractAddress: '0x132363a3bbf47E06CF642dd18E9173E364546C99',
         contractMethod: 'mintFromFixedPriceSale',
-        contractParams: `[5562, 1, address, "0x18FfAD7FEc51119C55368607e43E6a986edaa831"]`,
+        contractParams: `[5562, quantity, address, "0x18FfAD7FEc51119C55368607e43E6a986edaa831"]`,
         priceWei: '100000000000000',
         featuredImageUrlPattern: /https:\/\/f8n-production-collection-ass.+/,
         availableForPurchaseStart: '2024-08-06T05:47:19',
@@ -77,8 +80,12 @@ describe('Rodeo', function () {
         expect(template.featuredImageUrl).to.match(expected.featuredImageUrlPattern);
 
         expect(template.marketingUrl).to.equal(input.url);
-        expect(template.availableForPurchaseStart?.getTime()).to.equal(new Date(expected.availableForPurchaseStart).getTime());
-        expect(template.availableForPurchaseEnd?.getTime()).to.equal(new Date(expected.availableForPurchaseEnd).getTime());
+        expect(template.availableForPurchaseStart?.getTime()).to.equal(
+          new Date(expected.availableForPurchaseStart).getTime(),
+        );
+        expect(template.availableForPurchaseEnd?.getTime()).to.equal(
+          new Date(expected.availableForPurchaseEnd).getTime(),
+        );
       });
     });
   });
@@ -91,7 +98,7 @@ describe('Rodeo', function () {
           chainId: testCase.chainId,
           contractAddress: testCase.expected.outputContractAddress,
           url: testCase.input.url,
-          tokenId: testCase.input.tokenId
+          tokenId: testCase.input.tokenId,
         };
         const template = await ingestor.createMintForContract(resources, contract);
 
@@ -113,8 +120,12 @@ describe('Rodeo', function () {
         expect(template.featuredImageUrl?.length).to.be.greaterThan(0);
 
         expect(template.marketingUrl).to.equal(contract.url);
-        expect(template.availableForPurchaseStart?.getTime()).to.equal(new Date(testCase.expected.availableForPurchaseStart).getTime());
-        expect(template.availableForPurchaseEnd?.getTime()).to.equal(new Date(testCase.expected.availableForPurchaseEnd).getTime());
+        expect(template.availableForPurchaseStart?.getTime()).to.equal(
+          new Date(testCase.expected.availableForPurchaseStart).getTime(),
+        );
+        expect(template.availableForPurchaseEnd?.getTime()).to.equal(
+          new Date(testCase.expected.availableForPurchaseEnd).getTime(),
+        );
       });
     }
   });
