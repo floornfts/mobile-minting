@@ -82,7 +82,7 @@ export class ZoraMetadataProvider {
       throw new Error(`Unsupported chain: ${tokenDetails.chain_name}`);
     }
 
-    const { address, method, params, abi, priceWei, tokenId, supportsQuantity } =
+    const { address, method, params, abi, priceWei, tokenId, supportsQuantity, defaultQuantity, mintFeePerTokenWei } =
       await this._contractAddressMethodAndParams(tokenDetails);
 
     const mintInstructions: EVMMintInstructions = {
@@ -94,6 +94,8 @@ export class ZoraMetadataProvider {
       priceWei: priceWei,
       tokenId: parseInt(tokenId || '1'),
       supportsQuantity: supportsQuantity,
+      defaultQuantity: defaultQuantity,
+      mintFeePerTokenWei: mintFeePerTokenWei,
     };
 
     return mintInstructions;
@@ -119,6 +121,8 @@ export class ZoraMetadataProvider {
     priceWei: string;
     tokenId: string | null;
     supportsQuantity: boolean;
+    defaultQuantity: number;
+    mintFeePerTokenWei: string;
   }> => {
     if (tokenDetails.mintable?.mint_context.mint_context_type === 'zora_uniswap_v3_secondary_market') {
       throw new Error('Uniswap V3 secondary market not supported');
@@ -131,9 +135,10 @@ export class ZoraMetadataProvider {
     var params = '';
     var abi: any = [];
     var supportsQuantity = false;
+    var defaultQuantity = 1;
 
-    const mintPriceWei = await this._mintPriceWeiForToken(tokenDetails);
-
+    let mintPriceWei = await this._mintPriceWeiForToken(tokenDetails);
+    const mintFeePerTokenWei = mintPriceWei;
     if (mintType === 'ZORA_TIMED') {
       //mint(address mintTo, uint256 quantity, address collection, uint256 tokenId, address mintReferral, string comment)
       params = `[address, quantity, "${tokenDetails.collection.address}", tokenId, "${FLOOR_REFERRER_REWARDS_ADDRESS}", "Minted on floor.fun"]`;
@@ -141,6 +146,10 @@ export class ZoraMetadataProvider {
       method = 'mint';
       abi = ZORA_TIMED_MINT_ABI;
       supportsQuantity = true;
+      if (parseInt(mintPriceWei) <= 111000000000000) {
+        defaultQuantity = 11;
+        mintPriceWei = (BigInt(mintPriceWei) * BigInt(defaultQuantity)).toString();
+      }
     } else if (mintType === 'FIXED_PRICE') {
       abi = ZORA_FIXED_PRICE_ABI;
       contractAddress = tokenDetails.collection.address;
@@ -156,6 +165,8 @@ export class ZoraMetadataProvider {
       priceWei: mintPriceWei,
       tokenId: tokenId,
       supportsQuantity: supportsQuantity,
+      defaultQuantity: defaultQuantity,
+      mintFeePerTokenWei: mintFeePerTokenWei,
     };
   };
 }
