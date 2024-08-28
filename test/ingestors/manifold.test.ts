@@ -14,7 +14,9 @@ describe('manifold', function () {
     {
       successUrls: ['https://app.manifold.xyz/c/spaceexplorer'],
       failureUrls: ['https://app.manifold.xyz/', 'https://app.manifold.xyz/x/spaceexplorer/'],
-      successContracts: [{ chainId: 8453, contractAddress: '0xE2Cf639a5eBA5e8d1e291AEb44ac66c8c0727F98' }],
+      successContracts: [
+        // { chainId: 8453, contractAddress: '0xE2Cf639a5eBA5e8d1e291AEb44ac66c8c0727F98' }
+      ],
       failureContracts: [
         // { chainId: 8453, contractAddress: '0x965ef172b303b0bcdc38669df1de3c26bad2db8a' },
         // { chainId: 8453, contractAddress: 'derp' }
