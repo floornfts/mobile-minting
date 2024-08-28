@@ -6,9 +6,7 @@ import { MANIFOLD_CLAIMS_ABI } from './abi';
 import { getManifoldMintOwner, getManifoldMintPriceInEth, urlForValidManifoldContract } from './onchain-metadata';
 import { manifoldOnchainDataFromUrl } from './offchain-metadata';
 
-const MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT = "0x26BBEA7803DcAc346D5F5f135b57Cf2c752A02bE";
 export class ManifoldIngestor implements MintIngestor {
-
   configuration = {
     supportsContractIsExpensive: true,
   };
@@ -17,20 +15,21 @@ export class ManifoldIngestor implements MintIngestor {
     if (new URL(url).hostname !== 'app.manifold.xyz') {
       return false;
     }
-  
+
     const slug = url.split('/').pop() || '';
-  
+
     try {
-      const { data } = await resources.fetcher.get(`https://apps.api.manifoldxyz.dev/public/instance/data?appId=2522713783&instanceSlug=${slug}`);
+      const { data } = await resources.fetcher.get(
+        `https://apps.api.manifoldxyz.dev/public/instance/data?appId=2522713783&instanceSlug=${slug}`,
+      );
       const { publicData } = data || {};
       const { network: chainId, contract: contractAddress } = publicData || {};
-  
+
       if (chainId !== 8453) {
         return false;
       }
-  
-      return !!chainId && !!contractAddress;
 
+      return !!chainId && !!contractAddress;
     } catch (error) {
       return false;
     }
@@ -75,44 +74,47 @@ export class ManifoldIngestor implements MintIngestor {
   }
 
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
-
     const { chainId, contractAddress } = contract;
 
     if (!contract.url) {
-      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Ingesting via contract address not supported');
+      throw new MintIngestorError(
+        MintIngestionErrorName.MissingRequiredData,
+        'Ingesting via contract address not supported',
+      );
     }
 
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
       .setPartnerName('Manifold');
 
-  
     if (contract.url) {
       mintBuilder.setMarketingUrl(contract.url);
     }
 
-    const metadata  = await manifoldOnchainDataFromUrl(contract.url, resources.fetcher);
+    const metadata = await manifoldOnchainDataFromUrl(contract.url, resources.fetcher);
     const owner = await getManifoldMintOwner(metadata.chainId, metadata.contractAddress, resources.alchemy);
 
-    mintBuilder
-      .setName(metadata.name)
-      .setDescription(metadata.description)
-      .setFeaturedImageUrl(metadata.imageUrl);
+    mintBuilder.setName(metadata.name).setDescription(metadata.description).setFeaturedImageUrl(metadata.imageUrl);
 
     mintBuilder.setCreator({
       name: metadata.creatorName,
-      walletAddress: owner
-    })
+      walletAddress: owner,
+    });
 
     const totalPriceWei = await getManifoldMintPriceInEth(metadata.mintPrice);
 
     mintBuilder.setMintInstructions({
       chainId,
-      contractAddress: MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT,
+      contractAddress: metadata.mintAddress,
       contractMethod: 'mintProxy',
       contractParams: `["${contractAddress}", "${metadata.instanceId}", 1, [], [], address]`,
       abi: MANIFOLD_CLAIMS_ABI,
       priceWei: totalPriceWei,
+    });
+
+    mintBuilder.setMintOutputContract({
+      chainId,
+      address: metadata.contractAddress,
     });
 
     const liveDate = new Date() > metadata.startDate ? new Date() : metadata.startDate;
