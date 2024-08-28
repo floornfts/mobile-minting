@@ -8,22 +8,29 @@ import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 const resources = mintIngestorResources();
 
 describe('CoinbaseWallet', function () {
-  basicIngestorTests(new CoinbaseWalletIngestor(), resources, {
-    successUrls: [
-      'https://wallet.coinbase.com/nft/mint/eip155:8453:erc721:0xb5408b7126142C61f509046868B1273F96191b6d',
-      'https://wallet.coinbase.com/nft/mint/eip155:8453:erc721:0xEE8128c612ABE57070dEac0E299282ef0a71a347',
-      'https://wallet.coinbase.com/nft/mint/eip155:8453:erc721:0x13F294BF5e26843C33d0ae739eDb8d6B178740B0',
-    ],
-    failureUrls: [
-      'https://wallet.coinbase.com/nft/gallery/ethereum-etf',
-      'https://foundation.app/mint/base/the-billows',
-    ],
-    successContracts: [
-      { chainId: 8453, contractAddress: '0x13F294BF5e26843C33d0ae739eDb8d6B178740B0' },
-      { chainId: 8453, contractAddress: '0xEE8128c612ABE57070dEac0E299282ef0a71a347' },
-    ],
-    failureContracts: [{ chainId: 5000, contractAddress: '0x62F8C536De24ED32611f128f64F6eAbd9b82176c' }],
-  });
+  basicIngestorTests(
+    new CoinbaseWalletIngestor(),
+    resources,
+    {
+      successUrls: [
+        'https://wallet.coinbase.com/nft/mint/eip155:8453:erc721:0xb5408b7126142C61f509046868B1273F96191b6d',
+        'https://wallet.coinbase.com/nft/mint/eip155:8453:erc721:0xEE8128c612ABE57070dEac0E299282ef0a71a347',
+        'https://wallet.coinbase.com/nft/mint/eip155:8453:erc721:0x3aDa53708b167Fbd2907b5a1bA19b58a856E2200'
+      ],
+      failureUrls: [
+        'https://wallet.coinbase.com/nft/gallery/ethereum-etf',
+        'https://foundation.app/mint/base/the-billows',
+      ],
+      successContracts: [
+        { chainId: 8453, contractAddress: '0x13F294BF5e26843C33d0ae739eDb8d6B178740B0' },
+        { chainId: 8453, contractAddress: '0xEE8128c612ABE57070dEac0E299282ef0a71a347' },
+      ],
+      failureContracts: [{ chainId: 5000, contractAddress: '0x62F8C536De24ED32611f128f64F6eAbd9b82176c' }],
+    },
+    {
+      '8453': '0x1175BA0',
+    },
+  );
   it('supportsUrl: Returns false for an unsupported URL', async function () {
     const ingestor = new CoinbaseWalletIngestor();
     const url = 'https://wallet.coinbase.com/nft/gallery/ethereum-etf';
@@ -87,7 +94,9 @@ describe('CoinbaseWallet', function () {
     builder.validateMintTemplate();
 
     expect(template.name).to.equal('Onchain Summit 2024 San Francisco');
-    expect(template.description).to.contain('Base community is bringing the Onchain Summit Billboard to life in San Francisco');
+    expect(template.description).to.contain(
+      'Base community is bringing the Onchain Summit Billboard to life in San Francisco',
+    );
     const mintInstructions = template.mintInstructions as EVMMintInstructions;
 
     expect(mintInstructions.contractAddress).to.equal('0xf9aDb505EaadacCF170e48eE46Ee4d5623f777d7');
