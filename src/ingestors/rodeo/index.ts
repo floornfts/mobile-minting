@@ -1,40 +1,36 @@
 import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../lib/types/mint-ingestor';
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
-import { TRANSIENT_BASE_ABI, TRANSIENT_ERC7160TL_ABI } from './abi';
-import {
-  getTransientBaseMintByAddressAndChain,
-  getTransientBaseMintByURL,
-  transientSupports,
-} from './offchain-metadata';
+import { getRodeoMintByAddressAndChain, getRodeoMintByURL, rodeoSupports } from './offchain-metadata';
 
 import { BigNumber } from 'alchemy-sdk';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { getTransientProtocolFeeInEth } from './onchain-metadata';
+import { RODEO_ABI } from './abi';
+import { getRodeoFeeInEth } from './onchain-metadata';
 
-export class TransientIngestor implements MintIngestor {
+export class RodeoIngestor implements MintIngestor {
   configuration = {
     supportsContractIsExpensive: true,
   };
 
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
-    if (new URL(url).hostname !== 'www.transient.xyz') {
+    if (new URL(url).hostname !== 'rodeo.club') {
       return false;
     }
     try {
-      const { chainId, contractAddress } = await getTransientBaseMintByURL(resources, url);
-      return !!chainId && !!contractAddress;
+      const { chainId, contractAddress, tokenId } = await getRodeoMintByURL(resources, url);
+      return !!chainId && !!contractAddress && !!tokenId;
     } catch (error) {
       return false;
     }
   }
 
   async supportsContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<boolean> {
-    const { chainId, contractAddress } = contract;
-    if (!chainId || !contractAddress) {
+    const { chainId, contractAddress, tokenId } = contract;
+    if (!chainId || !contractAddress || !tokenId) {
       return false;
     }
-    return await transientSupports(contract, resources);
+    return await rodeoSupports(contract, resources);
   }
 
   async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
@@ -43,70 +39,60 @@ export class TransientIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    const { chainId, contractAddress } = await getTransientBaseMintByURL(resources, url);
+    const { chainId, contractAddress, tokenId } = await getRodeoMintByURL(resources, url);
 
-    if (!chainId || !contractAddress) {
+    if (!chainId || !contractAddress || !tokenId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
     }
 
-    return this.createMintForContract(resources, { chainId, contractAddress, url });
+    return this.createMintForContract(resources, { chainId, contractAddress, url, tokenId });
   }
 
   async createMintForContract(resources: MintIngestorResources, contract: MintContractOptions): Promise<MintTemplate> {
-    const { chainId, contractAddress } = contract;
-    if (!chainId || !contractAddress) {
+    const { chainId, contractAddress, tokenId } = contract;
+    if (!chainId || !contractAddress || !tokenId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
     }
 
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('Transient');
+      .setPartnerName('RodeoClub');
 
     if (contract.url) {
       mintBuilder.setMarketingUrl(contract.url);
     }
 
     // asides name and image no other metadata we need is onchain so we can just use the offchain metadata
-    const {
-      name,
-      image,
-      description,
-      priceInWei,
-      mintAddress,
-      public_sale_start_at,
-      public_sale_end_at,
-      token_id,
-      contract_type,
-      user,
-    } = await getTransientBaseMintByAddressAndChain(resources, contract.chainId, contract.contractAddress);
+    const { name, image, description, mintAddress, public_sale_start_at, public_sale_end_at, sale_terms_id, user } =
+      await getRodeoMintByAddressAndChain(
+        resources,
+        contract.chainId,
+        contract.contractAddress,
+        contract.tokenId as string,
+      );
 
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
-    const protocolFee = await getTransientProtocolFeeInEth(chainId, mintAddress, resources.alchemy);
-    const totalPrice = BigNumber.from(priceInWei).add(BigNumber.from(protocolFee)).toString();
+    const totalPrice = await getRodeoFeeInEth(sale_terms_id, user.address, mintAddress, resources.alchemy);
 
     mintBuilder.setMintOutputContract({
       chainId,
       address: contractAddress,
-      tokenId: token_id,
     });
 
     mintBuilder.setCreator({
       name: user.name,
       imageUrl: user.image,
-      websiteUrl: user.website,
     });
 
     mintBuilder.setMintInstructions({
       chainId,
       contractAddress: mintAddress,
-      contractMethod: 'purchase',
-      tokenId: token_id,
-      contractParams:
-        contract_type == 'ERC1155TL'
-          ? `["${contractAddress}", ${token_id}, address, 1, 0, []]`
-          : `["${contractAddress}", address, 1, 0, []]`,
-      abi: contract_type == 'ERC1155TL' ? TRANSIENT_BASE_ABI : TRANSIENT_ERC7160TL_ABI,
+      contractMethod: 'mintFromFixedPriceSale',
+      contractParams: `[${sale_terms_id}, quantity, address, "${user.address}"]`,
+      abi: RODEO_ABI,
       priceWei: totalPrice,
+      mintFeePerTokenWei: totalPrice,
+      supportsQuantity: true,
     });
 
     const startDate = public_sale_start_at ? new Date(public_sale_start_at) : new Date();

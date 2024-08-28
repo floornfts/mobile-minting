@@ -1,6 +1,7 @@
 import {
   CollectionContract,
   EVMMintInstructions,
+  EVMMintInstructionsInput,
   MintArtistMetadata,
   MintInstructionType,
   MintTemplate,
@@ -43,7 +44,7 @@ export class MintTemplateBuilder {
     }
     if (!this.mintTemplate.featuredImageUrl) {
       throw new Error('MintTemplate featuredImageUrl is required');
-    }
+    }   
     if (!this.mintTemplate.mintInstructionType) {
       throw new Error('MintTemplate mintInstructionType is required');
     }
@@ -102,8 +103,14 @@ export class MintTemplateBuilder {
     return this;
   }
 
-  setMintInstructions(mintInstructions: EVMMintInstructions | SolanaMintInstructions) {
-    this.mintTemplate.mintInstructions = mintInstructions;
+  setMintInstructions(mintInstructions: EVMMintInstructionsInput) {
+    const mintInstructionsWithQuantity: EVMMintInstructions = {
+      supportsQuantity: false,
+      defaultQuantity: 1,
+      mintFeePerTokenWei: mintInstructions.priceWei,
+      ...mintInstructions,
+    };
+    this.mintTemplate.mintInstructions = mintInstructionsWithQuantity;
     return this;
   }
 
