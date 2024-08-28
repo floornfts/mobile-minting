@@ -18,4 +18,5 @@ jobs:
           TENDERLY_ACCOUNT_SLUG: ${{ secrets.TENDERLY_ACCOUNT_SLUG }}
           TENDERLY_PROJECT_SLUG: ${{ secrets.TENDERLY_PROJECT_SLUG }}
           TENDERLY_ACCESS_KEY: ${{ secrets.TENDERLY_ACCESS_KEY }}
+          RARIBLE_API_KEY: ${{ secrets.RARIBLE_API_KEY }}
         run: yarn install --userconfig=/dev/null && yarn test

@@ -20,6 +20,9 @@ export const simulateEVMTransactionWithAlchemy = async (
   quantity: number,
   blockNumber?: string,
 ): Promise<{ message: string; success: boolean; rawSimulationResult: any }> => {
+  const amount = mintInstructions.supportsQuantity
+    ? (BigInt(quantity) * BigInt(mintInstructions.mintFeePerTokenWei)).toString()
+    : mintInstructions.mintFeePerTokenWei || mintInstructions.priceWei || '0';
   const network = NETWORKS[mintInstructions.chainId];
   if (!network) {
     console.log(`Unsupported chainId: ${mintInstructions.chainId}. Defaulting to success for now.`);
@@ -35,9 +38,7 @@ export const simulateEVMTransactionWithAlchemy = async (
     to: mintInstructions.contractAddress,
     from: SIGNER1_WALLET,
     data: data,
-    value: BigNumber.from(mintInstructions.priceWei || '0')
-      .toHexString()
-      .replace('0x0', '0x'),
+    value: BigNumber.from(amount).toHexString().replace('0x0', '0x'),
   };
 
   const simResult = await alchemy.transact.simulateExecution(tx, blockNumber ? blockNumber : undefined);
@@ -79,12 +80,15 @@ export const simulateEVMTransactionWithTenderly = async (
   blockNumber?: string,
 ): Promise<{ message: string; success: boolean; rawSimulationResult: any }> => {
   const tenderly = new Tenderly();
+  const amount = mintInstructions.supportsQuantity
+    ? (BigInt(quantity) * BigInt(mintInstructions.mintFeePerTokenWei)).toString()
+    : mintInstructions.mintFeePerTokenWei || mintInstructions.priceWei || '0';
 
   const tx = {
     to: mintInstructions.contractAddress,
     from: SIGNER1_WALLET,
     data: dataForMintInstructions(mintInstructions, quantity),
-    value: BigNumber.from(mintInstructions.priceWei || '0')
+    value: BigNumber.from(amount || '0')
       .toHexString()
       .replace('0x0', '0x'),
     chainId: mintInstructions.chainId,

@@ -154,6 +154,7 @@ export class ZoraMetadataProvider {
       abi = ZORA_FIXED_PRICE_ABI;
       contractAddress = tokenDetails.collection.address;
       method = 'mint';
+      supportsQuantity = true;
       params = `["${ZORA_FIXED_PRICE_STRATEGY_ADDRESS}", tokenId, quantity, ["${FLOOR_REFERRER_REWARDS_ADDRESS}"], encodedAddress]`;
     }
 
