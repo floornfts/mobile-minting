@@ -3,9 +3,9 @@ import axios, { AxiosInstance } from 'axios';
 import { MANIFOLD_CLAIMS_ABI } from './abi';
 
 // fetch contract instance
-const getContract = async (chainId: number, contractAddress: string, alchemy: Alchemy): Promise<Contract> => {
+export const getContract = async (chainId: number, contractAddress: string, alchemy: Alchemy, abi: any): Promise<Contract> => {
   const ethersProvider = await alchemy.config.getProvider();
-  const contract = new Contract(contractAddress, MANIFOLD_CLAIMS_ABI, ethersProvider);
+  const contract = new Contract(contractAddress, abi, ethersProvider);
   return contract;
 };
 
@@ -24,7 +24,7 @@ export const urlForValidManifoldContract = async (
 
   let name: string;
   try {
-    const contract = await getContract(chainId, contractAddress, alchemy);
+    const contract = await getContract(chainId, contractAddress, alchemy, MANIFOLD_CLAIMS_ABI);
     const response = await contract.functions.name();
     name = response[0];
   } catch (error) {
@@ -64,7 +64,7 @@ export const getManifoldMintOwner = async (
   contractAddress: string,
   alchemy: Alchemy,
 ): Promise<any> => {
-  const contract = await getContract(chainId, contractAddress, alchemy);
+  const contract = await getContract(chainId, contractAddress, alchemy, MANIFOLD_CLAIMS_ABI);
   const response = await contract.functions.owner();
   const owner = response[0];
   

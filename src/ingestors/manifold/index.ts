@@ -64,10 +64,10 @@ export class ManifoldIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    const { chainId, contractAddress } = await manifoldOnchainDataFromUrl(url, resources.fetcher);
+    const { chainId, contractAddress } = await manifoldOnchainDataFromUrl(url, resources.alchemy, resources.fetcher);
 
     if (!chainId || !contractAddress) {
-      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data');
+      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data, mint expired, or sold out');
     }
 
     return this.createMintForContract(resources, { chainId, contractAddress, url });
@@ -91,7 +91,7 @@ export class ManifoldIngestor implements MintIngestor {
       mintBuilder.setMarketingUrl(contract.url);
     }
 
-    const metadata = await manifoldOnchainDataFromUrl(contract.url, resources.fetcher);
+    const metadata = await manifoldOnchainDataFromUrl(contract.url, resources.alchemy, resources.fetcher);
     const owner = await getManifoldMintOwner(metadata.chainId, metadata.contractAddress, resources.alchemy);
 
     mintBuilder.setName(metadata.name).setDescription(metadata.description).setFeaturedImageUrl(metadata.imageUrl);
