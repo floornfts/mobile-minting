@@ -25,7 +25,149 @@ This library is included in Floor's platform and executed in a sandboxed environ
 ## Adding a new platform to Mobile Minting
 
 Today, Mobile Minting supports the following creator platforms: 
-![supported_platforms_base](https://github.com/floornfts/mobile-minting/assets/8492853/44fd5e45-c74f-4749-9b64-938b427de4db)
+<table>
+  <tr>
+    <td>
+      Platform
+    </td>
+    <td>
+      Create from URL
+    </td>
+    <td>
+      Create from onchain address
+    </td>
+    <td>
+      Supports Quantity
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Zora
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ✅
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Highlight
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ❌
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Rodeo
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ✅
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Manifold
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ❌
+    </td>
+    <td>
+      ❌
+    </td>
+  </tr>
+  <tr>
+    <td>
+      FXHash
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ❌
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Rarible
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ❌
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Foundation
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ❌
+    </td>
+    <td>
+      ❌
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Prohibition Daily
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ❌
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Transient Labs
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ✅
+    </td>
+    <td>
+      ❌
+    </td>
+  </tr>
+  
+</table>
 
 Adding a new platform to Mobile Minting is easy - you just have to write a `MintIngestor`!
 
