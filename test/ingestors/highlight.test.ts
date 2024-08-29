@@ -61,7 +61,7 @@ describe('highlight', function () {
 
     expect(mintInstructions.contractAddress).to.equal('0x8087039152c472Fa74F47398628fF002994056EA');
     expect(mintInstructions.contractMethod).to.equal('vectorMint721');
-    expect(mintInstructions.contractParams).to.equal('[866, 1, address]');
+    expect(mintInstructions.contractParams).to.equal('[866, quantity, address]');
     expect(mintInstructions.priceWei).to.equal('2100000000000000');
 
     expect(template.featuredImageUrl).to.equal(
