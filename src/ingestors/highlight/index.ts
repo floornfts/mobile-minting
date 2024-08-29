@@ -109,9 +109,10 @@ export class HighlightIngestor implements MintIngestor {
       chainId: 8453,
       contractAddress: CONTRACT_ADDRESS,
       contractMethod: 'vectorMint721',
-      contractParams: `[${vectorId}, 1, address]`,
+      contractParams: `[${vectorId}, quantity, address]`,
       abi: MINT_CONTRACT_ABI,
       priceWei: totalPriceWei,
+      supportsQuantity: true,
     });
 
     const metadata = await getHighlightMetadata(+vectorId, resources.alchemy);
