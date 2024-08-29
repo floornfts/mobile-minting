@@ -1,8 +1,14 @@
 import { Alchemy, Contract } from 'alchemy-sdk';
 import { FOUNDATION_MINT_ABI } from './abi';
+import { AlchemyMultichainClient } from 'src/lib/rpc/alchemy-multichain';
+import { NETWORKS } from '../../../src/lib/simulation/simulation';
 
-const getContract = async (chainId: number, contractAddress: string, alchemy: Alchemy): Promise<Contract> => {
-  const ethersProvider = await alchemy.config.getProvider();
+const getContract = async (
+  chainId: number,
+  contractAddress: string,
+  alchemy: AlchemyMultichainClient,
+): Promise<Contract> => {
+  const ethersProvider = await alchemy.forNetwork(NETWORKS[chainId]).config.getProvider();
   const contract = new Contract(contractAddress, FOUNDATION_MINT_ABI, ethersProvider);
   return contract;
 };
@@ -11,10 +17,9 @@ export const getFoundationMintPriceInWei = async (
   chainId: number,
   contractAddress: string,
   dropAddress: string,
-  alchemy: Alchemy,
+  alchemy: AlchemyMultichainClient,
   saleType: 'FIXED_PRICE_DROP' | string,
 ): Promise<string | undefined> => {
-
   try {
     const contract = await getContract(chainId, contractAddress, alchemy);
     const saleData =
@@ -26,6 +31,5 @@ export const getFoundationMintPriceInWei = async (
     const totalFee = parseInt(tokenPrice.toString()) + parseInt(saleData.mintFeePerNftInWei.toString());
 
     return `${totalFee}`;
-  } catch (error) {
-  }
+  } catch (error) {}
 };

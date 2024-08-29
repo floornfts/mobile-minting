@@ -1,10 +1,17 @@
-import { Alchemy, Contract } from 'alchemy-sdk';
+import { Contract } from 'alchemy-sdk';
 import axios, { AxiosInstance } from 'axios';
 import { MANIFOLD_CLAIMS_ABI } from './abi';
+import { AlchemyMultichainClient } from '../../../src/lib/rpc/alchemy-multichain';
+import { NETWORKS } from '../../../src/lib/simulation/simulation';
 
 // fetch contract instance
-export const getContract = async (chainId: number, contractAddress: string, alchemy: Alchemy, abi: any): Promise<Contract> => {
-  const ethersProvider = await alchemy.config.getProvider();
+export const getContract = async (
+  chainId: number,
+  contractAddress: string,
+  alchemy: AlchemyMultichainClient,
+  abi: any,
+): Promise<Contract> => {
+  const ethersProvider = await alchemy.forNetwork(NETWORKS[chainId]).config.getProvider();
   const contract = new Contract(contractAddress, abi, ethersProvider);
   return contract;
 };
@@ -18,10 +25,9 @@ const convertNameToUrl = (name: string): string => {
 export const urlForValidManifoldContract = async (
   chainId: number,
   contractAddress: string,
-  alchemy: Alchemy,
+  alchemy: AlchemyMultichainClient,
   fetcher: AxiosInstance = axios,
 ): Promise<string | undefined> => {
-
   let name: string;
   try {
     const contract = await getContract(chainId, contractAddress, alchemy, MANIFOLD_CLAIMS_ABI);
@@ -49,9 +55,7 @@ export const urlForValidManifoldContract = async (
   }
 };
 
-export const getManifoldMintPriceInEth = async (
-  mintPrice: number
-): Promise<any> => {
+export const getManifoldMintPriceInEth = async (mintPrice: number): Promise<any> => {
   // fee amount is standard
   const feePrice = 500000000000000;
 
@@ -62,11 +66,11 @@ export const getManifoldMintPriceInEth = async (
 export const getManifoldMintOwner = async (
   chainId: number,
   contractAddress: string,
-  alchemy: Alchemy,
+  alchemy: AlchemyMultichainClient,
 ): Promise<any> => {
   const contract = await getContract(chainId, contractAddress, alchemy, MANIFOLD_CLAIMS_ABI);
   const response = await contract.functions.owner();
   const owner = response[0];
-  
+
   return owner;
 };
