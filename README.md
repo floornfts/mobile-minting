@@ -31,6 +31,9 @@ Today, Mobile Minting supports the following creator platforms:
       Platform
     </td>
     <td>
+      Chains
+    </td>
+    <td>
       Create from URL
     </td>
     <td>
@@ -43,6 +46,9 @@ Today, Mobile Minting supports the following creator platforms:
   <tr>
     <td>
       Zora
+    </td>
+    <td>
+      Base, Zora
     </td>
     <td>
       ✅
@@ -59,6 +65,9 @@ Today, Mobile Minting supports the following creator platforms:
       Highlight
     </td>
     <td>
+      Base
+    </td>
+    <td>
       ✅
     </td>
     <td>
@@ -71,6 +80,9 @@ Today, Mobile Minting supports the following creator platforms:
   <tr>
     <td>
       Rodeo
+    </td>
+    <td>
+      Base
     </td>
     <td>
       ✅
@@ -87,6 +99,9 @@ Today, Mobile Minting supports the following creator platforms:
       Manifold
     </td>
     <td>
+      Base
+    </td>
+    <td>
       ✅
     </td>
     <td>
@@ -99,6 +114,9 @@ Today, Mobile Minting supports the following creator platforms:
   <tr>
     <td>
       FXHash
+    </td>
+    <td>
+      Base
     </td>
     <td>
       ✅
@@ -115,6 +133,9 @@ Today, Mobile Minting supports the following creator platforms:
       Rarible
     </td>
     <td>
+      Base
+    </td>
+    <td>
       ✅
     </td>
     <td>
@@ -127,6 +148,9 @@ Today, Mobile Minting supports the following creator platforms:
   <tr>
     <td>
       Foundation
+    </td>
+    <td>
+      Base, ETH
     </td>
     <td>
       ✅
@@ -143,6 +167,9 @@ Today, Mobile Minting supports the following creator platforms:
       Prohibition Daily
     </td>
     <td>
+      Base
+    </td>
+    <td>
       ✅
     </td>
     <td>
@@ -155,6 +182,9 @@ Today, Mobile Minting supports the following creator platforms:
   <tr>
     <td>
       Transient Labs
+    </td>
+    <td>
+      Base
     </td>
     <td>
       ✅
