@@ -9,7 +9,7 @@ export type Collection = {
   symbol: string;
   chainId: number;
   status: string;
-  baseUri: string,
+  baseUri: string;
 };
 
 export type CollectionByAddress1 = {
@@ -23,8 +23,8 @@ export type CollectionByAddress1 = {
   symbol: string;
   description: string;
   sampleImages: string[];
-  creator: string; 
-}
+  creator: string;
+};
 
 export type CollectionByAddress2 = {
   chainId: number;
@@ -36,7 +36,8 @@ export type CollectionByAddress2 = {
     owner: string;
     imageUrl: string;
     animationUrl: string;
-  }
-}
+    address: string;
+  };
+};
 
-export type CollectionByAddress = CollectionByAddress1 & CollectionByAddress2
+export type CollectionByAddress = CollectionByAddress1 & CollectionByAddress2;
