@@ -8,21 +8,28 @@ import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 const resources = mintIngestorResources();
 
 describe('highlight', function () {
-  basicIngestorTests(new HighlightIngestor(), resources, {
-    successUrls: [
-      'https://highlight.xyz/mint/665fa33f07b3436991e55632',
-      'https://highlight.xyz/mint/66856628ff8a01fdccc132f4',
-    ],
-    failureUrls: [
-      'https://highlight.xyz/mint/66963c500b48236f1acf322b',
-      'https://foundation.app/mint/base/the-billows',
-    ],
-    successContracts: [
-      { chainId: 8453, contractAddress: '0x0E5DDe3De7cf2761d8a81Ee68F48410425e2dBbA' },
-      { chainId: 8453, contractAddress: '0xBE96B2572CA0F1ac8ec6323Bc9037AffD270bA7F' },
-    ],
-    failureContracts: [{ chainId: 5000, contractAddress: '0x62F8C536De24ED32611f128f64F6eAbd9b82176c' }],
-  });
+  basicIngestorTests(
+    new HighlightIngestor(),
+    resources,
+    {
+      successUrls: [
+        'https://highlight.xyz/mint/66856628ff8a01fdccc132f4',
+        'https://highlight.xyz/mint/66d03b0eaae45d4534822482',
+      ],
+      failureUrls: [
+        'https://highlight.xyz/mint/66963c500b48236f1acf322b',
+        'https://foundation.app/mint/base/the-billows',
+      ],
+      successContracts: [
+        { chainId: 8453, contractAddress: '0x0E5DDe3De7cf2761d8a81Ee68F48410425e2dBbA' },
+        { chainId: 8453, contractAddress: '0x7022a51D648CEB4f4D290a81A0E543979a003e86' },
+      ],
+      failureContracts: [{ chainId: 5000, contractAddress: '0x62F8C536De24ED32611f128f64F6eAbd9b82176c' }],
+    },
+    {
+      '8453': '0x124F956',
+    },
+  );
   it('supportsUrl: Returns false for an unsupported URL', async function () {
     const ingestor = new HighlightIngestor();
     const url = 'https://example.com';
@@ -45,7 +52,7 @@ describe('highlight', function () {
 
   it('createMintTemplateForUrl: Returns a mint template for a supported URL', async function () {
     const ingestor = new HighlightIngestor();
-    const url = 'https://highlight.xyz/mint/665fa33f07b3436991e55632';
+    const url = 'https://highlight.xyz/mint/66856628ff8a01fdccc132f4';
     const resources = mintIngestorResources();
     const template = await ingestor.createMintTemplateForUrl(resources, url);
 
@@ -53,32 +60,31 @@ describe('highlight', function () {
     const builder = new MintTemplateBuilder(template);
     builder.validateMintTemplate();
 
-    expect(template.name).to.equal('COMBAT MODE by Emily Xie');
-    expect(template.description).to.contain(
-      'It depicts two creatures in battle, melding the nostalgia of old school video games with the contemporary possibilities of digital illustration.',
-    );
+    expect(template.name).to.equal('Based Fren$');
+    expect(template.description).to.contain('3,333 Based Fren$ muy basados');
     const mintInstructions = template.mintInstructions as EVMMintInstructions;
 
     expect(mintInstructions.contractAddress).to.equal('0x8087039152c472Fa74F47398628fF002994056EA');
+    expect(template.mintOutputContract?.address).to.equal('0x0E5DDe3De7cf2761d8a81Ee68F48410425e2dBbA');
     expect(mintInstructions.contractMethod).to.equal('vectorMint721');
-    expect(mintInstructions.contractParams).to.equal('[866, 1, address]');
-    expect(mintInstructions.priceWei).to.equal('2100000000000000');
+    expect(mintInstructions.contractParams).to.equal('[1176, quantity, address]');
+    expect(mintInstructions.priceWei).to.equal('800000000000000');
 
     expect(template.featuredImageUrl).to.equal(
-      'https://img.reservoir.tools/images/v2/base/z9JRSpLYGu7%2BCZoKWtAuANCXTgWBry4OTpgBkNYv7UVX%2FOELQ1B1IQGOoFgJBPmEzWQJa5hKPeiypcjXnSgXVEhZJDeOg9vk5slunBxp8ABMKIlkw3COL8nejLu9cx7f5QrJHJecqNaXIZCHlWY311DY%2F4e9zjeJnyY%2Fvp3J%2FivCSdJShfdu2%2FoCfqed8TvVTrlrElK7Wp8owCwKnZNhaw%3D%3D',
+      'https://img.reservoir.tools/images/v2/base/z9JRSpLYGu7%2BCZoKWtAuAI37ZMpGmBWtUpAQDl1tI6DEJRvIrkDVCqzOxkdek%2BfesLtA3sYS0SXZeU4voi8R9rQD1uumcaPxveg8%2B3UfVgFBR82zeA%2FzrfIHHRUbhHMTK4V08qvpcJ5dRYdYVwRvZPTKTulv78c%2FB6vgLUkdfSX0ND53Mjp2wUysnfKmYO5rOIxPwl1ACpM%2BOQDWOOSOzg%3D%3D',
     );
 
     if (template.creator) {
-      expect(template.creator.name).to.equal('Emily Xie');
-      expect(template.creator.walletAddress).to.equal('0x591a0b1994e8880215b89c5b9cd8d0738e5c0f1e');
+      expect(template.creator.name).to.equal('Nxsh');
+      expect(template.creator.walletAddress).to.equal('0xf5977a695e85d3046ed8ce03dd3b562e40532200');
       expect(template.creator.imageUrl).to.equal(
-        'https://highlight-creator-assets.highlight.xyz/main/image/91eaf712-b9de-49e4-8674-85f37dd823e0.png',
+        'https://highlight-creator-assets.highlight.xyz/main/image/e5eca4b9-1b8e-4ebf-8cd5-e0f6d618e15a.png',
       );
     }
 
     expect(template.marketingUrl).to.equal(url);
-    expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2024-06-05T16:00:00.000Z'));
-    expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2024-08-31T16:00:00.000Z'));
+    expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date(1720042380000));
+    expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date(1893456000000));
   });
 
   it.skip('createMintTemplateForUrl: Returns a mint template for a supported URL with free price', async function () {

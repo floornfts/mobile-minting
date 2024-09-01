@@ -93,6 +93,8 @@ export class HighlightIngestor implements MintIngestor {
       imageUrl: creator?.creatorAccountSettings?.displayAvatar,
     });
 
+    mintBuilder.setMintOutputContract({ chainId: 8453, address: collection.highlightCollection.address });
+
     const vectorId = await getHighlightVectorId(resources, collectionId);
 
     if (!vectorId) {
@@ -109,9 +111,10 @@ export class HighlightIngestor implements MintIngestor {
       chainId: 8453,
       contractAddress: CONTRACT_ADDRESS,
       contractMethod: 'vectorMint721',
-      contractParams: `[${vectorId}, 1, address]`,
+      contractParams: `[${vectorId}, quantity, address]`,
       abi: MINT_CONTRACT_ABI,
       priceWei: totalPriceWei,
+      supportsQuantity: true,
     });
 
     const metadata = await getHighlightMetadata(+vectorId, resources.alchemy);
