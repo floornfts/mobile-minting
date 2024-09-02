@@ -281,7 +281,7 @@ In this example we make a template, relying on `getMintMetadataFromSomewhere()` 
     });
 ```
 
-_Note: You will typically want to implement either 
+_Note: You will typically want to implement either `createMintForContract` or `createMintTemplateForUrl`, and then call that one from the other._
 
 You can then build the MintTemplate from the builder.
 
