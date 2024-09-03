@@ -74,7 +74,7 @@ Today, Mobile Minting supports the following creator platforms:
       ✅
     </td>
     <td>
-      ❌
+      ✅
     </td>
   </tr>
   <tr>
