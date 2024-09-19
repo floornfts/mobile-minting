@@ -1,5 +1,5 @@
 ## What is Mobile Minting?
-Mobile Minting unlocks mobile payments for onchain purchases and powers minting in the Floor app.
+Mobile Minting unlocks mobile payments for onchain purchases and powers minting in the Rally app (formerly known as Floor!).
 
 **📱 Users pay in-app with In-App Purchases**
 
@@ -16,9 +16,9 @@ _Example Mobile Minting user experience._
 ## What is this repository?
 This repository is a **public, contributable collection of Ingestors** that teach Mobile Minting how to support mints from new platforms. 
 
-Historically, only Floor could choose what mints users could mint through Floor based on our roadmap, or partnerships, now anyone can build support for any minting platform / product and (provided it meets some safety & reliability checks) it can be included in Mobile Minting.
+Historically, only Rally could choose what mints users could mint through Rally based on our roadmap, or partnerships, now anyone can build support for any minting platform / product and (provided it meets some safety & reliability checks) it can be included in Mobile Minting.
 
-This library is included in Floor's platform and executed in a sandboxed environment for indexing mints.
+This library is included in Rally's platform and executed in a sandboxed environment for indexing mints.
 
 <br />
 
@@ -218,7 +218,7 @@ A MintTemplate is a standard format for expressing the details of a mint. It's u
 
 _Mapping of MintTemplate fields to an in-app mint._
 
-Once you generate a MintTemplate, Floor will do all the additional work to get the mint live:
+Once you generate a MintTemplate, Rally will do all the additional work to get the mint live:
 
 * Map priceWei to an in-app purchase
 * Simulate the transaction in multiple scenarios to ensure success
@@ -350,7 +350,7 @@ yarn dry-run some-erc-1155-ingestor contract 8453:contractAddress:tokenId
 ```
 
 # Submitting a Mobile Minting Ingestor
-Once you've written a Mobile Minting Ingestor, it needs to be Pull Requested to this repository to be included in the production Floor Mobile Minting ingestion fleet.
+Once you've written a Mobile Minting Ingestor, it needs to be Pull Requested to this repository to be included in the production Rally Mobile Minting ingestion fleet.
 
 ### Before you submit
 - [ ] Ensure your generated MintTemplate works 😄
@@ -370,7 +370,7 @@ We're excited to see new platforms supported, so will quickly jump to help!
 ### Hopes and dreams
 Mobile Minting started out entirely internal & this is our first experiment in decentralizing it & making it more accessible.
 
-In time, we hope to continue down this path, but for now all ingestors will be reviewed by the Floor engineering team & accepted on the basis of safety, cost & other considerations by Floor.
+In time, we hope to continue down this path, but for now all ingestors will be reviewed by the Rally engineering team & accepted on the basis of safety, cost & other considerations by Rally.
 
 We hope to see people (other companies!?) emerge for whom Mobile Minting, and a unified standard for expressing onchain mints is useful, and look forward to working with them to continue this mission.
 
