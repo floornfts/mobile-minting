@@ -141,7 +141,7 @@ export class ZoraMetadataProvider {
     const mintFeePerTokenWei = mintPriceWei;
     if (mintType === 'ZORA_TIMED') {
       //mint(address mintTo, uint256 quantity, address collection, uint256 tokenId, address mintReferral, string comment)
-      params = `[address, quantity, "${tokenDetails.collection.address}", tokenId, "${FLOOR_REFERRER_REWARDS_ADDRESS}", "Minted on floor.fun"]`;
+      params = `[address, quantity, "${tokenDetails.collection.address}", tokenId, "${FLOOR_REFERRER_REWARDS_ADDRESS}", "Minted on rally.xyz"]`;
       contractAddress = ZORA_TIMED_MINT_STRATEGY_ADDRESS;
       method = 'mint';
       abi = ZORA_TIMED_MINT_ABI;
