@@ -7,6 +7,7 @@ import { BigNumber } from 'alchemy-sdk';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 import { RODEO_ABI } from './abi';
 import { getRodeoFeeInEth } from './onchain-metadata';
+import { parse } from 'path';
 
 export class RodeoIngestor implements MintIngestor {
   configuration = {
@@ -74,9 +75,11 @@ export class RodeoIngestor implements MintIngestor {
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
     const totalPrice = await getRodeoFeeInEth(sale_terms_id, user.address, mintAddress, resources.alchemy);
 
+    const tokenIdNum = parseInt(tokenId);
     mintBuilder.setMintOutputContract({
       chainId,
       address: contractAddress,
+      tokenId: isNaN(tokenIdNum) ? null : tokenIdNum,
     });
 
     mintBuilder.setCreator({
