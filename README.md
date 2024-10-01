@@ -68,13 +68,13 @@ Today, Mobile Minting supports the following creator platforms:
       Base
     </td>
     <td>
-      ✅
+      💥 Failing
     </td>
     <td>
-      ✅
+      💥 Failing
     </td>
     <td>
-      ✅
+      💥 Failing
     </td>
   </tr>
   <tr>
