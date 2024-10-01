@@ -15,6 +15,8 @@ export type MintIngestionMap = {
 };
 
 export const ALL_MINT_INGESTORS: MintIngestionMap = {
+  'zora-internal': new ZoraInternalIngestor(),
+  rodeo: new RodeoIngestor(),
   'prohibition-daily': new ProhibitionDailyIngestor(),
   fxhash: new FxHashIngestor(),
   manifold: new ManifoldIngestor(),
@@ -22,9 +24,7 @@ export const ALL_MINT_INGESTORS: MintIngestionMap = {
   transient: new TransientIngestor(),
   highlight: new HighlightIngestor(),
   foundation: new FoundationIngestor(),
-  'coinbase-wallet': new CoinbaseWalletIngestor(),
-  'zora-internal': new ZoraInternalIngestor(),
-  rodeo: new RodeoIngestor(),
+  'coinbase-wallet': new CoinbaseWalletIngestor()
 };
 
 export * from './';
