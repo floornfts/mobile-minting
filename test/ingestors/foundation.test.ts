@@ -66,7 +66,9 @@ describe('foundation', function () {
     expect(mintInstructions.contractParams).to.equal(
       '["0x89E63F58da71E9CD4DA439C3D1194917c67eb869", 1, address, "0x0000000000000000000000000000000000000000"]',
     );
-    expect(mintInstructions.priceWei).to.equal('7700000000000000');
+
+    // This has now ended and the API returns 0 for the price
+    expect(mintInstructions.priceWei).to.equal('0');
 
     expect(template.featuredImageUrl).to.equal(
       'https://f8n-production-collection-assets.imgix.net/8453/0x89E63F58da71E9CD4DA439C3D1194917c67eb869/pre_reveal/nft.jpg',

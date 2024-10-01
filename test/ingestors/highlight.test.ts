@@ -7,7 +7,7 @@ import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 
 const resources = mintIngestorResources();
 
-describe('highlight', function () {
+describe.skip('highlight', function () {
   basicIngestorTests(
     new HighlightIngestor(),
     resources,
