@@ -95,6 +95,7 @@ export class RodeoIngestor implements MintIngestor {
       priceWei: totalPrice,
       mintFeePerTokenWei: totalPrice,
       supportsQuantity: true,
+      tokenId: tokenIdNum
     });
 
     const startDate = public_sale_start_at ? new Date(public_sale_start_at) : new Date();
