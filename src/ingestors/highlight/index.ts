@@ -15,32 +15,34 @@ const CONTRACT_ADDRESS = '0x8087039152c472Fa74F47398628fF002994056EA';
 
 export class HighlightIngestor implements MintIngestor {
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
-    const id = url.split('/').pop();
-    if (!id) {
-      return false;
-    }
+    return false;
+    // const id = url.split('/').pop();
+    // if (!id) {
+    //   return false;
+    // }
 
-    const collection = await getHighlightCollectionById(resources, id);
+    // const collection = await getHighlightCollectionById(resources, id);
 
-    if (!collection || collection.chainId !== 8453) {
-      return false;
-    }
+    // if (!collection || collection.chainId !== 8453) {
+    //   return false;
+    // }
 
-    const urlPattern = /^https:\/\/highlight\.xyz\/mint\/[a-f0-9]{24}$/;
-    return (
-      new URL(url).hostname === 'www.highlight.xyz' || new URL(url).hostname === 'highlight.xyz' || urlPattern.test(url)
-    );
+    // const urlPattern = /^https:\/\/highlight\.xyz\/mint\/[a-f0-9]{24}$/;
+    // return (
+    //   new URL(url).hostname === 'www.highlight.xyz' || new URL(url).hostname === 'highlight.xyz' || urlPattern.test(url)
+    // );
   }
 
   async supportsContract(resources: MintIngestorResources, contractOptions: MintContractOptions): Promise<boolean> {
-    if (contractOptions.chainId !== 8453) {
-      return false;
-    }
-    const collection = await getHighlightCollectionByAddress(resources, contractOptions);
-    if (!collection) {
-      return false;
-    }
-    return true;
+    return false;
+    // if (contractOptions.chainId !== 8453) {
+    //   return false;
+    // }
+    // const collection = await getHighlightCollectionByAddress(resources, contractOptions);
+    // if (!collection) {
+    //   return false;
+    // }
+    // return true;
   }
 
   async createMintForContract(
@@ -80,7 +82,7 @@ export class HighlightIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Error finding creator');
     }
 
-    const collectionId = collection.highlightCollection?.id;
+    const collectionId = collection.highlightCollection?.id || collection.id;
 
     if (!collectionId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Collection id not available');
@@ -92,6 +94,8 @@ export class HighlightIngestor implements MintIngestor {
       walletAddress: collection.creator,
       imageUrl: creator?.creatorAccountSettings?.displayAvatar,
     });
+
+    mintBuilder.setMintOutputContract({ chainId: 8453, address: collection.highlightCollection.address });
 
     const vectorId = await getHighlightVectorId(resources, collectionId);
 
@@ -109,9 +113,10 @@ export class HighlightIngestor implements MintIngestor {
       chainId: 8453,
       contractAddress: CONTRACT_ADDRESS,
       contractMethod: 'vectorMint721',
-      contractParams: `[${vectorId}, 1, address]`,
+      contractParams: `[${vectorId}, quantity, address]`,
       abi: MINT_CONTRACT_ABI,
       priceWei: totalPriceWei,
+      supportsQuantity: true,
     });
 
     const metadata = await getHighlightMetadata(+vectorId, resources.alchemy);

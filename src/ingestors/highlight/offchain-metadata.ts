@@ -27,7 +27,6 @@ export const getHighlightCollectionById = async (
           marketplaceId
           accountId
           address
-          symbol
           chainId
           status
           baseUri

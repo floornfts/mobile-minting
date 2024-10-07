@@ -74,11 +74,13 @@ export class RodeoIngestor implements MintIngestor {
     mintBuilder.setName(name).setDescription(description).setFeaturedImageUrl(image);
     const totalPrice = await getRodeoFeeInEth(sale_terms_id, user.address, mintAddress, resources.alchemy);
 
+    const tokenIdNum = parseInt(tokenId);
     mintBuilder.setMintOutputContract({
       chainId,
       address: contractAddress,
+      tokenId: isNaN(tokenIdNum) ? null : tokenIdNum,
     });
-
+    
     mintBuilder.setCreator({
       name: user.name,
       imageUrl: user.image,
@@ -93,6 +95,7 @@ export class RodeoIngestor implements MintIngestor {
       priceWei: totalPrice,
       mintFeePerTokenWei: totalPrice,
       supportsQuantity: true,
+      tokenId: tokenIdNum
     });
 
     const startDate = public_sale_start_at ? new Date(public_sale_start_at) : new Date();
