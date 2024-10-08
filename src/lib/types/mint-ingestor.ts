@@ -1,4 +1,4 @@
-import { Alchemy } from 'alchemy-sdk';
+import { AlchemyMultichainClient } from '../rpc/alchemy-multichain';
 import { MintTemplate } from './mint-template';
 import { AxiosInstance } from 'axios';
 
@@ -19,7 +19,7 @@ interface MintIngestor {
 }
 
 type MintIngestorResources = {
-  alchemy: Alchemy;
+  alchemy: AlchemyMultichainClient;
   fetcher: AxiosInstance;
 };
 
@@ -32,6 +32,6 @@ export type MintIngestorOptions = {
   */
   supportsUrlIsExpensive?: boolean;
   supportsContractIsExpensive?: boolean;
-}
+};
 
 export { MintIngestor, MintIngestorResources };

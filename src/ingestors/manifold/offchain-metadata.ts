@@ -1,16 +1,15 @@
 import { Axios } from 'axios';
-import { Alchemy } from 'alchemy-sdk';
 import { getContract } from './onchain-metadata';
 import { MANIFOLD_CLAIMS_ERC115_SPECIFIC_ABI, MANIFOLD_CLAIMS_ERC721_SPECIFIC_ABI } from './abi';
-
+import { AlchemyMultichainClient } from '../../../src/lib/rpc/alchemy-multichain';
 
 const MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT_1155 = '0x26BBEA7803DcAc346D5F5f135b57Cf2c752A02bE';
 const MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT_721 = '0x23aA05a271DEBFFAA3D75739aF5581f744b326E4';
 
 export const manifoldOnchainDataFromUrl = async (
-  url: any, 
-  alchemy: Alchemy,
-  fetcher: Axios
+  url: any,
+  alchemy: AlchemyMultichainClient,
+  fetcher: Axios,
 ): Promise<any> => {
   const slug = url.match(/\/c\/([^\/]+)/)?.[1];
   if (!slug) return false;
@@ -20,6 +19,7 @@ export const manifoldOnchainDataFromUrl = async (
       `https://apps.api.manifoldxyz.dev/public/instance/data?appId=2522713783&instanceSlug=${slug}`,
     );
     const { id, creator, publicData } = data || {};
+
     const {
       asset,
       network: chainId,
@@ -64,34 +64,41 @@ export const manifoldOnchainDataFromUrl = async (
 
     // Check if mint sold out
     switch (spec) {
-      case 'ERC721':
-        {
-          const contract = await getContract(chainId, MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT_721, alchemy, MANIFOLD_CLAIMS_ERC721_SPECIFIC_ABI);
-          const response = await contract.functions.getClaim(contractAddress, id);
-          const total = response[0][0];
-          const totalMax = response[0][1];
+      case 'ERC721': {
+        const contract = await getContract(
+          chainId,
+          MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT_721,
+          alchemy,
+          MANIFOLD_CLAIMS_ERC721_SPECIFIC_ABI,
+        );
+        const response = await contract.functions.getClaim(contractAddress, id);
+        const total = response[0][0];
+        const totalMax = response[0][1];
 
-          if (total == totalMax) return false;
+        if (total == totalMax) return false;
 
-          break;
-        }
-        
-      case 'ERC1155':
-        {
-          const contract = await getContract(chainId, MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT_1155, alchemy, MANIFOLD_CLAIMS_ERC115_SPECIFIC_ABI);
-          const response = await contract.functions.getClaim(contractAddress, id);
-          const total = response[0][0];
-          const totalMax = response[0][1];
+        break;
+      }
 
-          if (total == totalMax) return false;
-          
-          break;
-        }
+      case 'ERC1155': {
+        const contract = await getContract(
+          chainId,
+          MANIFOLD_LAZY_PAYABLE_CLAIM_CONTRACT_1155,
+          alchemy,
+          MANIFOLD_CLAIMS_ERC115_SPECIFIC_ABI,
+        );
+        const response = await contract.functions.getClaim(contractAddress, id);
+        const total = response[0][0];
+        const totalMax = response[0][1];
+
+        if (total == totalMax) return false;
+
+        break;
+      }
 
       default:
         return false; // Unknown spec
     }
-
 
     return {
       instanceId: id,

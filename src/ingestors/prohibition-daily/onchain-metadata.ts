@@ -1,16 +1,22 @@
-import { Alchemy, Contract } from 'alchemy-sdk';
+import { Contract } from 'alchemy-sdk';
 import { PROHIBITION_DAILY_ABI } from './abi';
+import { AlchemyMultichainClient } from '../../../src/lib/rpc/alchemy-multichain';
+import { NETWORKS } from '../../../src/lib/simulation/simulation';
 
-const getContract = async (chainId: number, contractAddress: string, alchemy: Alchemy): Promise<Contract> => {
-  const ethersProvider = await alchemy.config.getProvider();
+const getContract = async (
+  chainId: number,
+  contractAddress: string,
+  alchemy: AlchemyMultichainClient,
+): Promise<Contract> => {
+  const ethersProvider = await alchemy.forNetwork(NETWORKS[chainId]).config.getProvider();
   const contract = new Contract(contractAddress, PROHIBITION_DAILY_ABI, ethersProvider);
   return contract;
 };
-             
+
 export const getProhibitionContractMetadata = async (
   chainId: number,
   contractAddress: string,
-  alchemy: Alchemy,
+  alchemy: AlchemyMultichainClient,
 ): Promise<any> => {
   const contract = await getContract(chainId, contractAddress, alchemy);
   const metadata = await contract.functions.contractURI();
@@ -31,7 +37,7 @@ export const getProhibitionContractMetadata = async (
 export const getProhibitionMintPriceInEth = async (
   chainId: number,
   contractAddress: string,
-  alchemy: Alchemy,
+  alchemy: AlchemyMultichainClient,
 ): Promise<any> => {
   const contract = await getContract(chainId, contractAddress, alchemy);
   const feePrice = await contract.functions.mintFee(1);

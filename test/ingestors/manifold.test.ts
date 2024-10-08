@@ -12,7 +12,7 @@ describe('manifold', function () {
     new ManifoldIngestor(),
     resources,
     {
-      successUrls: ['https://app.manifold.xyz/c/spaceexplorer'],
+      successUrls: ['https://app.manifold.xyz/c/spaceexplorer', 'https://app.manifold.xyz/c/freedom-to-run'],
       failureUrls: ['https://app.manifold.xyz/', 'https://app.manifold.xyz/x/spaceexplorer/'],
       successContracts: [
         // { chainId: 8453, contractAddress: '0xE2Cf639a5eBA5e8d1e291AEb44ac66c8c0727F98' }
