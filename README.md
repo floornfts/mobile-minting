@@ -375,6 +375,6 @@ In time, we hope to continue down this path, but for now all ingestors will be r
 We hope to see people (other companies!?) emerge for whom Mobile Minting, and a unified standard for expressing onchain mints is useful, and look forward to working with them to continue this mission.
 
 ### Questions?
-Open an issue, or email developers@floor.fun
+Open an issue, or email developers@rally.xyz
 
 
