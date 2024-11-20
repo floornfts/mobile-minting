@@ -123,7 +123,7 @@ export const getHighlightCollectionOwnerDetails = async (resources: MintIngestor
     operationName: 'GetCollectionCreatorDetails',
     variables: {
       withEns: true,
-      collectionId: id,
+      collectionId: `base:${id}`,
     },
     query: `query GetCollectionCreatorDetails($collectionId: String!, $withEns: Boolean) {
     getPublicCollectionDetails(collectionId: $collectionId) {
