@@ -79,7 +79,7 @@ export const getHighlightVectorId = async (resources: MintIngestorResources, id:
   const data = {
     operationName: 'GetCollectionSaleDetails',
     variables: {
-      collectionId: id,
+      collectionId: `base:${id}`,
     },
     query: `
     query GetCollectionSaleDetails($collectionId: String!) {
