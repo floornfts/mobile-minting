@@ -57,9 +57,6 @@ export class HighlightIngestor implements MintIngestor {
 
     const collection = await getHighlightCollectionByAddress(resources, contractOptions);
 
-
-    console.log(collection)
-
     if (!collection) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection not found');
     }
@@ -96,12 +93,9 @@ export class HighlightIngestor implements MintIngestor {
       imageUrl: creator?.creatorAccountSettings?.displayAvatar,
     });
 
-
     mintBuilder.setMintOutputContract({ chainId: 8453, address: collection.primaryContract });
 
     const vectorId = await getHighlightVectorId(resources, collectionId);
-
-    console.log(vectorId)
 
     if (!vectorId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Id not available');
