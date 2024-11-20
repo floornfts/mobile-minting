@@ -40,4 +40,17 @@ export type CollectionByAddress2 = {
   };
 };
 
-export type CollectionByAddress = CollectionByAddress1 & CollectionByAddress2;
+export type CollectionByAddress3 = {
+  collection: {
+    // Collection address
+    id: string;
+    name: string;
+    creator: string;
+    image: string;
+    animationUrl: string;
+    address: string;
+  };
+  primaryContract: string;
+};
+
+export type CollectionByAddress = CollectionByAddress1 & CollectionByAddress2 & CollectionByAddress3;
