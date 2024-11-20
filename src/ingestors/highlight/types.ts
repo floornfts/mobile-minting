@@ -10,6 +10,7 @@ export type Collection = {
   chainId: number;
   status: string;
   baseUri: string;
+  editionId: string;
 };
 
 export type CollectionByAddress1 = {
@@ -24,6 +25,7 @@ export type CollectionByAddress1 = {
   description: string;
   sampleImages: string[];
   creator: string;
+  primaryContract: string;
 };
 
 export type CollectionByAddress2 = {

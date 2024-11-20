@@ -1,48 +1,49 @@
 import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../lib/types/mint-ingestor';
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
-import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { getHighlightMetadata, getHighlightMintPriceInWei } from './onchain-metadata';
 import {
   getHighlightCollectionByAddress,
   getHighlightCollectionById,
   getHighlightCollectionOwnerDetails,
+  getHighlightUrlForAddress,
   getHighlightVectorId,
 } from './offchain-metadata';
+import { getHighlightMetadata, getHighlightMintPriceInWei } from './onchain-metadata';
+
 import { MINT_CONTRACT_ABI } from './abi';
+import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
 
 const CONTRACT_ADDRESS = '0x8087039152c472Fa74F47398628fF002994056EA';
 
 export class HighlightIngestor implements MintIngestor {
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
-    return false;
-    // const id = url.split('/').pop();
-    // if (!id) {
-    //   return false;
-    // }
+    const match = url.match(/\/mint\/([^\/]+)/);
+    const id = match ? match[1] : null;
+    if (!id) {
+      return false;
+    }
+    // accept
+    const collection = await getHighlightCollectionById(resources, id);
 
-    // const collection = await getHighlightCollectionById(resources, id);
+    if (!collection || collection.chainId !== 8453) {
+      return false;
+    }
 
-    // if (!collection || collection.chainId !== 8453) {
-    //   return false;
-    // }
-
-    // const urlPattern = /^https:\/\/highlight\.xyz\/mint\/[a-f0-9]{24}$/;
-    // return (
-    //   new URL(url).hostname === 'www.highlight.xyz' || new URL(url).hostname === 'highlight.xyz' || urlPattern.test(url)
-    // );
+    const urlPattern = /^https:\/\/highlight\.xyz\/mint\/[a-f0-9]{24}$/;
+    return (
+      new URL(url).hostname === 'www.highlight.xyz' || new URL(url).hostname === 'highlight.xyz' || urlPattern.test(url)
+    );
   }
 
   async supportsContract(resources: MintIngestorResources, contractOptions: MintContractOptions): Promise<boolean> {
-    return false;
-    // if (contractOptions.chainId !== 8453) {
-    //   return false;
-    // }
-    // const collection = await getHighlightCollectionByAddress(resources, contractOptions);
-    // if (!collection) {
-    //   return false;
-    // }
-    // return true;
+    if (contractOptions.chainId !== 8453) {
+      return false;
+    }
+    const collection = await getHighlightCollectionByAddress(resources, contractOptions);
+    if (!collection) {
+      return false;
+    }
+    return true;
   }
 
   async createMintForContract(
@@ -82,7 +83,10 @@ export class HighlightIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Error finding creator');
     }
 
-    const collectionId = collection.highlightCollection?.id || collection.id;
+    const url = await getHighlightUrlForAddress(resources, contractOptions.contractAddress);
+
+    const match = url.match(/\/mint\/([^\/]+)/);
+    const collectionId = match ? match[1] : null;
 
     if (!collectionId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Collection id not available');
@@ -95,7 +99,7 @@ export class HighlightIngestor implements MintIngestor {
       imageUrl: creator?.creatorAccountSettings?.displayAvatar,
     });
 
-    mintBuilder.setMintOutputContract({ chainId: 8453, address: collection.highlightCollection.address });
+    mintBuilder.setMintOutputContract({ chainId: 8453, address: collection.primaryContract });
 
     const vectorId = await getHighlightVectorId(resources, collectionId);
 
@@ -143,9 +147,10 @@ export class HighlightIngestor implements MintIngestor {
     }
 
     // Example URL: https://highlight.xyz/mint/665fa33f07b3436991e55632
-    const splits = url.split('/');
-    const id = splits.pop();
-    const chain = splits.pop();
+    const match = url.match(/\/mint\/([^\/]+)/);
+    const id = match ? match[1] : null;
+
+    const tokenId = url.split('/t/')[1];
 
     if (!id) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Url error');
@@ -160,7 +165,10 @@ export class HighlightIngestor implements MintIngestor {
     return this.createMintForContract(resources, {
       chainId: collection.chainId,
       contractAddress: collection.address,
-      url,
+      url: `https://highlight.xyz/mint/base:${collection.address}${
+        collection.editionId == '1' ? ':' + collection.editionId : ''
+      }${tokenId ? '/t/' + tokenId : ''}`,
+      tokenId,
     });
   }
 }

@@ -1,13 +1,13 @@
-import { expect } from 'chai';
-import { HighlightIngestor } from '../../src/ingestors/highlight';
-import { mintIngestorResources } from '../../src/lib/resources';
 import { EVMMintInstructions } from '../../src/lib/types/mint-template';
+import { HighlightIngestor } from '../../src/ingestors/highlight';
 import { MintTemplateBuilder } from '../../src/lib/builder/mint-template-builder';
 import { basicIngestorTests } from '../shared/basic-ingestor-tests';
+import { expect } from 'chai';
+import { mintIngestorResources } from '../../src/lib/resources';
 
 const resources = mintIngestorResources();
 
-describe.skip('highlight', function () {
+describe('highlight', function () {
   basicIngestorTests(
     new HighlightIngestor(),
     resources,
@@ -52,7 +52,7 @@ describe.skip('highlight', function () {
 
   it('createMintTemplateForUrl: Returns a mint template for a supported URL', async function () {
     const ingestor = new HighlightIngestor();
-    const url = 'https://highlight.xyz/mint/66856628ff8a01fdccc132f4';
+    const url = 'https://highlight.xyz/mint/base:0x0E5DDe3De7cf2761d8a81Ee68F48410425e2dBbA';
     const resources = mintIngestorResources();
     const template = await ingestor.createMintTemplateForUrl(resources, url);
 
@@ -65,7 +65,7 @@ describe.skip('highlight', function () {
     const mintInstructions = template.mintInstructions as EVMMintInstructions;
 
     expect(mintInstructions.contractAddress).to.equal('0x8087039152c472Fa74F47398628fF002994056EA');
-    expect(template.mintOutputContract?.address).to.equal('0x0E5DDe3De7cf2761d8a81Ee68F48410425e2dBbA');
+    expect(template.mintOutputContract?.address).to.equal('0x0e5dde3de7cf2761d8a81ee68f48410425e2dbba');
     expect(mintInstructions.contractMethod).to.equal('vectorMint721');
     expect(mintInstructions.contractParams).to.equal('[1176, quantity, address]');
     expect(mintInstructions.priceWei).to.equal('800000000000000');
@@ -89,7 +89,7 @@ describe.skip('highlight', function () {
 
   it.skip('createMintTemplateForUrl: Returns a mint template for a supported URL with free price', async function () {
     const ingestor = new HighlightIngestor();
-    const url = 'https://highlight.xyz/mint/66744e64e610ed36adeb1a64';
+    const url = 'https://highlight.xyz/mint/base:0x30d745EDC90E92b4fdCE50c5239962Cf3407B12B';
     const resources = mintIngestorResources();
     const template = await ingestor.createMintTemplateForUrl(resources, url);
 

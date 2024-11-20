@@ -1,5 +1,5 @@
-import { MintContractOptions, MintIngestorResources } from 'src/lib';
 import { Collection, CollectionByAddress, CollectionByAddress1 } from './types';
+import { MintContractOptions, MintIngestorResources } from 'src/lib';
 
 export const getHighlightCollectionById = async (
   resources: MintIngestorResources,
@@ -31,6 +31,7 @@ export const getHighlightCollectionById = async (
           status
           baseUri
           onChainBaseUri
+          editionId
         }
       }
     `,
@@ -68,7 +69,10 @@ export const getHighlightCollectionByAddress = async (
   } catch (error) {}
 };
 
-export const getHighlightVectorId = async (resources: MintIngestorResources, id: string): Promise<string | undefined> => {
+export const getHighlightVectorId = async (
+  resources: MintIngestorResources,
+  id: string,
+): Promise<string | undefined> => {
   const url = 'https://api.highlight.xyz:8080/';
 
   const headers = {
@@ -114,7 +118,8 @@ export const getHighlightVectorId = async (resources: MintIngestorResources, id:
     ).onchainMintVectorId;
     const vectorId = vectorString.split(':').pop();
     return vectorId;
-  } catch (error) {}
+  } catch (error) {
+  }
 };
 
 export const getHighlightCollectionOwnerDetails = async (resources: MintIngestorResources, id: string) => {
@@ -152,8 +157,21 @@ export const getHighlightCollectionOwnerDetails = async (resources: MintIngestor
   try {
     const resp = await resources.fetcher.post(url, data, { headers });
     if (resp.data.errors) {
-      throw new Error("Error fetching owner");
+      throw new Error('Error fetching owner');
     }
     return resp.data.data.getPublicCollectionDetails;
   } catch (error) {}
+};
+
+export const getHighlightUrlForAddress = async (resources: MintIngestorResources, address: string) => {
+  // try to get it by edition 1 or edition 0
+  let edition1Id = `base:${address}:1`;
+  let edition0Id = `base:${address}`;
+
+  let promises = [getHighlightCollectionById(resources, edition1Id), getHighlightCollectionById(resources, edition0Id)];
+
+  let data = (await Promise.all(promises)) as Collection[];
+  let record = data.filter((d) => !!d)[0];
+
+  return `https://highlight.xyz/mint/base:${record.address}${record.editionId === '1' ? ':1' : ''}`;
 };

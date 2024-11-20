@@ -1,4 +1,5 @@
 import { Alchemy, Contract } from 'alchemy-sdk';
+
 import { MINT_CONTRACT_ABI } from './abi';
 
 const CONTRACT_ADDRESS = '0x8087039152c472Fa74F47398628fF002994056EA';
@@ -19,9 +20,7 @@ export const getHighlightMintPriceInWei = async (vectorId: number, alchemy: Alch
     const totalFee = parseInt(pricePerToken.toString()) + fee;
 
     return `${totalFee}`;
-  } catch (error) {
-    console.log(error);
-  }
+  } catch (error) {}
 };
 
 export const getHighlightMetadata = async (
