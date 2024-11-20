@@ -65,11 +65,10 @@ const resources = mintIngestorResources();
       ).length;
       if (totalCalls - failedCalls > 0) {
         console.log(`✅ Although one or more (${failedCalls}) Error Occurred [execution reverted] Contract Execution Completed`);
-        console.log(JSON.stringify(simulationResult, null, 2));
       } else {
         console.log('❌ Simulation Failed');
-        console.log(JSON.stringify(simulationResult, null, 2));
       }
+        console.log(JSON.stringify(simulationResult, null, 2));
     }
   } catch (error) {
     console.error(error);
