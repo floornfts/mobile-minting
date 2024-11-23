@@ -18,15 +18,13 @@ const getContract = async (
 export const getVvMintPriceInWei = async (
   alchemy: Alchemy,
   contractAddress: string,
-  amount: number,
+  blockNumber: number,
 ): Promise<string | undefined> => {
   try {
     const { provider } = await getContract(alchemy, contractAddress);
-    const block = await provider.getBlock('latest');
+    const block = await provider.getBlock(blockNumber);
 
-    // Extract the base fee per gas
     const baseFeePerGas = block.baseFeePerGas;
-
     if (!baseFeePerGas) {
       throw new Error('Unable to fetch baseFee');
     }
@@ -35,22 +33,19 @@ export const getVvMintPriceInWei = async (
   } catch (error) {}
 };
 
-export const getVvLatestTokenId = async (
-  alchemy: Alchemy,
-  contractAddress: string,
-): Promise<{ startTimestamp: number; endTimestamp: number } | undefined> => {
+export const getVvLatestTokenId = async (alchemy: Alchemy, contractAddress: string): Promise<number | undefined> => {
   try {
     const { contract } = await getContract(alchemy, contractAddress);
     const tokenId = await contract.functions.latestTokenId();
-    return tokenId;
+    return +tokenId;
   } catch (error) {}
 };
 
 export const getVvCollection = async (alchemy: Alchemy, contractAddress: string, vectorId?: number) => {
   try {
     const { contract } = await getContract(alchemy, contractAddress);
-    const collection = await contract.functions.get(vectorId);
-    const { name, description, artifact, renderer, mintedBlock, closeAt, data } = collection[0];
+    const collection = await contract.functions.get(vectorId ?? (await getVvLatestTokenId(alchemy, contractAddress)));
+    const { name, description, artifact, renderer, mintedBlock, closeAt, data } = collection;
     return { name, description, artifact, renderer, mintedBlock, closeAt, data };
   } catch (error) {}
 };
@@ -75,7 +70,7 @@ export const getVvCollectionCreator = async (alchemy: Alchemy, contractAddress: 
     const owner = await contract.functions.owner();
     const name = await provider.lookupAddress(owner[0]);
     return {
-      creator: owner,
+      creator: owner[0],
       name,
     };
   } catch (error) {}

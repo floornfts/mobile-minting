@@ -90,7 +90,7 @@ export class VvIngestor implements MintIngestor {
 
     mintBuilder.setMintOutputContract({ chainId: 1, address: contractAddress });
 
-    const totalPriceWei = await getVvMintPriceInWei(resources.alchemy, contractAddress, 1);
+    const totalPriceWei = await getVvMintPriceInWei(resources.alchemy, contractAddress, collection.mintedBlock);
 
     if (!totalPriceWei) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Price not available');
