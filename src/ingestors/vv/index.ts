@@ -24,8 +24,6 @@ export class VvIngestor implements MintIngestor {
     const collection = await getVvCollection(resources.alchemy, address as string, +tokenId);
     if (!collection) return false;
 
-    console.log('here');
-
     const urlPattern = /^https:\/\/mint\.vv\.xyz\/0x[a-fA-F0-9]{40}\/\d+$/;
     return (
       new URL(url).hostname === 'www.mint.vv.xyz' || new URL(url).hostname === 'mint.vv.xyz' || urlPattern.test(url)
