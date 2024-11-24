@@ -11,7 +11,6 @@ import {
 import { getVvCollection } from './onchain-metadata';
 import { MINT_CONTRACT_ABI } from './abi';
 
-// https://mint.vv.xyz/0xcb52f0fe1d559cd2869db7f29753e8951381b4a3/1
 export class VvIngestor implements MintIngestor {
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
     const splitUrl = url.split('/');
@@ -125,7 +124,7 @@ export class VvIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
     }
 
-    // Example URL: https://highlight.xyz/mint/665fa33f07b3436991e55632
+    // Example URL: https://mint.vv.xyz/0xcb52f0fe1d559cd2869db7f29753e8951381b4a3/1
     const splits = url.split('/');
     const id = splits.pop();
     const contract = splits.pop();
