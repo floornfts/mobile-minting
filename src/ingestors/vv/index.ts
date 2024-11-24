@@ -57,6 +57,8 @@ export class VvIngestor implements MintIngestor {
     }
 
     const { contractAddress } = contractOptions;
+
+    // Use latestTokenId as default, see: https://docs.mint.vv.xyz/guide/contracts/mint#token-count
     const tokenId = contractOptions.tokenId ?? (await getVvLatestTokenId(resources.alchemy, contractAddress));
 
     const collection = await getVvCollection(resources.alchemy, contractAddress, tokenId ? +tokenId : undefined);
@@ -72,7 +74,7 @@ export class VvIngestor implements MintIngestor {
     }
 
     mintBuilder.setName(metadata.name).setDescription(metadata.description).setFeaturedImageUrl(metadata.image);
-    mintBuilder.setMintOutputContract({ chainId: 1, address: contractAddress });
+    mintBuilder.setMintOutputContract({ chainId: contractOptions.chainId ?? 1, address: contractAddress });
 
     const creatorData = await getVvCollectionCreator(resources.alchemy, contractAddress);
 
@@ -96,7 +98,7 @@ export class VvIngestor implements MintIngestor {
     }
 
     mintBuilder.setMintInstructions({
-      chainId: 8453,
+      chainId: contractOptions.chainId ?? 1,
       contractAddress,
       contractMethod: 'mint',
       contractParams: `[${tokenId}, quantity]`,
