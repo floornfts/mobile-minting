@@ -9,7 +9,7 @@ export const mintIngestorResources = (): MintIngestorResources => {
     }
     const settings = {
       apiKey: ALCHEMY_API_KEY,
-      network: Network.BASE_MAINNET, // Replace with the correct network
+      network: Network.ETH_MAINNET, // Replace with the correct network
     };
     const alchemy = new Alchemy(settings);
   
