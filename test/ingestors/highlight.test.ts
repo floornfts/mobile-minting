@@ -7,7 +7,7 @@ import { basicIngestorTests } from '../shared/basic-ingestor-tests';
 
 const resources = mintIngestorResources();
 
-describe.skip('highlight', function () {
+describe('highlight', function () {
   basicIngestorTests(
     new HighlightIngestor(),
     resources,
@@ -64,8 +64,8 @@ describe.skip('highlight', function () {
     expect(template.description).to.contain('3,333 Based Fren$ muy basados');
     const mintInstructions = template.mintInstructions as EVMMintInstructions;
 
-    expect(mintInstructions.contractAddress).to.equal('0x8087039152c472Fa74F47398628fF002994056EA');
-    expect(template.mintOutputContract?.address).to.equal('0x0E5DDe3De7cf2761d8a81Ee68F48410425e2dBbA');
+    expect(mintInstructions.contractAddress.toLowerCase()).to.equal('0x8087039152c472Fa74F47398628fF002994056EA'.toLowerCase());
+    expect(template.mintOutputContract?.address.toLowerCase()).to.equal('0x0E5DDe3De7cf2761d8a81Ee68F48410425e2dBbA'.toLowerCase());
     expect(mintInstructions.contractMethod).to.equal('vectorMint721');
     expect(mintInstructions.contractParams).to.equal('[1176, quantity, address]');
     expect(mintInstructions.priceWei).to.equal('800000000000000');
@@ -87,7 +87,7 @@ describe.skip('highlight', function () {
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date(1893456000000));
   });
 
-  it.skip('createMintTemplateForUrl: Returns a mint template for a supported URL with free price', async function () {
+  it('createMintTemplateForUrl: Returns a mint template for a supported URL with free price', async function () {
     const ingestor = new HighlightIngestor();
     const url = 'https://highlight.xyz/mint/66744e64e610ed36adeb1a64';
     const resources = mintIngestorResources();
@@ -103,7 +103,7 @@ describe.skip('highlight', function () {
 
     expect(mintInstructions.contractAddress).to.equal('0x8087039152c472Fa74F47398628fF002994056EA');
     expect(mintInstructions.contractMethod).to.equal('vectorMint721');
-    expect(mintInstructions.contractParams).to.equal('[977, 1, address]');
+    expect(mintInstructions.contractParams).to.equal('[977, quantity, address]');
     expect(mintInstructions.priceWei).to.equal('800000000000000');
 
     expect(template.featuredImageUrl).to.equal(

@@ -61,14 +61,7 @@ export class ZoraMetadataProvider {
     if (fallbackStartDateValue) {
       startDate = new Date(parseInt(fallbackStartDateValue) * 1000);
     }
-
-    let fallbackEndDateValue =
-      tokenDetails.mintable?.mint_context.sale_strategies[0].fixed_price?.sale_end ||
-      tokenDetails.mintable?.mint_context.sale_strategies[0].zora_timed_minter?.sale_end;
-    if (fallbackEndDateValue) {
-      endDate = new Date(parseInt(fallbackEndDateValue) * 1000);
-    }
-
+    
     let liveDate = startDate > new Date() ? startDate : new Date();
 
     return { startDate, endDate, liveDate };
