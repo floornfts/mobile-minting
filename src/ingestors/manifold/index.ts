@@ -10,6 +10,7 @@ export class ManifoldIngestor implements MintIngestor {
   configuration = {
     supportsContractIsExpensive: true,
   };
+  supportedChainIds = [8453, 1];
 
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
     if (new URL(url).hostname !== 'app.manifold.xyz') {
@@ -25,7 +26,7 @@ export class ManifoldIngestor implements MintIngestor {
       const { publicData } = data || {};
       const { network: chainId, contract: contractAddress } = publicData || {};
 
-      if (chainId !== 8453) {
+      if (!this.supportedChainIds.includes(chainId)) {
         return false;
       }
 
@@ -42,7 +43,7 @@ export class ManifoldIngestor implements MintIngestor {
       return false;
     }
 
-    if (chainId !== 8453) {
+    if (!this.supportedChainIds.includes(chainId)) {
       return false;
     }
 
@@ -67,7 +68,10 @@ export class ManifoldIngestor implements MintIngestor {
     const { chainId, contractAddress } = await manifoldOnchainDataFromUrl(url, resources.alchemy, resources.fetcher);
 
     if (!chainId || !contractAddress) {
-      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing required data, mint expired, or sold out');
+      throw new MintIngestorError(
+        MintIngestionErrorName.MissingRequiredData,
+        'Missing required data, mint expired, or sold out',
+      );
     }
 
     return this.createMintForContract(resources, { chainId, contractAddress, url });
