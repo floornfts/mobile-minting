@@ -1,5 +1,4 @@
 import { MintIngestor } from '../lib/types/mint-ingestor';
-import { ProhibitionDailyIngestor } from './prohibition-daily';
 import { ManifoldIngestor } from './manifold';
 import { RaribleIngestor } from './rarible';
 import { FxHashIngestor } from './fxhash';
@@ -17,14 +16,13 @@ export type MintIngestionMap = {
 export const ALL_MINT_INGESTORS: MintIngestionMap = {
   'zora-internal': new ZoraInternalIngestor(),
   rodeo: new RodeoIngestor(),
-  'prohibition-daily': new ProhibitionDailyIngestor(),
   fxhash: new FxHashIngestor(),
   manifold: new ManifoldIngestor(),
   rarible: new RaribleIngestor(),
   transient: new TransientIngestor(),
   highlight: new HighlightIngestor(),
   foundation: new FoundationIngestor(),
-  'coinbase-wallet': new CoinbaseWalletIngestor()
+  'coinbase-wallet': new CoinbaseWalletIngestor(),
 };
 
 export * from './';
