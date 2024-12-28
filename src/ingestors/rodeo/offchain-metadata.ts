@@ -192,6 +192,10 @@ export const rodeoSupports = async (
   resources: MintIngestorResources,
 ): Promise<boolean> => {
   const { chainId, contractAddress, tokenId } = contract;
-  const exists = await getRodeoMintByAddressAndChain(resources, chainId, contractAddress, tokenId as string);
-  return !!exists;
+  try {
+    const exists = await getRodeoMintByAddressAndChain(resources, chainId, contractAddress, tokenId as string);
+    return !!exists;
+  } catch (error) {
+    return false;
+  }
 };
