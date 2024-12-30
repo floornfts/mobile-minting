@@ -31,6 +31,7 @@ export const getHighlightCollectionById = async (
           status
           baseUri
           onChainBaseUri
+          standard
         }
       }
     `,

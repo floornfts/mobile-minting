@@ -9,13 +9,17 @@ const getContract = async (alchemy: Alchemy): Promise<Contract> => {
   return contract;
 };
 
-export const getHighlightMintPriceInWei = async (vectorId: number, alchemy: Alchemy): Promise<string | undefined> => {
+export const getHighlightMintPriceInWei = async (
+  vectorId: number,
+  alchemy: Alchemy,
+  standard: 'ERC721' | 'ERC1155',
+): Promise<string | undefined> => {
   try {
     const contract = await getContract(alchemy);
     const data = await contract.functions.getAbridgedVector(vectorId);
     const { pricePerToken } = data[0];
 
-    const fee = 800000000000000;
+    const fee = standard.toUpperCase() === 'ERC721' ? 800000000000000 : 400000000000000;
     const totalFee = parseInt(pricePerToken.toString()) + fee;
 
     return `${totalFee}`;
