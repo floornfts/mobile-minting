@@ -10,6 +10,7 @@ import {
 } from './onchain-metadata';
 import { getVvCollection } from './onchain-metadata';
 import { MINT_CONTRACT_ABI } from './abi';
+import { NETWORKS } from '../../lib/simulation/simulation';
 
 export class VvIngestor implements MintIngestor {
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
@@ -19,8 +20,8 @@ export class VvIngestor implements MintIngestor {
     if (!tokenId || !address) {
       return false;
     }
-
-    const collection = await getVvCollection(resources.alchemy, address as string, +tokenId);
+    const alchemy = await resources.alchemy.forNetwork(NETWORKS[1]);
+    const collection = await getVvCollection(alchemy, address as string, +tokenId);
     if (!collection) return false;
 
     const urlPattern = /^https:\/\/mint\.vv\.xyz\/0x[a-fA-F0-9]{40}\/\d+$/;
@@ -33,8 +34,9 @@ export class VvIngestor implements MintIngestor {
     if (!(contractOptions.chainId === 1 || contractOptions.chainId === 8453)) {
       return false;
     }
+    const alchemy = await resources.alchemy.forNetwork(NETWORKS[1]);
     const collection = await getVvCollection(
-      resources.alchemy,
+      alchemy,
       contractOptions.contractAddress,
       contractOptions.tokenId ? +contractOptions.tokenId : undefined,
     );
@@ -50,7 +52,9 @@ export class VvIngestor implements MintIngestor {
   ): Promise<MintTemplate> {
     const mintBuilder = new MintTemplateBuilder()
       .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('Highlight');
+      .setPartnerName('Vv');
+
+    const alchemy = await resources.alchemy.forNetwork(NETWORKS[1]);
 
     if (contractOptions.url) {
       mintBuilder.setMarketingUrl(contractOptions.url);
@@ -59,15 +63,15 @@ export class VvIngestor implements MintIngestor {
     const { contractAddress } = contractOptions;
 
     // Use latestTokenId as default, see: https://docs.mint.vv.xyz/guide/contracts/mint#token-count
-    const tokenId = contractOptions.tokenId ?? (await getVvLatestTokenId(resources.alchemy, contractAddress));
+    const tokenId = contractOptions.tokenId ?? (await getVvLatestTokenId(alchemy, contractAddress));
 
-    const collection = await getVvCollection(resources.alchemy, contractAddress, tokenId ? +tokenId : undefined);
+    const collection = await getVvCollection(alchemy, contractAddress, tokenId ? +tokenId : undefined);
 
     if (!collection) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection not found');
     }
 
-    const metadata = await getVvCollectionMetadata(resources.alchemy, contractAddress);
+    const metadata = await getVvCollectionMetadata(alchemy, contractAddress);
 
     if (!metadata) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection metadata not found');
@@ -76,7 +80,7 @@ export class VvIngestor implements MintIngestor {
     mintBuilder.setName(metadata.name).setDescription(metadata.description).setFeaturedImageUrl(metadata.image);
     mintBuilder.setMintOutputContract({ chainId: contractOptions.chainId ?? 1, address: contractAddress });
 
-    const creatorData = await getVvCollectionCreator(resources.alchemy, contractAddress);
+    const creatorData = await getVvCollectionCreator(alchemy, contractAddress);
 
     if (!creatorData) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Error finding creator');
@@ -91,7 +95,7 @@ export class VvIngestor implements MintIngestor {
 
     mintBuilder.setMintOutputContract({ chainId: 1, address: contractAddress });
 
-    const totalPriceWei = await getVvMintPriceInWei(resources.alchemy, contractAddress, collection.mintedBlock);
+    const totalPriceWei = await getVvMintPriceInWei(alchemy, contractAddress, collection.mintedBlock);
 
     if (!totalPriceWei) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Price not available');
@@ -135,7 +139,8 @@ export class VvIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Url error');
     }
 
-    const collection = await getVvCollection(resources.alchemy, contract, +id);
+    const alchemy = await resources.alchemy.forNetwork(NETWORKS[1]);
+    const collection = await getVvCollection(alchemy, contract, +id);
 
     if (!collection) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'No such collection');

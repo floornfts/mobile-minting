@@ -1,8 +1,6 @@
 import { Alchemy, AlchemyProvider, Contract } from 'alchemy-sdk';
 import { MINT_CONTRACT_ABI } from './abi';
 
-const CONTRACT_ADDRESS = '0x8087039152c472Fa74F47398628fF002994056EA';
-
 const getContract = async (
   alchemy: Alchemy,
   contractAddress: string,
