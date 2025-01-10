@@ -71,7 +71,7 @@ export class VvIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection not found');
     }
 
-    const metadata = await getVvCollectionMetadata(alchemy, contractAddress);
+    const metadata = await getVvCollectionMetadata(alchemy, contractAddress, collection.renderer);
 
     if (!metadata) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection metadata not found');

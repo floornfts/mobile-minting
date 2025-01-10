@@ -50,23 +50,33 @@ export const getVvCollection = async (alchemy: Alchemy, contractAddress: string,
   } catch (error) {}
 };
 
-export const getVvCollectionMetadata = async (alchemy: Alchemy, contractAddress: string, vectorId?: number) => {
+export const getVvCollectionMetadata = async (
+  alchemy: Alchemy,
+  contractAddress: string,
+  rendererId: number,
+  vectorId?: number,
+) => {
   try {
     const { contract } = await getContract(alchemy, contractAddress);
     const uri = await contract.functions.contractURI();
+
+    if (rendererId > 0) {
+      const rendererAddress = await contract.functions.renderers(rendererId);
+      console.log(`Contract uses custom renderer: ${rendererAddress}`);
+    }
 
     // Decode base64
     const rawContent = uri[0].split(',')[1];
     let jsonString = atob(rawContent);
 
-    const { name, symbol, description, image: imageBase64 } = JSON.parse(jsonString);
+    const parsedJson = JSON.parse(jsonString);
+    if (Object.keys(parsedJson).length > 4) {
+      console.log('Decoded metadata contains extra values');
+    }
 
-    // Decode again image
-    const rawImage = imageBase64.split(',')[1];
+    const { name, symbol, description, image } = parsedJson;
 
-    // Image is stored as a svg in the contract
-    const image = atob(rawImage);
-
+    // Return image as base64
     return { name, symbol, description, image };
   } catch (error) {}
 };
