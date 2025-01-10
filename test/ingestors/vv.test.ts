@@ -71,7 +71,7 @@ describe('vv', function () {
     expect(template.creator?.walletAddress).to.equal('0xc8f8e2F59Dd95fF67c3d39109ecA2e2A017D4c8a');
 
     // Image is stored onchain as an svg
-    expect(template.featuredImageUrl).to.contain('<svg width="64" height="64"');
+    expect(template.featuredImageArtifact).to.contain('data:image/svg+xml;base64');
 
     expect(template.marketingUrl).to.equal(url);
     expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2024-11-12T02:21:23+02:00'));
