@@ -2,7 +2,8 @@ export type MintTemplate = {
   name: string;
   description?: string | null;
 
-  featuredImageUrl: string | null;
+  featuredImageUrl: UrlImage | null;
+  featuredImageArtifact: ArtifactImage | null;
   images: MintImage[];
   marketingUrl: string;
   creator?: MintArtistMetadata | null;
@@ -22,6 +23,12 @@ export type MintTemplate = {
   partnerName: string | null;
   promotionaltext: string | null;
 };
+
+/* Returns a string url */
+type UrlImage = `https://${string}`;
+
+/* Returns base64 encoded image */
+type ArtifactImage = `data:image/svg+xml;base64,${string}`;
 
 export enum MintInstructionType {
   EVM_MINT = 'EVM_MINT',

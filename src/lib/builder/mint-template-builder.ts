@@ -42,9 +42,9 @@ export class MintTemplateBuilder {
     if (!this.mintTemplate.name) {
       throw new Error('MintTemplate name is required');
     }
-    if (!this.mintTemplate.featuredImageUrl) {
-      throw new Error('MintTemplate featuredImageUrl is required');
-    }   
+    if (!this.mintTemplate.featuredImageUrl && !this.mintTemplate.featuredImageArtifact) {
+      throw new Error('MintTemplate featuredImage is required');
+    }
     if (!this.mintTemplate.mintInstructionType) {
       throw new Error('MintTemplate mintInstructionType is required');
     }
@@ -83,8 +83,15 @@ export class MintTemplateBuilder {
     return this;
   }
 
-  setFeaturedImageUrl(featuredImageUrl: string) {
-    this.mintTemplate.featuredImageUrl = featuredImageUrl;
+  setFeaturedImageUrl(featuredImage: string) {
+    const isValidURL = (s: string) =>
+      s.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+
+    if (isValidURL(featuredImage)) {
+      this.mintTemplate.featuredImageUrl = featuredImage;
+    } else {
+      this.mintTemplate.featuredImageArtifact = featuredImage;
+    }
     return this;
   }
 
