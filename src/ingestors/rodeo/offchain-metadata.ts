@@ -39,7 +39,7 @@ export const getRodeoMintByAddressAndChain = async (
 ) => {
   let response: AxiosResponse;
   try {
-    const url = 'https://api-v2.foundation.app/electric/v2/graphql';
+    const url = 'https://api.rodeo.club/graphql';
 
     const headers = {
       Accept: '*/*',
