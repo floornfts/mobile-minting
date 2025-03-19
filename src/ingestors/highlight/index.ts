@@ -101,7 +101,7 @@ export class HighlightIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Id not available');
     }
 
-    const totalPriceWei = await getHighlightMintPriceInWei(+vectorId, resources.alchemy);
+    const totalPriceWei = await getHighlightMintPriceInWei(+vectorId, resources.alchemy, collection.standard || collection.contractKind);
 
     if (!totalPriceWei) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Price not available');

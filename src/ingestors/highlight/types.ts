@@ -24,6 +24,8 @@ export type CollectionByAddress1 = {
   description: string;
   sampleImages: string[];
   creator: string;
+  contractKind: 'erc721' | 'erc1155'
+  standard: "ERC1155" | "ERC721"
 };
 
 export type CollectionByAddress2 = {
