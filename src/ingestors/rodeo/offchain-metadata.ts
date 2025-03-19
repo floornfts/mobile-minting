@@ -39,7 +39,7 @@ export const getRodeoMintByAddressAndChain = async (
 ) => {
   let response: AxiosResponse;
   try {
-    const url = 'https://api-v2.foundation.app/electric/v2/graphql';
+    const url = 'https://api.rodeo.club/graphql';
 
     const headers = {
       Accept: '*/*',
@@ -192,6 +192,10 @@ export const rodeoSupports = async (
   resources: MintIngestorResources,
 ): Promise<boolean> => {
   const { chainId, contractAddress, tokenId } = contract;
-  const exists = await getRodeoMintByAddressAndChain(resources, chainId, contractAddress, tokenId as string);
-  return !!exists;
+  try {
+    const exists = await getRodeoMintByAddressAndChain(resources, chainId, contractAddress, tokenId as string);
+    return !!exists;
+  } catch (error) {
+    return false;
+  }
 };
