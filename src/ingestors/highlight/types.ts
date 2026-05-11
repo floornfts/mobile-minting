@@ -10,47 +10,46 @@ export type Collection = {
   chainId: number;
   status: string;
   baseUri: string;
+  creatorAddresses?: {
+    address: string;
+    name: string | null;
+  }[];
+  creatorAccountSettings?: {
+    displayAvatar?: string | null;
+    displayName?: string | null;
+    walletAddresses?: string[];
+  } | null;
+  mintVectors?: HighlightMintVector[];
 };
 
-export type CollectionByAddress1 = {
-  chainId: number;
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  contractDeployedAt: string;
+export type HighlightMintVector = {
   name: string;
-  image: string;
-  symbol: string;
+  start: string;
+  end: string | null;
+  paused: boolean;
+  price: string;
+  currency: string;
+  chainId: number;
+  onchainMintVectorId: string | null;
+  paymentCurrency?: {
+    address: string;
+    decimals: number;
+    symbol: string;
+    type: string;
+    mintFee: string | null;
+  } | null;
+};
+
+export type CollectionByAddress = {
+  id: string;
+  chainId: number;
+  name: string;
   description: string;
+  image: string;
   sampleImages: string[];
   creator: string;
-};
-
-export type CollectionByAddress2 = {
-  chainId: number;
   contract: string;
-  highlightCollection: {
-    // Vector id
-    id: string;
-    name: string;
-    owner: string;
-    imageUrl: string;
-    animationUrl: string;
-    address: string;
-  };
-};
-
-export type CollectionByAddress3 = {
-  collection: {
-    // Collection address
-    id: string;
-    name: string;
-    creator: string;
-    image: string;
-    animationUrl: string;
-    address: string;
-  };
   primaryContract: string;
+  mintVector: HighlightMintVector;
+  creatorAccountSettings?: Collection["creatorAccountSettings"];
 };
-
-export type CollectionByAddress = CollectionByAddress1 & CollectionByAddress2 & CollectionByAddress3;

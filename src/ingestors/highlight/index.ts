@@ -2,38 +2,59 @@ import { MintContractOptions, MintIngestor, MintIngestorResources } from '../../
 import { MintIngestionErrorName, MintIngestorError } from '../../lib/types/mint-ingestor-error';
 import { MintInstructionType, MintTemplate } from '../../lib/types/mint-template';
 import { MintTemplateBuilder } from '../../lib/builder/mint-template-builder';
-import { getHighlightMetadata, getHighlightMintPriceInWei } from './onchain-metadata';
 import {
   getHighlightCollectionByAddress,
   getHighlightCollectionById,
-  getHighlightCollectionOwnerDetails,
-  getHighlightVectorId,
+  getHighlightCollectionIdByOnChainId,
+  getHighlightMintContractAddress,
+  getHighlightMintDataForCollection,
+  getHighlightMintVectorId,
+  getHighlightVectorPriceInWei,
+  isSupportedHighlightChain,
+  normalizeHighlightOnChainCollectionId,
 } from './offchain-metadata';
 import { MINT_CONTRACT_ABI } from './abi';
+import { CollectionByAddress } from './types';
 
-const CONTRACT_ADDRESS = '0x8087039152c472Fa74F47398628fF002994056EA';
+const HIGHLIGHT_HOSTS = new Set(['highlight.xyz', 'www.highlight.xyz']);
+const DEFAULT_END_TIMESTAMP_SECONDS = 1893456000;
+
+const getHighlightMintIdFromUrl = (url: string): string | undefined => {
+  try {
+    const parsedUrl = new URL(url);
+    if (!HIGHLIGHT_HOSTS.has(parsedUrl.hostname)) {
+      return undefined;
+    }
+
+    const [, mintPath, id] = parsedUrl.pathname.split('/');
+    if (mintPath !== 'mint' || !id) {
+      return undefined;
+    }
+
+    return decodeURIComponent(id);
+  } catch (error) {}
+};
+
+const getTimestampSeconds = (value: string, fieldName: string): number => {
+  const timestamp = Date.parse(value);
+  if (Number.isNaN(timestamp)) {
+    throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, `${fieldName} not available`);
+  }
+  return Math.floor(timestamp / 1000);
+};
 
 export class HighlightIngestor implements MintIngestor {
   async supportsUrl(resources: MintIngestorResources, url: string): Promise<boolean> {
-    const id = url.split('/').pop();
-    if (!id) {
+    const collection = await this.getCollectionFromUrl(resources, url);
+    if (!collection) {
       return false;
     }
 
-    const collection = await getHighlightCollectionById(resources, id);
-
-    if (!collection || collection.chainId !== 8453) {
-      return false;
-    }
-
-    const urlPattern = /^https:\/\/highlight\.xyz\/mint\/[a-f0-9]{24}$/;
-    return (
-      new URL(url).hostname === 'www.highlight.xyz' || new URL(url).hostname === 'highlight.xyz' || urlPattern.test(url)
-    );
+    return !!getHighlightMintDataForCollection(collection);
   }
 
   async supportsContract(resources: MintIngestorResources, contractOptions: MintContractOptions): Promise<boolean> {
-    if (contractOptions.chainId !== 8453) {
+    if (!isSupportedHighlightChain(contractOptions.chainId)) {
       return false;
     }
     const collection = await getHighlightCollectionByAddress(resources, contractOptions);
@@ -47,28 +68,61 @@ export class HighlightIngestor implements MintIngestor {
     resources: MintIngestorResources,
     contractOptions: MintContractOptions,
   ): Promise<MintTemplate> {
-    const mintBuilder = new MintTemplateBuilder()
-      .setMintInstructionType(MintInstructionType.EVM_MINT)
-      .setPartnerName('Highlight');
-
-    if (contractOptions.url) {
-      mintBuilder.setMarketingUrl(contractOptions.url);
-    }
-
     const collection = await getHighlightCollectionByAddress(resources, contractOptions);
 
     if (!collection) {
       throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Collection not found');
     }
 
-    const contractAddress = collection.contract;
+    return this.buildMintTemplate(collection, contractOptions.url);
+  }
+
+  async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
+    const collection = await this.getCollectionFromUrl(resources, url);
+    const mintData = collection ? getHighlightMintDataForCollection(collection) : undefined;
+
+    if (!mintData) {
+      throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
+    }
+
+    return this.buildMintTemplate(mintData, url);
+  }
+
+  private async getCollectionFromUrl(resources: MintIngestorResources, url: string) {
+    const id = getHighlightMintIdFromUrl(url);
+    if (!id) {
+      return undefined;
+    }
+
+    if (/^[a-f0-9]{24}$/i.test(id)) {
+      return getHighlightCollectionById(resources, id);
+    }
+
+    const onChainId = normalizeHighlightOnChainCollectionId(id);
+    if (!onChainId) {
+      return undefined;
+    }
+
+    const collectionId = await getHighlightCollectionIdByOnChainId(resources, onChainId);
+    if (!collectionId) {
+      return undefined;
+    }
+
+    return getHighlightCollectionById(resources, collectionId);
+  }
+
+  private buildMintTemplate(collection: CollectionByAddress, url: string | undefined): MintTemplate {
+    const mintBuilder = new MintTemplateBuilder()
+      .setMintInstructionType(MintInstructionType.EVM_MINT)
+      .setPartnerName('Highlight');
+
+    if (url) {
+      mintBuilder.setMarketingUrl(url);
+    }
+
     const description = collection?.description;
 
-    mintBuilder
-      .setName(collection.name)
-      .setDescription(description)
-      .setFeaturedImageUrl(collection.image.split('?')[0]);
-    mintBuilder.setMintOutputContract({ chainId: 8453, address: contractAddress });
+    mintBuilder.setName(collection.name).setDescription(description).setFeaturedImageUrl(collection.image.split('?')[0]);
 
     if (collection.sampleImages.length) {
       collection.sampleImages.forEach((url, index) => {
@@ -80,36 +134,40 @@ export class HighlightIngestor implements MintIngestor {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Error finding creator');
     }
 
-    const collectionId = collection.id || collection.highlightCollection?.id;
+    const collectionId = collection.id;
 
     if (!collectionId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Collection id not available');
     }
-    const creator = await getHighlightCollectionOwnerDetails(resources, collectionId);
-
     mintBuilder.setCreator({
-      name: creator?.creatorAccountSettings?.displayName || '',
+      name: collection.creatorAccountSettings?.displayName || '',
       walletAddress: collection.creator,
-      imageUrl: creator?.creatorAccountSettings?.displayAvatar,
+      imageUrl: collection.creatorAccountSettings?.displayAvatar,
     });
 
-    mintBuilder.setMintOutputContract({ chainId: 8453, address: collection.primaryContract });
+    mintBuilder.setMintOutputContract({ chainId: collection.chainId, address: collection.primaryContract });
 
-    const vectorId = await getHighlightVectorId(resources, collectionId);
+    const vectorId = getHighlightMintVectorId(collection.mintVector);
 
     if (!vectorId) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Id not available');
     }
 
-    const totalPriceWei = await getHighlightMintPriceInWei(+vectorId, resources.alchemy);
+    const totalPriceWei = getHighlightVectorPriceInWei(collection.mintVector);
 
     if (!totalPriceWei) {
       throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Price not available');
     }
 
+    const mintContractAddress = getHighlightMintContractAddress(collection.mintVector);
+
+    if (!mintContractAddress) {
+      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Mint contract not available');
+    }
+
     mintBuilder.setMintInstructions({
-      chainId: 8453,
-      contractAddress: CONTRACT_ADDRESS,
+      chainId: collection.chainId,
+      contractAddress: mintContractAddress,
       contractMethod: 'vectorMint721',
       contractParams: `[${vectorId}, quantity, address]`,
       abi: MINT_CONTRACT_ABI,
@@ -117,48 +175,18 @@ export class HighlightIngestor implements MintIngestor {
       supportsQuantity: true,
     });
 
-    const metadata = await getHighlightMetadata(+vectorId, resources.alchemy);
-
-    if (!metadata) {
-      throw new MintIngestorError(MintIngestionErrorName.MissingRequiredData, 'Missing timestamps');
-    }
-
-    const { startTimestamp, endTimestamp } = metadata;
+    const { mintVector } = collection;
+    const startTimestamp = getTimestampSeconds(mintVector.start, 'Start date');
+    const endTimestamp = mintVector.end
+      ? getTimestampSeconds(mintVector.end, 'End date')
+      : DEFAULT_END_TIMESTAMP_SECONDS;
 
     const liveDate = +new Date() > startTimestamp * 1000 ? new Date() : new Date(startTimestamp * 1000);
     mintBuilder
-      .setAvailableForPurchaseStart(new Date(startTimestamp * 1000 || Date.now()))
-      .setAvailableForPurchaseEnd(new Date(endTimestamp * 1000 || '2030-01-01'))
+      .setAvailableForPurchaseStart(new Date(startTimestamp * 1000))
+      .setAvailableForPurchaseEnd(new Date(endTimestamp * 1000))
       .setLiveDate(liveDate);
 
     return mintBuilder.build();
-  }
-
-  async createMintTemplateForUrl(resources: MintIngestorResources, url: string): Promise<MintTemplate> {
-    const isCompatible = await this.supportsUrl(resources, url);
-    if (!isCompatible) {
-      throw new MintIngestorError(MintIngestionErrorName.IncompatibleUrl, 'Incompatible URL');
-    }
-
-    // Example URL: https://highlight.xyz/mint/665fa33f07b3436991e55632
-    const splits = url.split('/');
-    const id = splits.pop();
-    const chain = splits.pop();
-
-    if (!id) {
-      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'Url error');
-    }
-
-    const collection = await getHighlightCollectionById(resources, id);
-
-    if (!collection) {
-      throw new MintIngestorError(MintIngestionErrorName.CouldNotResolveMint, 'No such collection');
-    }
-
-    return this.createMintForContract(resources, {
-      chainId: collection.chainId,
-      contractAddress: collection.address,
-      url,
-    });
   }
 }

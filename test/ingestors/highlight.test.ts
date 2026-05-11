@@ -15,6 +15,7 @@ describe('highlight', function () {
       successUrls: [
         'https://highlight.xyz/mint/66856628ff8a01fdccc132f4',
         'https://highlight.xyz/mint/66d03b0eaae45d4534822482',
+        'https://highlight.xyz/mint/ethereum%3A0x17747Ba2c75CF60d274BCD36210A5b4408A18A6E%3A0',
       ],
       failureUrls: [
         'https://highlight.xyz/mint/66963c500b48236f1acf322b',
@@ -23,6 +24,7 @@ describe('highlight', function () {
       successContracts: [
         { chainId: 8453, contractAddress: '0x0E5DDe3De7cf2761d8a81Ee68F48410425e2dBbA' },
         { chainId: 8453, contractAddress: '0x7022a51D648CEB4f4D290a81A0E543979a003e86' },
+        { chainId: 1, contractAddress: '0x17747Ba2c75CF60d274BCD36210A5b4408A18A6E' },
       ],
       failureContracts: [{ chainId: 5000, contractAddress: '0x62F8C536De24ED32611f128f64F6eAbd9b82176c' }],
     },
@@ -71,7 +73,7 @@ describe('highlight', function () {
     expect(mintInstructions.priceWei).to.equal('800000000000000');
 
     expect(template.featuredImageUrl).to.equal(
-      'https://img.reservoir.tools/images/v2/base/z9JRSpLYGu7%2BCZoKWtAuAI37ZMpGmBWtUpAQDl1tI6DEJRvIrkDVCqzOxkdek%2BfesLtA3sYS0SXZeU4voi8R9rQD1uumcaPxveg8%2B3UfVgFBR82zeA%2FzrfIHHRUbhHMTK4V08qvpcJ5dRYdYVwRvZPTKTulv78c%2FB6vgLUkdfSX0ND53Mjp2wUysnfKmYO5rOIxPwl1ACpM%2BOQDWOOSOzg%3D%3D',
+      'https://highlight-creator-assets.highlight.xyz/main/image/ecc4d99e-72e5-4bf4-a823-4e8ebca2dce5.png',
     );
 
     if (template.creator) {
@@ -107,7 +109,7 @@ describe('highlight', function () {
     expect(mintInstructions.priceWei).to.equal('800000000000000');
 
     expect(template.featuredImageUrl).to.equal(
-      'https://img.reservoir.tools/images/v2/base/z9JRSpLYGu7%2BCZoKWtAuAKM5v2dthdDNgoFYsopVhfXBHjSfVbMXHiaW1XsdogS5oNzhOcvyJcxoIKiiKqHsNxiXyJX%2B%2BppNtkeQvHYCslZTqG21HhITlOtTV8jhhZhOQdWST4CHb1DA%2B5K8ZAHTSu9b0MV4dWJJsqPVJ439DhVcURxmw1fKJ4pAhC3iCwl1DOXK1xnEOnLO0il04rMAPA%3D%3D',
+      'https://highlight-creator-assets.highlight.xyz/main/image/085fb994-dc1d-4bc3-9c9e-7ab06c024935.gif',
     );
 
     if (template.creator) {
@@ -120,6 +122,43 @@ describe('highlight', function () {
 
     expect(template.marketingUrl).to.equal(url);
     expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2024-06-20T17:00:04.000Z'));
+    expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2030-01-01T00:00:00.000Z'));
+  });
+
+  it('createMintTemplateForUrl: Returns a mint template for a supported Ethereum URL', async function () {
+    const ingestor = new HighlightIngestor();
+    const url = 'https://highlight.xyz/mint/ethereum:0x17747Ba2c75CF60d274BCD36210A5b4408A18A6E:0';
+    const resources = mintIngestorResources();
+    const template = await ingestor.createMintTemplateForUrl(resources, url);
+
+    const builder = new MintTemplateBuilder(template);
+    builder.validateMintTemplate();
+
+    expect(template.name).to.equal('Cosmic Communications');
+    expect(template.description).to.contain('Cosmic Communications continues with my Cosmic series');
+    const mintInstructions = template.mintInstructions as EVMMintInstructions;
+
+    expect(mintInstructions.chainId).to.equal(1);
+    expect(mintInstructions.contractAddress.toLowerCase()).to.equal('0x1bf979282181f2b7a640d17aB5D2e25125F2de5e'.toLowerCase());
+    expect(template.mintOutputContract?.address.toLowerCase()).to.equal('0x17747Ba2c75CF60d274BCD36210A5b4408A18A6E'.toLowerCase());
+    expect(mintInstructions.contractMethod).to.equal('vectorMint721');
+    expect(mintInstructions.contractParams).to.equal('[18, quantity, address]');
+    expect(mintInstructions.priceWei).to.equal('35800000000000000');
+
+    expect(template.featuredImageUrl).to.equal(
+      'https://highlight-creator-assets.highlight.xyz/main/image/8c8773ad-b501-4ca1-994b-72242308e767.jpeg',
+    );
+
+    if (template.creator) {
+      expect(template.creator.name).to.equal('markwebster');
+      expect(template.creator.walletAddress).to.equal('0x21ae441387c6bd5a4f9cb110684ba28761aa5a6d');
+      expect(template.creator.imageUrl).to.equal(
+        'https://highlight-creator-assets.highlight.xyz/main/image/9dfea465-d598-4ae8-a15a-9046c5f0a802.jpeg',
+      );
+    }
+
+    expect(template.marketingUrl).to.equal(url);
+    expect(template.availableForPurchaseStart?.getTime()).to.equal(+new Date('2023-09-26T16:00:00.000Z'));
     expect(template.availableForPurchaseEnd?.getTime()).to.equal(+new Date('2030-01-01T00:00:00.000Z'));
   });
 });
